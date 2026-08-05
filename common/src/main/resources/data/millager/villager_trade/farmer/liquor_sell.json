@@ -1,0 +1,16 @@
+{
+  "wants": {
+    "id": "minecraft:emerald",
+    "count": { "type": "minecraft:uniform", "min": 1.0, "max": 3.0 }
+  },
+  "gives": { "id": "millager:liquor" },
+  "given_item_modifiers": [
+    {
+      "function": "minecraft:set_count",
+      "count": { "type": "minecraft:uniform", "min": 2.0, "max": 4.0 }
+    }
+  ],
+  "max_uses": 12.0,
+  "xp": 10.0,
+  "reputation_discount": 0.05
+}

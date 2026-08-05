@@ -1,0 +1,18 @@
+{
+    "type": "minecraft:crafting_shaped",
+    "pattern": [
+        "#F",
+        "MB"
+    ],
+    "key": {
+        "#": "minecraft:string",
+        "F": "minecraft:feather",
+        "M": "millager:liquor",
+        "B": "minecraft:blaze_powder"
+    },
+    "result": {
+        "id": "millager:molotov_cocktail",
+        "count": 2
+    },
+    "group": "millager_molotov_cocktail"
+}

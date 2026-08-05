@@ -1,0 +1,68 @@
+{
+	"model": {
+		"type": "minecraft:select",
+		"property": "minecraft:display_context",
+		"cases": [
+			{
+				"when": [
+					"thirdperson_lefthand",
+					"firstperson_lefthand"
+				],
+				"model": {
+					"type": "minecraft:composite",
+					"models": [
+						{ "type": "minecraft:model", "model": "millager:laser_gun_left/0" },
+						{ "type": "minecraft:model", "model": "millager:laser_gun_left/1" },
+						{ "type": "minecraft:model", "model": "millager:laser_gun_left/2" },
+						{ "type": "minecraft:model", "model": "millager:laser_gun_left/3" },
+						{ "type": "minecraft:model", "model": "millager:laser_gun_left/4" },
+						{ "type": "minecraft:model", "model": "millager:laser_gun_left/5" },
+						{ "type": "minecraft:model", "model": "millager:laser_gun_left/6" },
+						{ "type": "minecraft:model", "model": "millager:laser_gun_left/7" },
+						{ "type": "minecraft:model", "model": "millager:laser_gun_left/8" },
+						{ "type": "minecraft:model", "model": "millager:laser_gun_left/9" },
+						{ "type": "minecraft:model", "model": "millager:laser_gun_left/10" },
+						{ "type": "minecraft:model", "model": "millager:laser_gun_left/11" },
+						{ "type": "minecraft:model", "model": "millager:laser_gun_left/12" },
+						{ "type": "minecraft:model", "model": "millager:laser_gun_left/13" },
+						{ "type": "minecraft:model", "model": "millager:laser_gun_left/14" },
+						{ "type": "minecraft:model", "model": "millager:laser_gun_left/15" },
+						{ "type": "minecraft:model", "model": "millager:laser_gun_left/16" }
+					]
+				}
+			},
+			{
+				"when": [
+					"thirdperson_righthand",
+					"firstperson_righthand"
+				],
+				"model": {
+					"type": "minecraft:composite",
+					"models": [
+						{ "type": "minecraft:model", "model": "millager:laser_gun/0" },
+						{ "type": "minecraft:model", "model": "millager:laser_gun/1" },
+						{ "type": "minecraft:model", "model": "millager:laser_gun/2" },
+						{ "type": "minecraft:model", "model": "millager:laser_gun/3" },
+						{ "type": "minecraft:model", "model": "millager:laser_gun/4" },
+						{ "type": "minecraft:model", "model": "millager:laser_gun/5" },
+						{ "type": "minecraft:model", "model": "millager:laser_gun/6" },
+						{ "type": "minecraft:model", "model": "millager:laser_gun/7" },
+						{ "type": "minecraft:model", "model": "millager:laser_gun/8" },
+						{ "type": "minecraft:model", "model": "millager:laser_gun/9" },
+						{ "type": "minecraft:model", "model": "millager:laser_gun/10" },
+						{ "type": "minecraft:model", "model": "millager:laser_gun/11" },
+						{ "type": "minecraft:model", "model": "millager:laser_gun/12" },
+						{ "type": "minecraft:model", "model": "millager:laser_gun/13" },
+						{ "type": "minecraft:model", "model": "millager:laser_gun/14" },
+						{ "type": "minecraft:model", "model": "millager:laser_gun/15" },
+						{ "type": "minecraft:model", "model": "millager:laser_gun/16" }
+					]
+				}
+			}
+		],
+		"fallback": {
+			"type": "minecraft:model",
+			"model": "millager:item/laser_gun"
+		}
+	}
+}

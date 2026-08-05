@@ -1,0 +1,38 @@
+{
+  "required": true,
+  "package": "org.lzyzl.millager.mixin",
+  "compatibilityLevel": "JAVA_25",
+  "refmap": "millager.refmap.json",
+  "mixins": [
+    "AllyHurtMixin",
+    "BucklerMixin",
+    "GameRuleDefaultAccessor",
+    "HorseDespawnMixin",
+    "IronGolemMixin",
+    "MillagerFactionMixin",
+    "MinecraftServerMixin",
+    "NoteBlockInstrumentInvoker",
+    "NoteBlockInstrumentMixin",
+    "PatrolSpawnerMixin",
+    "RaidDefenderMixin",
+    "ServerPlayerTotemMixin",
+    "StructureTemplatePoolAccessor",
+    "VillagerMixin",
+    "ZombieHealMixin",
+    "ZombieKillMixin"
+  ],
+  "client": [
+    "client.GameRendererInvoker",
+    "client.GameRendererMixin",
+    "client.HorseRenderStateMixin",
+    "client.HorseRendererMixin",
+    "client.HorseMarkingLayerMixin",
+    "client.SkullBlockRendererMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  },
+  "overwrites": {
+    "requireAnnotations": true
+  }
+}

@@ -1,0 +1,31 @@
+{
+  "wants": {
+    "id": "minecraft:emerald",
+    "count": { "type": "minecraft:uniform", "min": 3.0, "max": 5.0 }
+  },
+  "gives": { "id": "minecraft:map" },
+  "given_item_modifiers": [
+    {
+      "function": "minecraft:exploration_map",
+      "destination": "millager:on_outpost_exploder_maps",
+      "decoration": "minecraft:target_point",
+      "search_radius": 100
+    },
+    {
+      "function": "minecraft:set_name",
+      "name": { "translate": "filled_map.pillager_outpost" },
+      "target": "item_name"
+    },
+    {
+      "function": "minecraft:filtered",
+      "item_filter": {
+        "items": "minecraft:filled_map",
+        "predicates": { "minecraft:map_id": {} }
+      },
+      "on_fail": { "function": "minecraft:discard" }
+    }
+  ],
+  "max_uses": 3.0,
+  "xp": 1.0,
+  "reputation_discount": 0.2
+}

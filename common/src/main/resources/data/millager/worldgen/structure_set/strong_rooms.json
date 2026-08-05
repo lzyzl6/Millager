@@ -1,0 +1,14 @@
+{
+  "structures": [
+    {
+      "structure": "millager:strong_room",
+      "weight": 1
+    }
+  ],
+  "placement": {
+    "type": "minecraft:random_spread",
+    "spacing": 96,
+    "separation": 16,
+    "salt": 513942687
+  }
+}

@@ -1,0 +1,28 @@
+{
+  "parent": "millager:husbandry/elixir_drink",
+  "display": {
+    "icon": {
+      "id": "minecraft:emerald_block"
+    },
+    "title": {
+      "translate": "advancements.millager.heal_nitwit.title"
+    },
+    "description": {
+      "translate": "advancements.millager.heal_nitwit.description"
+    },
+    "frame": "challenge",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": true
+  },
+  "criteria": {
+    "healed": {
+      "trigger": "millager:heal_nitwit"
+    }
+  },
+  "requirements": [
+    [
+      "healed"
+    ]
+  ]
+}

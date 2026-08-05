@@ -1,0 +1,18 @@
+{
+    "type": "minecraft:crafting_shaped",
+    "pattern": [
+        "#A#",
+        "ATA",
+        "#A#"
+    ],
+    "key": {
+        "#": "minecraft:yellow_dye",
+        "A": "minecraft:arrow",
+        "T": "minecraft:tnt"
+    },
+    "result": {
+        "id" : "millager:explosive_arrow",
+        "count": 4
+    },
+    "group": "millager_explosive_arrow"
+}

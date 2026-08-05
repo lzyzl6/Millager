@@ -1,0 +1,233 @@
+{
+  "entity.villager.work_commander": {
+    "subtitle": "sound.millager.entity.villager.work_commander",
+    "sounds": [
+      {
+        "name": "millager:chessdrop_1",
+        "weight": 1,
+        "volume": 1.0
+      },
+      {
+        "name": "millager:chessdrop_2",
+        "weight": 1,
+        "volume": 1.0
+      },
+      {
+        "name": "millager:chessdrop_3",
+        "weight": 1,
+        "volume": 1.0
+      }
+    ]
+  },
+  "totem_infuse": {
+    "subtitle": "sound.millager.block.totem_infuser.infuse",
+    "sounds": [
+      {
+        "name": "millager:totem_infuse_ascending",
+        "weight": 1,
+        "volume": 1.0
+      },
+      {
+        "name": "millager:totem_infuse_descending",
+        "weight": 1,
+        "volume": 1.0
+      },
+      {
+        "name": "millager:totem_infuse_normal",
+        "weight": 1,
+        "volume": 1.0
+      }
+    ]
+  },
+  "quaffing": {
+    "subtitle": "sound.millager.quaffing",
+    "sounds": [
+      {
+        "name": "millager:quaffing_deep",
+        "weight": 1,
+        "volume": 1.2
+      },
+      {
+        "name": "millager:quaffing_fast",
+        "weight": 1,
+        "volume": 1.0
+      },
+      {
+        "name": "millager:quaffing_normal",
+        "weight": 4,
+        "volume": 2
+      }
+    ]
+  },
+  "reinforce_horn": {
+    "subtitle": "sound.millager.reinforce_horn",
+    "sounds": [
+      {
+        "type": "event",
+        "name": "minecraft:item.goat_horn.sound.3"
+      }
+    ]
+  },
+  "item.muster_order.start": {
+    "subtitle": "sound.millager.item.muster_order.start",
+    "sounds": [
+      {
+        "type": "event",
+        "name": "minecraft:entity.evoker.cast_spell"
+      }
+    ]
+  },
+  "item.muster_order.complete": {
+    "subtitle": "sound.millager.item.muster_order.complete",
+    "sounds": [
+      {
+        "type": "event",
+        "name": "minecraft:entity.evoker.cast_spell"
+      }
+    ]
+  },
+  "item.profession_order.break": {
+    "subtitle": "sound.millager.item.profession_order.break",
+    "sounds": [
+      {
+        "type": "event",
+        "name": "minecraft:block.enchantment_table.use"
+      }
+    ]
+  },
+  "entity.archer.crafting_arrow": {
+    "subtitle": "sound.millager.entity.archer.crafting_arrow",
+    "sounds": [
+      {
+        "type": "event",
+        "name": "minecraft:entity.villager.work_fletcher"
+      }
+    ]
+  },
+  "entity.archer.drinking_potion": {
+    "subtitle": "sound.millager.entity.archer.drinking_potion",
+    "sounds": [
+      {
+        "type": "event",
+        "name": "minecraft:entity.wandering_trader.drink_potion"
+      }
+    ]
+  },
+  "entity.bee_golem.glass_break": {
+    "subtitle": "sound.millager.entity.bee_golem.glass_break",
+    "sounds": [
+      {
+        "type": "event",
+        "name": "minecraft:block.glass.break"
+      }
+    ]
+  },
+  "entity.bee_golem.wax_break": {
+    "subtitle": "sound.millager.entity.bee_golem.wax_break",
+    "sounds": [
+      {
+        "type": "event",
+        "name": "minecraft:block.candle.break"
+      }
+    ]
+  },
+  "entity.bee_golem.burst_out": {
+    "subtitle": "sound.millager.entity.bee_golem.burst_out",
+    "sounds": [
+      {
+        "type": "event",
+        "name": "minecraft:entity.bee.sting"
+      }
+    ]
+  },
+  "entity.bee_golem.hurt": {
+    "subtitle": "sound.millager.entity.bee_golem.hurt",
+    "sounds": [
+      {
+        "type": "event",
+        "name": "minecraft:entity.generic.hurt"
+      }
+    ]
+  },
+  "entity.doctor.drinking_potion": {
+    "subtitle": "sound.millager.entity.doctor.drinking_potion",
+    "sounds": [
+      {
+        "type": "event",
+        "name": "minecraft:entity.wandering_trader.drink_potion"
+      }
+    ]
+  },
+  "entity.lancer.cast_spell": {
+    "subtitle": "sound.millager.entity.lancer.cast_spell",
+    "sounds": [
+      {
+        "type": "event",
+        "name": "minecraft:entity.evoker.cast_spell"
+      }
+    ]
+  },
+  "entity.swordmaster.shield_block": {
+    "subtitle": "sound.millager.entity.swordmaster.shield_block",
+    "sounds": [
+      {
+        "type": "event",
+        "name": "minecraft:item.shield.block"
+      }
+    ]
+  },
+  "entity.mauler.fixing": {
+    "subtitle": "sound.millager.entity.mauler.fixing",
+    "sounds": [
+      {
+        "type": "event",
+        "name": "minecraft:entity.villager.work_toolsmith"
+      }
+    ]
+  },
+  "entity.rioter.taunting": {
+    "subtitle": "sound.millager.entity.rioter.taunting",
+    "sounds": [
+      {
+        "type": "event",
+        "name": "minecraft:item.shield.block"
+      }
+    ]
+  },
+  "entity.breacher.shield_bash": {
+    "subtitle": "sound.millager.entity.breacher.shield_bash",
+    "sounds": [
+      {
+        "type": "event",
+        "name": "minecraft:entity.player.attack.crit"
+      }
+    ]
+  },
+  "block.note_block.imitate.villager": {
+    "subtitle": "subtitles.entity.villager.ambient",
+    "sounds": [
+      {
+        "type": "event",
+        "name": "minecraft:entity.villager.ambient"
+      }
+    ]
+  },
+  "block.note_block.imitate.illager": {
+    "subtitle": "subtitles.entity.pillager.ambient",
+    "sounds": [
+      {
+        "type": "event",
+        "name": "minecraft:entity.pillager.ambient"
+      }
+    ]
+  },
+  "block.rose.wilt": {
+    "subtitle": "sound.millager.block.rose.wilt",
+    "sounds": [
+      {
+        "type": "event",
+          "name": "minecraft:particle.soul_escape"
+      }
+    ]
+  }
+}

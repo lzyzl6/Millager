@@ -1,0 +1,6 @@
+{
+  "parent": "millager:block/template_fire_side",
+  "textures": {
+    "fire": "minecraft:block/fire_0"
+  }
+}

@@ -1,0 +1,7 @@
+{
+  "type": "millager:trading_hall",
+  "biomes": "#millager:has_structure/trading_hall",
+  "step": "surface_structures",
+  "terrain_adaptation": "beard_thin",
+  "spawn_overrides": {}
+}

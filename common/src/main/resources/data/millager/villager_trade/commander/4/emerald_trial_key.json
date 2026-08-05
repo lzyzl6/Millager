@@ -1,0 +1,10 @@
+{
+  "wants": {
+    "id": "minecraft:emerald",
+    "count": { "type": "minecraft:uniform", "min": 13.0, "max": 16.0 }
+  },
+  "gives": { "id": "minecraft:trial_key" },
+  "max_uses": 3.0,
+  "xp": 15.0,
+  "reputation_discount": 0.2
+}

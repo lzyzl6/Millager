@@ -1,0 +1,75 @@
+{
+  "values": [
+    "minecraft:forest",
+    "minecraft:flower_forest",
+    {
+      "id": "#c:flower_forests",
+      "required": false
+    },
+    {
+      "id": "#forge:flower_forests",
+      "required": false
+    },
+    "minecraft:birch_forest",
+    "minecraft:old_growth_birch_forest",
+    {
+      "id": "#c:birch_forest",
+      "required": false
+    },
+    {
+      "id": "#forge:birch_forest",
+      "required": false
+    },
+    "minecraft:dark_forest",
+    "minecraft:meadow",
+    "minecraft:cherry_grove",
+    "minecraft:snowy_slopes",
+    "minecraft:grove",
+    "#minecraft:is_taiga",
+    {
+      "id": "#c:taiga",
+      "required": false
+    },
+    {
+      "id": "#forge:taiga",
+      "required": false
+    },
+    "minecraft:plains",
+    "minecraft:sunflower_plains",
+    {
+      "id": "#c:plains",
+      "required": false
+    },
+    {
+      "id": "#forge:plains",
+      "required": false
+    },
+    "minecraft:snowy_plains",
+    {
+      "id": "#c:snowy_plains",
+      "required": false
+    },
+    {
+      "id": "#forge:snowy_plains",
+      "required": false
+    },
+    "#minecraft:is_savanna",
+    {
+      "id": "#c:savanna",
+      "required": false
+    },
+    {
+      "id": "#forge:savanna",
+      "required": false
+    },
+    "minecraft:desert",
+    {
+      "id": "#c:is_desert",
+      "required": false
+    },
+    {
+      "id": "#forge:is_desert",
+      "required": false
+    }
+  ]
+}
