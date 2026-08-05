@@ -1,0 +1,33 @@
+{
+  "parent": "minecraft:adventure/totem_of_undying",
+  "display": {
+    "icon": {
+      "id": "millager:totem_of_healing"
+    },
+    "title": {
+      "translate": "advancements.millager.multi_totem.title"
+    },
+    "description": {
+      "translate": "advancements.millager.multi_totem.description"
+    },
+    "frame": "goal",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "totems": {
+      "trigger": "millager:hold_totems",
+      "conditions": {
+        "count": {
+          "min": 2
+        }
+      }
+    }
+  },
+  "requirements": [
+    [
+      "totems"
+    ]
+  ]
+}

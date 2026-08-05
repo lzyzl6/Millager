@@ -1,0 +1,13 @@
+{
+  "asset_id": "millager:how_to_make_a_molotov_cocktail",
+  "author": {
+    "color": "gray",
+    "translate": "painting.millager.how_to_make_a_molotov_cocktail.author"
+  },
+  "height": 4,
+  "title": {
+    "color": "yellow",
+    "translate": "painting.millager.how_to_make_a_molotov_cocktail.title"
+  },
+  "width": 4
+}

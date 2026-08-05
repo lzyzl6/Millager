@@ -1,0 +1,19 @@
+{
+  "replace" : false,
+  "values": [
+    "minecraft:villager",
+    "minecraft:wandering_trader",
+    "millager:doctor",
+    "millager:lancer",
+    "millager:archer",
+    "millager:breacher",
+    "millager:swordmaster",
+    "millager:mauler",
+    "millager:rioter",
+    "millager:scouter",
+    {
+      "id": "guardvillagers:guard",
+      "required": false
+    }
+  ]
+}

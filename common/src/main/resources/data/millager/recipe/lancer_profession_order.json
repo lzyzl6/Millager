@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    " E ",
+    "APB",
+    " C "
+  ],
+  "key": {
+    "E": "minecraft:emerald_block",
+    "P": "minecraft:paper",
+    "A": "minecraft:iron_spear",
+    "B": "minecraft:book",
+    "C": "minecraft:chainmail_chestplate"
+  },
+  "result": {
+    "id": "millager:lancer_profession_order",
+    "count": 1
+  }
+}

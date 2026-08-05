@@ -1,0 +1,13 @@
+{
+    "type": "minecraft:crafting_shapeless",
+    "ingredients": [
+        "minecraft:tnt",
+        "minecraft:stick",
+        "minecraft:string"
+    ],
+    "result": {
+        "id": "millager:tnt_on_a_stick",
+        "count": 1
+    },
+    "group": "millager_tnt_on_a_stick"
+}

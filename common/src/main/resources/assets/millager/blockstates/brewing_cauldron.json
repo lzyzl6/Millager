@@ -1,0 +1,5 @@
+{
+  "variants": {
+    "": { "model": "millager:block/brewing_cauldron" }
+  }
+}

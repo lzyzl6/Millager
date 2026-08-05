@@ -1,0 +1,9 @@
+{
+  "replace": false,
+  "values": [
+    "millager:brewing_cauldron",
+    "millager:liquor_cauldron",
+    "millager:fake_iron_block",
+    "millager:totem_infuser"
+  ]
+}

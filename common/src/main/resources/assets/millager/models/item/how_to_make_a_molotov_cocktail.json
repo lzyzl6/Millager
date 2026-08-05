@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "millager:painting/how_to_make_a_molotov_cocktail"
+  }
+}
