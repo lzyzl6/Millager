@@ -1,0 +1,37 @@
+{
+  "parent": "minecraft:adventure/trade",
+  "display": {
+    "icon": {
+      "item": "millager:molotov_cocktail_plus"
+    },
+    "title": {
+      "translate": "advancements.millager.arms_trade.title"
+    },
+    "description": {
+      "translate": "advancements.millager.arms_trade.description"
+    },
+    "frame": "goal",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "traded": {
+      "trigger": "minecraft:villager_trade",
+      "conditions": {
+        "item": {
+          "items": [
+            "millager:tnt_on_a_stick",
+            "millager:molotov_cocktail",
+            "millager:golem_amber"
+          ]
+        }
+      }
+    }
+  },
+  "requirements": [
+    [
+      "traded"
+    ]
+  ]
+}

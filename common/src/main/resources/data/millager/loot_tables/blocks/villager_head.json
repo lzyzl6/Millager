@@ -1,0 +1,28 @@
+{
+  "type": "minecraft:block",
+  "pools": [
+    {
+      "bonus_rolls": 0.0,
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "functions": [
+            {
+              "function": "minecraft:copy_nbt",
+              "source": "block_entity",
+              "ops": [
+                {
+                  "source": "CustomName",
+                  "target": "display.Name",
+                  "op": "replace"
+                }
+              ]
+            }
+          ],
+          "name": "millager:villager_head"
+        }
+      ],
+      "rolls": 1.0
+    }
+  ]
+}

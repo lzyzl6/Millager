@@ -1,0 +1,43 @@
+{
+  "replace" : false,
+  "type": "minecraft:entity",
+  "pools": [
+    {
+      "bonus_rolls": 0.0,
+      "entries": [
+        {
+          "type": "minecraft:alternatives",
+          "children": [
+            {
+              "type": "minecraft:loot_table",
+              "conditions": [
+                {
+                  "condition": "minecraft:entity_properties",
+                  "entity": "this",
+                  "predicate": {
+                    "type": "#minecraft:villagers"
+                  }
+                }
+              ],
+              "name": "millager:charged_creeper/villager"
+            },
+            {
+              "type": "minecraft:loot_table",
+              "conditions": [
+                {
+                  "condition": "minecraft:entity_properties",
+                  "entity": "this",
+                  "predicate": {
+                    "type": "#minecraft:illagers"
+                  }
+                }
+              ],
+              "name": "millager:charged_creeper/illager"
+            }
+          ]
+        }
+      ],
+      "rolls": 1.0
+    }
+  ]
+}

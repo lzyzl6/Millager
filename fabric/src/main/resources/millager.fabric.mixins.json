@@ -1,0 +1,15 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "org.lzyzl.millager.mixin.fabric",
+  "compatibilityLevel": "JAVA_17",
+  "refmap": "millager.refmap.json",
+  "mixins": [
+    "RioterExplosionMixin",
+    "StructureTemplateMixin"
+  ],
+  "client": [],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "millager:item/tnt_on_a_stick"
+  },
+  "overrides": [
+    {
+      "predicate": {
+        "millager:in_hand": 1
+      },
+      "model": "millager:item/tnt_on_a_stick_entity"
+    }
+  ]
+}

@@ -1,0 +1,35 @@
+plugins {
+    id 'multiloader-common'
+    id 'net.neoforged.moddev.legacyforge'
+}
+
+legacyForge {
+    mcpVersion = minecraft_version
+    def at = file('src/main/resources/META-INF/accesstransformer.cfg')
+    if (at.exists()) {
+        accessTransformers = [at.absolutePath]
+    }
+}
+
+dependencies {
+    compileOnly 'org.spongepowered:mixin:0.8.5'
+    implementation 'org.jspecify:jspecify:1.0.0'
+}
+
+sourceSets.main.resources.srcDir 'src/generated/resources'
+
+configurations {
+    commonJava {
+        canBeResolved = false
+        canBeConsumed = true
+    }
+    commonResources {
+        canBeResolved = false
+        canBeConsumed = true
+    }
+}
+
+artifacts.add('commonJava', sourceSets.main.java.sourceDirectories.singleFile)
+sourceSets.main.resources.srcDirs.each {
+    artifacts.add('commonResources', it)
+}

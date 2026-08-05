@@ -1,0 +1,22 @@
+{
+    "type": "minecraft:crafting_shaped",
+    "pattern": [
+        "RBP",
+        "WYG",
+        "OO#"
+    ],
+    "key": {
+        "R": { "item": "minecraft:red_dye" },
+        "B": { "item": "minecraft:blue_dye" },
+        "W": { "tag": "minecraft:wool" },
+        "Y": { "tag": "minecraft:stone_crafting_materials" },
+        "G": { "item": "minecraft:yellow_dye" },
+        "P": { "item": "minecraft:white_dye" },
+        "#": { "item": "minecraft:brown_dye" },
+        "O": { "item": "minecraft:dark_oak_log" }
+    },
+    "result": {
+        "item": "millager:sand_table",
+        "count": 1
+    }
+}

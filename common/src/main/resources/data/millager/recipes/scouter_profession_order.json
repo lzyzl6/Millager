@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    " E ",
+    "APB",
+    " C "
+  ],
+  "key": {
+    "E": { "item": "minecraft:emerald_block" },
+    "P": { "item": "minecraft:paper" },
+    "A": { "item": "minecraft:crossbow" },
+    "B": { "item": "minecraft:firework_rocket" },
+    "C": { "item": "minecraft:iron_horse_armor" }
+  },
+  "result": {
+    "item": "millager:scouter_profession_order",
+    "count": 1
+  }
+}

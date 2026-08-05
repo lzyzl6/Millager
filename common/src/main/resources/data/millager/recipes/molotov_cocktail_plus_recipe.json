@@ -1,0 +1,11 @@
+{
+    "type": "minecraft:crafting_shapeless",
+    "ingredients": [
+        { "item": "millager:molotov_cocktail" },
+        { "item": "minecraft:dragon_breath" }
+    ],
+    "result": {
+        "item": "millager:molotov_cocktail_plus",
+        "count": 2
+    }
+}

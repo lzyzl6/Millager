@@ -1,0 +1,40 @@
+{
+  "type": "minecraft:block",
+  "pools": [
+    {
+      "rolls": 1,
+      "entries": [
+        {
+          "type": "minecraft:alternatives",
+          "children": [
+            {
+              "type": "minecraft:item",
+              "name": "minecraft:rose_bush",
+              "conditions": [
+                { "condition": "minecraft:random_chance", "chance": 0.5 }
+              ]
+            },
+            {
+              "type": "minecraft:item",
+              "name": "millager:rose",
+              "functions": [
+                {
+                  "function": "minecraft:set_count",
+                  "count": { "type": "minecraft:uniform", "min": 2, "max": 4 }
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "conditions": [
+        {
+          "condition": "minecraft:block_state_property",
+          "block": "minecraft:rose_bush",
+          "properties": { "half": "lower" }
+        },
+        { "condition": "minecraft:survives_explosion" }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,33 @@
+{
+  "parent": "millager:adventure/tnt_kill",
+  "display": {
+    "icon": {
+      "item": "millager:tnt_on_a_stick"
+    },
+    "title": {
+      "translate": "advancements.millager.tnt_multikill.title"
+    },
+    "description": {
+      "translate": "advancements.millager.tnt_multikill.description"
+    },
+    "frame": "challenge",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "multikill": {
+      "trigger": "millager:tnt_kill",
+      "conditions": {
+        "count": {
+          "min": 6
+        }
+      }
+    }
+  },
+  "requirements": [
+    [
+      "multikill"
+    ]
+  ]
+}

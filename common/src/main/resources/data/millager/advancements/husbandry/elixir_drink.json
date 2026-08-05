@@ -1,0 +1,35 @@
+{
+  "parent": "minecraft:husbandry/root",
+  "display": {
+    "icon": {
+      "item": "millager:elixir"
+    },
+    "title": {
+      "translate": "advancements.millager.elixir_drink.title"
+    },
+    "description": {
+      "translate": "advancements.millager.elixir_drink.description"
+    },
+    "frame": "goal",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "drank": {
+      "trigger": "minecraft:consume_item",
+      "conditions": {
+        "item": {
+          "items": [
+            "millager:elixir"
+          ]
+        }
+      }
+    }
+  },
+  "requirements": [
+    [
+      "drank"
+    ]
+  ]
+}

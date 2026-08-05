@@ -1,0 +1,56 @@
+plugins {
+    id 'multiloader-loader'
+    id 'net.neoforged.moddev.legacyforge'
+}
+
+mixin {
+    add(sourceSets.main, "${mod_id}.refmap.json")
+    config("${mod_id}.mixins.json")
+    config("${mod_id}.forge.mixins.json")
+}
+
+legacyForge {
+    version = "${minecraft_version}-${forge_version}"
+    validateAccessTransformers = true
+
+    def at = project(':common').file('src/main/resources/META-INF/accesstransformer.cfg')
+    if (at.exists()) {
+        accessTransformers = [at.absolutePath]
+    }
+
+    runs {
+        client {
+            client()
+        }
+        data {
+            data()
+            programArguments.addAll '--mod', project.mod_id, '--all',
+                    '--output', rootProject.project(':common').file('src/generated/resources').absolutePath,
+                    '--existing', rootProject.project(':common').file('src/main/resources').absolutePath
+        }
+        server {
+            server()
+        }
+    }
+
+    mods {
+        "${mod_id}" {
+            sourceSet sourceSets.main
+        }
+    }
+}
+
+dependencies {
+    compileOnly 'org.jspecify:jspecify:1.0.0'
+    annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
+}
+
+jar {
+    manifest.attributes([
+            'MixinConfigs': "${mod_id}.mixins.json,${mod_id}.forge.mixins.json"
+    ])
+}
+
+processResources {
+    exclude 'millager.accesswidener'
+}

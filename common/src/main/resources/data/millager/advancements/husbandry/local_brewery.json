@@ -1,0 +1,74 @@
+{
+  "parent": "millager:husbandry/liquor_brew",
+  "display": {
+    "icon": {
+      "item": "minecraft:cauldron"
+    },
+    "title": {
+      "translate": "advancements.millager.local_brewery.title"
+    },
+    "description": {
+      "translate": "advancements.millager.local_brewery.description"
+    },
+    "frame": "goal",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "wheat_seeds": {
+      "trigger": "millager:brew_liquor",
+      "conditions": {
+        "ingredient": {
+          "items": [
+            "minecraft:wheat_seeds"
+          ]
+        }
+      }
+    },
+    "wheat": {
+      "trigger": "millager:brew_liquor",
+      "conditions": {
+        "ingredient": {
+          "items": [
+            "minecraft:wheat"
+          ]
+        }
+      }
+    },
+    "potato": {
+      "trigger": "millager:brew_liquor",
+      "conditions": {
+        "ingredient": {
+          "items": [
+            "minecraft:potato"
+          ]
+        }
+      }
+    },
+    "beetroot": {
+      "trigger": "millager:brew_liquor",
+      "conditions": {
+        "ingredient": {
+          "items": [
+            "minecraft:beetroot"
+          ]
+        }
+      }
+    }
+  },
+  "requirements": [
+    [
+      "wheat_seeds"
+    ],
+    [
+      "wheat"
+    ],
+    [
+      "potato"
+    ],
+    [
+      "beetroot"
+    ]
+  ]
+}

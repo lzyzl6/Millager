@@ -1,0 +1,60 @@
+package org.lzyzl.millager.item;
+
+import net.minecraft.world.effect.MobEffect;
+import net.minecraft.world.effect.MobEffectCategory;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.UseAnim;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.world.level.Level;
+import org.jspecify.annotations.NonNull;
+
+import java.util.ArrayList;
+import java.util.List;
+
+public class Elixir extends Item {
+
+    public Elixir(Properties properties) {
+        super(properties);
+    }
+
+    @Override
+    public @NonNull UseAnim getUseAnimation(@NonNull ItemStack itemStack) {
+        return UseAnim.DRINK;
+    }
+
+    @Override
+    public @NonNull SoundEvent getDrinkingSound() {
+        return SoundEvents.GENERIC_DRINK;
+    }
+
+    @Override
+    public @NonNull SoundEvent getEatingSound() {
+        return SoundEvents.GENERIC_DRINK;
+    }
+
+    public @NonNull ItemStack finishUsingItem(@NonNull ItemStack itemStack, @NonNull Level level, @NonNull LivingEntity livingEntity) {
+        if (!level.isClientSide()) {
+            var activeEffects = livingEntity.getActiveEffects();
+
+            if (!activeEffects.isEmpty()) {
+                List<MobEffect> toRemove = new ArrayList<>(activeEffects.size());
+
+                for (var instance : activeEffects) {
+                    if (instance.getEffect().getCategory() == MobEffectCategory.HARMFUL) {
+                        toRemove.add(instance.getEffect());
+                    }
+                }
+
+                if (!toRemove.isEmpty()) {
+                    for (var effect : toRemove) {
+                        livingEntity.removeEffect(effect);
+                    }
+                }
+            }
+        }
+        return super.finishUsingItem(itemStack, level, livingEntity);
+    }
+}

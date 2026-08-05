@@ -1,0 +1,9 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [{ "item": "millager:rose" }],
+  "result": {
+    "item": "minecraft:red_dye",
+    "count": 1
+  }
+}

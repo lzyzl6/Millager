@@ -1,0 +1,24 @@
+accessWidener v2 named
+
+accessible field net/minecraft/world/entity/Mob targetSelector Lnet/minecraft/world/entity/ai/goal/GoalSelector;
+accessible field net/minecraft/world/entity/Mob goalSelector Lnet/minecraft/world/entity/ai/goal/GoalSelector;
+
+accessible class net/minecraft/world/level/block/state/properties/NoteBlockInstrument$Type
+
+accessible method net/minecraft/world/entity/monster/ZombieVillager startConverting (Ljava/util/UUID;I)V
+
+accessible method net/minecraft/world/entity/Display setInterpolationDelay (I)V
+accessible method net/minecraft/world/entity/Display setInterpolationDuration (I)V
+accessible method net/minecraft/world/entity/Display setTransformation (Lcom/mojang/math/Transformation;)V
+accessible method net/minecraft/world/entity/Display setBrightnessOverride (Lnet/minecraft/util/Brightness;)V
+accessible method net/minecraft/world/entity/Display setShadowRadius (F)V
+accessible method net/minecraft/world/entity/Display$ItemDisplay getItemStack ()Lnet/minecraft/world/item/ItemStack;
+accessible method net/minecraft/world/entity/Display$ItemDisplay setItemStack (Lnet/minecraft/world/item/ItemStack;)V
+
+accessible method net/minecraft/world/level/GameRules$BooleanValue create (Z)Lnet/minecraft/world/level/GameRules$Type;
+accessible field net/minecraft/world/level/GameRules GAME_RULE_TYPES Ljava/util/Map;
+
+accessible class net/minecraft/world/inventory/MenuType$MenuSupplier
+accessible method net/minecraft/world/inventory/MenuType <init> (Lnet/minecraft/world/inventory/MenuType$MenuSupplier;Lnet/minecraft/world/flag/FeatureFlagSet;)V
+
+accessible method net/minecraft/advancements/CriteriaTriggers register (Lnet/minecraft/advancements/CriterionTrigger;)Lnet/minecraft/advancements/CriterionTrigger;

@@ -1,0 +1,57 @@
+package org.lzyzl.millager.entity.ai.millager;
+
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.goal.target.HurtByTargetGoal;
+import net.minecraft.world.entity.ai.targeting.TargetingConditions;
+import net.minecraft.world.entity.animal.horse.Horse;
+import net.minecraft.world.level.GameRules;
+import org.lzyzl.millager.entity.millager.AbstractMillager;
+import org.lzyzl.millager.entity.millager.Rider;
+
+import java.util.EnumSet;
+
+public class RiderHorseHurtByTargetGoal<T extends AbstractMillager & Rider> extends HurtByTargetGoal {
+
+    private static final TargetingConditions HURT_BY_TARGETING = TargetingConditions.forCombat().ignoreLineOfSight().ignoreInvisibilityTesting();
+    private Horse horse;
+    private final Class<?>[] toIgnoreDamage;
+    private int timestamp;
+
+    public RiderHorseHurtByTargetGoal(T rider, Class<?>... classes) {
+        super(rider, classes);
+        this.toIgnoreDamage = classes;
+        this.setFlags(EnumSet.of(Flag.TARGET));
+    }
+
+    @Override
+    public boolean canUse() {
+        this.horse = (Horse)this.mob.getControlledVehicle();
+        if (this.horse == null || !this.horse.isAlive()) return false;
+        int i = this.horse.getLastHurtByMobTimestamp();
+        LivingEntity livingEntity = this.horse.getLastHurtByMob();
+        if (i != this.timestamp && livingEntity != null) {
+            if (livingEntity.getType() == EntityType.PLAYER && this.mob.level() instanceof ServerLevel sl && sl.getGameRules().getBoolean(GameRules.RULE_UNIVERSAL_ANGER)) {
+                return false;
+            } else {
+                for(Class<?> class_ : this.toIgnoreDamage) {
+                    if (class_.isAssignableFrom(livingEntity.getClass())) {
+                        return false;
+                    }
+                }
+                return this.canAttack(livingEntity, HURT_BY_TARGETING);
+            }
+        } else {
+            return false;
+        }
+    }
+
+    @Override
+    public void start() {
+        super.start();
+        this.mob.setTarget(this.horse.getLastHurtByMob());
+        this.targetMob = this.mob.getTarget();
+        this.timestamp = this.horse.getLastHurtByMobTimestamp();
+    }
+}
