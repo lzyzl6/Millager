@@ -1,0 +1,23 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "#BW",
+    "CPS",
+    "QAT"
+  ],
+  "key": {
+    "#": "minecraft:cactus_flower",
+    "B": "minecraft:blue_orchid",
+    "W": "minecraft:wither_rose",
+    "C": "minecraft:brain_coral",
+    "P": "minecraft:pitcher_plant",
+    "S": "minecraft:sunflower",
+    "Q": "minecraft:spore_blossom",
+    "A": "minecraft:amethyst_cluster",
+    "T": "minecraft:torchflower"
+  },
+  "result": {
+    "id": "millager:elixir",
+    "count": 1
+  }
+}

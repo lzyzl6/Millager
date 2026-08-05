@@ -1,0 +1,10 @@
+{
+  "wants": {
+    "id": "minecraft:gunpowder",
+    "count": { "type": "minecraft:uniform", "min": 3.0, "max": 7.0 }
+  },
+  "gives": { "id": "minecraft:emerald" },
+  "max_uses": 16.0,
+  "xp": 2.0,
+  "reputation_discount": 0.05
+}

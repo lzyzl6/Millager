@@ -1,0 +1,51 @@
+{
+	"textures": {
+		"1": "millager:item/laser_gun",
+		"particle": "millager:item/laser_gun_2d"
+	},
+	"elements": [
+		{
+			"from": [4, 7.5, 7],
+			"to": [12, 8.5, 9],
+			"light_emission": 0,
+			"faces": {
+				"north": {
+					"uv": [7, 1.5, 11, 2],
+					"texture": "#1"
+				},
+				"east": {
+					"uv": [6, 1.5, 7, 2],
+					"texture": "#1"
+				},
+				"south": {
+					"uv": [12, 1.5, 16, 2],
+					"texture": "#1"
+				},
+				"west": {
+					"uv": [11, 1.5, 12, 2],
+					"texture": "#1"
+				},
+				"up": {
+					"uv": [11, 1.5, 7, 0.5],
+					"texture": "#1"
+				},
+				"down": {
+					"uv": [15, 0.5, 11, 1.5],
+					"texture": "#1"
+				}
+			}
+		}
+	],
+	"display": {
+		"thirdperson_righthand": {
+			"rotation": [0, 90, 0],
+			"translation": [-0.1011, 0, -4.31556],
+			"scale": [1, 1, 1]
+		},
+		"firstperson_righthand": {
+			"rotation": [0, 90, 0],
+			"translation": [-3.1511, 4, -0.31556],
+			"scale": [1, 1, 1]
+		}
+	}
+}

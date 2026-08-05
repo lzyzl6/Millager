@@ -1,0 +1,93 @@
+import me.modmuss50.mpp.ReleaseType
+
+plugins {
+    id 'multiloader-loader'
+    id 'net.fabricmc.fabric-loom'
+    id 'me.modmuss50.mod-publish-plugin'
+}
+
+repositories {
+    maven {
+        name = 'TerraformersMC'
+        url = 'https://maven.terraformersmc.com/releases/'
+    }
+}
+
+publishMods {
+    file = layout.buildDirectory.file("libs/${base.archivesName.get()}-${project.version}.jar")
+    type = ReleaseType.STABLE
+    dryRun = providers.gradleProperty('publishDryRun').map { it.toBoolean() }.orElse(false)
+    modLoaders.add('fabric')
+    displayName = "Millager ${project.version} (Fabric ${minecraft_version})"
+    version = "${project.version}+fabric-${minecraft_version}"
+    def changelogFile = rootProject.file('CHANGELOG.md')
+    changelog = changelogFile.exists() ? changelogFile.text : "Release ${project.version} — see https://github.com/lzyzl6/Millager/releases/tag/${project.version}"
+    def mcVersions = publish_mc_versions.split(',').collect { it.trim() }
+
+    modrinth {
+        projectId = modrinth_id
+        accessToken = providers.environmentVariable('MODRINTH_TOKEN')
+        minecraftVersions.addAll(mcVersions)
+        requires { slug = 'fabric-api' }
+    }
+    curseforge {
+        projectId = curseforge_id
+        accessToken = providers.environmentVariable('CURSEFORGE_TOKEN')
+        minecraftVersions.addAll(mcVersions)
+        client = true
+        server = true
+        requires { slug = 'fabric-api' }
+    }
+}
+
+afterEvaluate {
+    tasks.matching { it.name in ['publishModrinth', 'publishCurseforge'] }.configureEach {
+        dependsOn tasks.named('build')
+    }
+}
+dependencies {
+    minecraft "com.mojang:minecraft:${minecraft_version}"
+    implementation "net.fabricmc:fabric-loader:${fabric_loader_version}"
+    implementation "net.fabricmc.fabric-api:fabric-api:${fabric_version}"
+    compileOnly "com.terraformersmc:modmenu:20.0.0-beta.2"
+}
+
+loom {
+    def aw = project(':common').file("src/main/resources/${mod_id}.accesswidener")
+    if (aw.exists()) {
+        accessWidenerPath.set(aw)
+    }
+    runs {
+        client {
+            client()
+            setConfigName('Fabric Client')
+            ideConfigGenerated(true)
+            runDir('runs/client')
+        }
+        server {
+            server()
+            setConfigName('Fabric Server')
+            ideConfigGenerated(true)
+            runDir('runs/server')
+        }
+    }
+}
+
+// Implement mcgradleconventions loader attribute
+def loaderAttribute = Attribute.of('io.github.mcgradleconventions.loader', String)
+['apiElements', 'runtimeElements', 'sourcesElements', 'javadocElements', 'modCompileClasspath'].each { variant ->
+    configurations.named("$variant") {
+        attributes {
+            attribute(loaderAttribute, 'fabric')
+        }
+    }
+}
+sourceSets.configureEach {
+    [it.compileClasspathConfigurationName, it.runtimeClasspathConfigurationName].each { variant->
+        configurations.named("$variant") {
+            attributes {
+                attribute(loaderAttribute, 'fabric')
+            }
+        }
+    }
+}

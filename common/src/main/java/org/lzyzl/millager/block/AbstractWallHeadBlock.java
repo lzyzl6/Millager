@@ -1,0 +1,35 @@
+package org.lzyzl.millager.block;
+
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.SkullBlock;
+import net.minecraft.world.level.block.WallSkullBlock;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.shapes.CollisionContext;
+import net.minecraft.world.phys.shapes.Shapes;
+import net.minecraft.world.phys.shapes.VoxelShape;
+import org.jspecify.annotations.NonNull;
+import org.lzyzl.millager.block.entity.HeadBlockEntity;
+
+import java.util.Map;
+
+public abstract class AbstractWallHeadBlock extends WallSkullBlock {
+
+    private static final Map<Direction, VoxelShape> SHAPES = Shapes.rotateHorizontal(Block.boxZ(8.0, 4.0, 14.0, 8.0, 16.0));
+
+    protected @NonNull VoxelShape getShape(BlockState blockState, @NonNull BlockGetter blockGetter, @NonNull BlockPos blockPos, @NonNull CollisionContext collisionContext) {
+        return SHAPES.get(blockState.getValue(FACING));
+    }
+
+    public AbstractWallHeadBlock(SkullBlock.Type type, Properties properties) {
+        super(type, properties);
+    }
+
+    @Override
+    public @NonNull BlockEntity newBlockEntity(@NonNull BlockPos blockPos, @NonNull BlockState blockState) {
+        return new HeadBlockEntity(blockPos, blockState);
+    }
+}

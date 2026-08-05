@@ -1,0 +1,10 @@
+{
+  "wants": {
+    "id": "minecraft:emerald",
+    "count": { "type": "minecraft:uniform", "min": 1.0, "max": 2.0 }
+  },
+  "gives": { "id": "millager:golem_amber" },
+  "max_uses": 16.0,
+  "xp": 30.0,
+  "reputation_discount": 0.05
+}

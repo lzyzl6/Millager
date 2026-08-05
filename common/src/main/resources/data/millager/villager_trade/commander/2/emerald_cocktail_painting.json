@@ -1,0 +1,12 @@
+{
+  "wants": { "id": "minecraft:emerald", "count": 2.0 },
+  "gives": {
+    "id": "minecraft:painting",
+    "components": {
+      "minecraft:painting/variant": "millager:how_to_make_a_molotov_cocktail"
+    }
+  },
+  "max_uses": 3.0,
+  "xp": 5.0,
+  "reputation_discount": 0.05
+}

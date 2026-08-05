@@ -1,0 +1,18 @@
+{
+    "type": "minecraft:crafting_shaped",
+    "pattern": [
+        "#F",
+        "MG"
+    ],
+    "key": {
+        "#": "minecraft:string",
+        "F": "minecraft:feather",
+        "M": "millager:liquor",
+        "G": "minecraft:gunpowder"
+    },
+    "result": {
+        "id": "millager:molotov_cocktail",
+        "count": 1
+    },
+    "group": "millager_molotov_cocktail"
+}

@@ -1,0 +1,6 @@
+{
+  "type": "millager:strong_room",
+  "biomes": "#millager:has_structure/strong_room",
+  "step": "underground_structures",
+  "spawn_overrides": {}
+}

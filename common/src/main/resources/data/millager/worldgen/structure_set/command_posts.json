@@ -1,0 +1,28 @@
+{
+  "structures": [
+    {
+      "structure": "millager:command_post",
+      "weight": 1
+    },
+    {
+      "structure": "millager:ruined_command_post",
+      "weight": 1
+    }
+  ],
+  "placement": {
+    "type": "millager:multi_exclusion_random_spread",
+    "exclusion_zones": [
+      {
+        "chunk_count": 10,
+        "other_set": "minecraft:villages"
+      },
+      {
+        "chunk_count": 10,
+        "other_set": "minecraft:pillager_outposts"
+      }
+    ],
+    "spacing": 48,
+    "separation": 10,
+    "salt": 741852963
+  }
+}

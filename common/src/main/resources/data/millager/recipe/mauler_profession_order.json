@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    " E ",
+    "APB",
+    " C "
+  ],
+  "key": {
+    "E": "minecraft:emerald_block",
+    "P": "minecraft:paper",
+    "A": "minecraft:mace",
+    "B": "minecraft:wind_charge",
+    "C": "minecraft:amethyst_block"
+  },
+  "result": {
+    "id": "millager:mauler_profession_order",
+    "count": 1
+  }
+}

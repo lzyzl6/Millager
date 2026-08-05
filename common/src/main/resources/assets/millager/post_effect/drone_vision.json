@@ -1,0 +1,23 @@
+{
+  "targets": {
+    "final": {}
+  },
+  "passes": [
+    {
+      "vertex_shader": "minecraft:core/screenquad",
+      "fragment_shader": "millager:post/drone_vision",
+      "inputs": [{"sampler_name": "In", "target": "minecraft:main"}],
+      "output": "final"
+    },
+    {
+      "vertex_shader": "minecraft:core/screenquad",
+      "fragment_shader": "minecraft:core/blit_screen",
+      "inputs": [{"sampler_name": "In", "target": "final"}],
+      "output": "minecraft:main"
+    }
+  ],
+  "uniforms": [
+    {"name": "OutSize", "values": [1.0, 1.0]},
+    {"name": "Time", "values": [0.0]}
+  ]
+}

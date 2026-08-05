@@ -1,0 +1,18 @@
+{
+    "type": "minecraft:crafting_shaped",
+    "pattern": [
+        "#S#",
+        "#/#",
+        " / "
+    ],
+    "key": {
+        "#": "minecraft:tnt",
+        "S": "minecraft:string",
+        "/": "minecraft:stick"
+    },
+    "result": {
+        "id": "millager:tnt_on_a_stick",
+        "count": 4
+    },
+    "group": "millager_tnt_on_a_stick"
+}

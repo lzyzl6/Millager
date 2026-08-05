@@ -1,0 +1,28 @@
+{
+  "parent": "minecraft:adventure/hero_of_the_village",
+  "display": {
+    "icon": {
+      "id": "millager:illager_head"
+    },
+    "title": {
+      "translate": "advancements.millager.grand_battle.title"
+    },
+    "description": {
+      "translate": "advancements.millager.grand_battle.description"
+    },
+    "frame": "challenge",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": true
+  },
+  "criteria": {
+    "won": {
+      "trigger": "millager:grand_battle"
+    }
+  },
+  "requirements": [
+    [
+      "won"
+    ]
+  ]
+}

@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    " E ",
+    "APB",
+    " C "
+  ],
+  "key": {
+    "E": "minecraft:emerald_block",
+    "P": "minecraft:paper",
+    "A": "millager:tnt_on_a_stick",
+    "B": "millager:molotov_cocktail",
+    "C": "minecraft:shield"
+  },
+  "result": {
+    "id": "millager:rioter_profession_order",
+    "count": 1
+  }
+}

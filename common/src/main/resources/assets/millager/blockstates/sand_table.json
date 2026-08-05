@@ -1,0 +1,8 @@
+{
+  "variants": {
+    "facing=north": { "model": "millager:block/sand_table" },
+    "facing=south": { "model": "millager:block/sand_table", "y": 180 },
+    "facing=west":  { "model": "millager:block/sand_table", "y": 270 },
+    "facing=east":  { "model": "millager:block/sand_table", "y": 90 }
+  }
+}

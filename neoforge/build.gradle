@@ -1,0 +1,96 @@
+import me.modmuss50.mpp.ReleaseType
+
+plugins {
+    id 'multiloader-loader'
+    id 'net.neoforged.moddev'
+    id 'me.modmuss50.mod-publish-plugin'
+}
+
+publishMods {
+    file = layout.buildDirectory.file("libs/${base.archivesName.get()}-${project.version}.jar")
+    type = ReleaseType.STABLE
+    dryRun = providers.gradleProperty('publishDryRun').map { it.toBoolean() }.orElse(false)
+    modLoaders.add('neoforge')
+    displayName = "Millager ${project.version} (NeoForge ${minecraft_version})"
+    version = "${project.version}+neoforge-${minecraft_version}"
+    def changelogFile = rootProject.file('CHANGELOG.md')
+    changelog = changelogFile.exists() ? changelogFile.text : "Release ${project.version} — see https://github.com/lzyzl6/Millager/releases/tag/${project.version}"
+    def mcVersions = publish_mc_versions.split(',').collect { it.trim() }
+
+    modrinth {
+        projectId = modrinth_id
+        accessToken = providers.environmentVariable('MODRINTH_TOKEN')
+        minecraftVersions.addAll(mcVersions)
+    }
+    curseforge {
+        projectId = curseforge_id
+        accessToken = providers.environmentVariable('CURSEFORGE_TOKEN')
+        minecraftVersions.addAll(mcVersions)
+        client = true
+        server = true
+    }
+}
+
+afterEvaluate {
+    tasks.matching { it.name in ['publishModrinth', 'publishCurseforge'] }.configureEach {
+        dependsOn tasks.named('build')
+    }
+}
+
+neoForge {
+    version = neoforge_version
+
+    // Automatically enable neoforge AccessTransformers if the file exists
+    def at = project(':common').file('src/main/resources/META-INF/accesstransformer.cfg')
+    if (at.exists()) {
+        accessTransformers.from(at.absolutePath)
+    }
+    runs {
+        configureEach {
+            systemProperty('neoforge.enabledGameTestNamespaces', mod_id)
+            ideName = "NeoForge ${it.name.capitalize()} (${project.path})" // Unify the run config names with fabric
+        }
+        client {
+            client()
+            gameDirectory = this.mkdir(this.file("runs/client"))
+        }
+        data {
+            clientData()
+            gameDirectory = this.mkdir(this.file("runs/data"))
+            // DataGen can be run by - "./gradlew :neoforge:runData" in Terminal.
+            // Specify the modid for data generation, where to output the resulting resource, and where to look for existing resources.
+            programArguments.addAll '--mod', project.mod_id, '--all', '--output', file('src/generated/resources/').getAbsolutePath(), '--existing', file('src/main/resources/').getAbsolutePath()
+        }
+        server {
+            server()
+            this.file("runs/server").createParentDirectories()
+            gameDirectory = this.mkdir(this.file("runs/server"))
+        }
+    }
+    mods {
+        "${mod_id}" {
+            sourceSet sourceSets.main
+        }
+    }
+}
+
+sourceSets.main.resources { srcDir 'src/generated/resources' }
+
+// Implement mcgradleconventions loader attribute
+def loaderAttribute = Attribute.of('io.github.mcgradleconventions.loader', String)
+['apiElements', 'runtimeElements', 'sourcesElements', 'javadocElements'].each { variant ->
+    configurations.named("$variant") {
+        attributes {
+            attribute(loaderAttribute, 'neoforge')
+        }
+    }
+}
+sourceSets.configureEach {
+    [it.compileClasspathConfigurationName, it.runtimeClasspathConfigurationName, it.getTaskName(null, 'jarJar')].each { variant ->
+        configurations.named("$variant") {
+            attributes {
+                attribute(loaderAttribute, 'neoforge')
+            }
+        }
+    }
+}

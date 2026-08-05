@@ -1,0 +1,7 @@
+{
+  "type": "millager:floating_island",
+  "biomes": "#millager:has_structure/floating_island",
+  "step": "surface_structures",
+  "terrain_adaptation": "beard_thin",
+  "spawn_overrides": {}
+}

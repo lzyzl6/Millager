@@ -1,0 +1,8 @@
+{
+  "type": "millager:command_post",
+  "biomes": "#millager:has_structure/command_post",
+  "ruined": false,
+  "step": "surface_structures",
+  "terrain_adaptation": "beard_thin",
+  "spawn_overrides": {}
+}

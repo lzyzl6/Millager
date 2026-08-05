@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    " # ",
+    "GgG",
+    "AAA"
+  ],
+  "key": {
+    "#": "minecraft:totem_of_undying",
+    "G": "minecraft:gold_nugget",
+    "g": "minecraft:gold_ingot",
+    "A": "minecraft:amethyst_block"
+  },
+  "result": {
+    "id": "millager:totem_infuser",
+    "count": 1
+  }
+}
