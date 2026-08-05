@@ -1,0 +1,28 @@
+{
+  "parent": "minecraft:husbandry/root",
+  "display": {
+    "icon": {
+      "id": "millager:liquor"
+    },
+    "title": {
+      "translate": "advancements.millager.liquor_brew.title"
+    },
+    "description": {
+      "translate": "advancements.millager.liquor_brew.description"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "brewed": {
+      "trigger": "millager:obtain_liquor"
+    }
+  },
+  "requirements": [
+    [
+      "brewed"
+    ]
+  ]
+}

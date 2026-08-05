@@ -1,0 +1,9 @@
+{
+  "values": [
+    "minecraft:pillager_outpost",
+    {
+      "id": "terralith:desert_outpost",
+      "required": false
+    }
+  ]
+}
