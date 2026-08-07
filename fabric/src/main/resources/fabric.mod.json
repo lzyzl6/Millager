@@ -7,6 +7,9 @@
     "authors": [
         "${mod_author}"
     ],
+    "contributors": [
+        "enesbaskaya26"
+    ],
     "contact": {
         "homepage": "https://modrinth.com/mod/millager",
         "issues": "https://github.com/lzyzl6/Millager/issues"

@@ -21,6 +21,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.component.CustomData;
 import org.jetbrains.annotations.NotNull;
+import org.lzyzl.millager.MillagerItems;
 import org.lzyzl.millager.MillagerSounds;
 import org.lzyzl.millager.entity.millager.AbstractMillager;
 
@@ -108,6 +109,13 @@ public class ProfessionOrderItem extends Item {
                 setHorseArmor(millager);
             }
         },
+        IRON_SPEAR_AND_HORSE_ARMOR {
+            @Override
+            void apply(AbstractMillager millager) {
+                millager.setItemSlot(EquipmentSlot.MAINHAND, new ItemStack(MillagerItems.ironLancerSpear.get()));
+                setHorseArmor(millager);
+            }
+        },
         IRON_AXE_AND_HORSE_ARMOR {
             @Override
             void apply(AbstractMillager millager) {
@@ -120,7 +128,7 @@ public class ProfessionOrderItem extends Item {
 
         static void setHorseArmor(AbstractMillager millager) {
             if (millager.getVehicle() instanceof Horse horse) {
-                horse.setBodyArmorItem(new ItemStack(Items.IRON_HORSE_ARMOR));
+                horse.setItemSlot(EquipmentSlot.BODY, new ItemStack(Items.IRON_HORSE_ARMOR));
             }
         }
     }

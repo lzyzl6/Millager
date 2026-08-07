@@ -20,6 +20,7 @@ public class MillagerEntityRenderers {
         ctx.registerEntityRenderer(MillagerEntityTypes.Bee_Golem.get(), BeeGolemRenderer::new);
         ctx.registerEntityRenderer(MillagerEntityTypes.Archers.get(), ArcherRenderer::new);
         ctx.registerEntityRenderer(MillagerEntityTypes.Breachers.get(), BreacherRenderer::new);
+        ctx.registerEntityRenderer(MillagerEntityTypes.Lancers.get(), LancerRenderer::new);
         ctx.registerEntityRenderer(MillagerEntityTypes.Doctors.get(), DoctorRenderer::new);
         ctx.registerEntityRenderer(MillagerEntityTypes.Swordmasters.get(), SwordmasterRenderer::new);
         ctx.registerEntityRenderer(MillagerEntityTypes.Maulers.get(), MaulerRenderer::new);

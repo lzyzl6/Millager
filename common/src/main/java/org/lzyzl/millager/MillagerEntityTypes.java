@@ -28,6 +28,11 @@ public class MillagerEntityTypes {
                     b -> b.sized(0.6F, 1.95F).eyeHeight(1.62F)
                             .passengerAttachments(2.0F).ridingOffset(-0.6F).clientTrackingRange(8));
 
+    public static final DeferredHolder<EntityType<?>, EntityType<Lancer>> Lancers =
+            ENTITY_TYPES.registerEntityType("lancer", Lancer::new, MobCategory.MISC,
+                    b -> b.sized(0.6F, 1.95F).eyeHeight(1.62F)
+                            .passengerAttachments(2.0F).ridingOffset(-0.6F).clientTrackingRange(8));
+
     public static final DeferredHolder<EntityType<?>, EntityType<Doctor>> Doctors =
             ENTITY_TYPES.registerEntityType("doctor", Doctor::new, MobCategory.MISC,
                     b -> b.sized(0.6F, 1.95F).eyeHeight(1.62F).clientTrackingRange(8));

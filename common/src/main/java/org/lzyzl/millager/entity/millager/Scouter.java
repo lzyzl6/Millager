@@ -270,7 +270,7 @@ public class Scouter extends AbstractMillager implements CrossbowAttackMob, Ride
                 explosionKnockbackAttribute.setBaseValue(0.5);
             }
             horse.setHealth(horse.getMaxHealth());
-            horse.setBodyArmorItem(new ItemStack(Rider.getRandomHorseArmor(level.getRandom(), 2)));
+            horse.setItemSlot(EquipmentSlot.BODY, new ItemStack(Rider.getRandomHorseArmor(level.getRandom(), 2)));
             horse.setTamed(true);
             horse.addTag("millager_mount");
 

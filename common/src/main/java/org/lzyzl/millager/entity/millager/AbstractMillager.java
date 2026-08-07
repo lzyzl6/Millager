@@ -9,6 +9,7 @@ import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.TimeUtil;
 import net.minecraft.util.valueproviders.UniformInt;
+import net.minecraft.world.Difficulty;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffects;
@@ -26,7 +27,6 @@ import net.minecraft.world.entity.ai.goal.MoveBackToVillageGoal;
 import net.minecraft.world.entity.ai.goal.OpenDoorGoal;
 import net.minecraft.world.entity.ai.goal.RandomLookAroundGoal;
 import net.minecraft.world.entity.ai.goal.WaterAvoidingRandomStrollGoal;
-import net.minecraft.world.entity.ai.goal.target.HurtByTargetGoal;
 import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
 import net.minecraft.world.entity.ai.goal.target.ResetUniversalAngerTargetGoal;
 import net.minecraft.world.entity.ai.navigation.GroundPathNavigation;
@@ -48,6 +48,7 @@ import org.lzyzl.millager.MillagerItems;
 import org.lzyzl.millager.entity.ai.millager.CavalryPatrolGoal;
 import org.lzyzl.millager.entity.ai.millager.InfantryPatrolGoal;
 import org.lzyzl.millager.entity.ai.millager.MillagerDefendVillageGoal;
+import org.lzyzl.millager.entity.ai.millager.MillagerHurtByTargetGoal;
 import org.lzyzl.millager.entity.ai.millager.RaidReinforcementGoal;
 import org.lzyzl.millager.entity.ai.millager.RaidRetreatGoal;
 import org.lzyzl.millager.entity.ai.vanilla.ExtendedDefendVillageTargetGoal;
@@ -63,6 +64,7 @@ import java.util.UUID;
 public abstract class AbstractMillager extends PathfinderMob implements NeutralMob, InventoryCarrier {
 
     private static final UniformInt PERSISTENT_ANGER_TIME = TimeUtil.rangeOfSeconds(20, 39);
+    private static final int PLAYER_ATTACK_WARNING_TICKS = 200;
     private static final int SQUAD_LEADER_CHECK_INTERVAL = 60;
     private static final int SQUAD_LEADER_MISSING_SCANS = 3;
     private static final int SQUAD_TARGET_SHARE_INTERVAL = 20;
@@ -88,6 +90,9 @@ public abstract class AbstractMillager extends PathfinderMob implements NeutralM
     private int squadTargetShareTimer;
     private int squadMergeCheckTimer;
     private int patrolAvoidanceTick = -2;
+    private @Nullable UUID playerAttackWarningPlayer;
+    private int playerAttackWarningTick;
+    private boolean playerAttackRetaliationReady;
     protected AbstractMillager(EntityType<? extends AbstractMillager> entityType, Level level) {
         super(entityType, level);
         this.getNavigation().setCanFloat(true);
@@ -129,15 +134,11 @@ public abstract class AbstractMillager extends PathfinderMob implements NeutralM
         this.goalSelector.addGoal(8, new RandomLookAroundGoal(this));
 
         this.targetSelector.addGoal(1, new ExtendedDefendVillageTargetGoal(this));
-        this.targetSelector.addGoal(2, new HurtByTargetGoal(this, AbstractMillager.class, BeeGolem.class, IronGolem.class).setAlertOthers());
+        this.targetSelector.addGoal(2, new MillagerHurtByTargetGoal(this, AbstractMillager.class, BeeGolem.class, IronGolem.class).setAlertOthers());
         this.targetSelector.addGoal(2, new NearestAttackableTargetGoal<>(this, Player.class, 10, true, false, livingEntity -> {
             if (livingEntity instanceof Player player) {
                 if (this.isProfessionOrderOwner(player)) return false;
                 if (player.isCreative() || player.isSpectator()) return false;
-                if (player.getLastHurtMob() instanceof AbstractMillager && this.tickCount - player.getLastHurtMobTimestamp() < 100 + this.level().getDifficulty().getId() * 40) {
-                    this.setPersistentAngerTarget(player.getUUID());
-                    return true;
-                }
                 if (this.getRemainingPersistentAngerTime() > 0 && player.getUUID().equals(this.getPersistentAngerTarget())) return true;
                 ItemStack head = player.getItemBySlot(EquipmentSlot.HEAD);
                 if (head.is(MillagerItems.VILLAGER_HEAD.asItem())) {
@@ -277,6 +278,50 @@ public abstract class AbstractMillager extends PathfinderMob implements NeutralM
     @Override
     protected @Nullable SoundEvent getHurtSound(@NonNull DamageSource damageSource) {
         return SoundEvents.VILLAGER_HURT;
+    }
+
+    @Override
+    public boolean hurt(DamageSource damageSource, float amount) {
+        boolean hurt = super.hurt(damageSource, amount);
+        if (hurt && !this.level().isClientSide() && damageSource.getEntity() instanceof Player player) this.recordPlayerAttack(player, amount);
+        return hurt;
+    }
+
+    public void recordPlayerAttack(Player player, float amount) {
+        this.clearExpiredPlayerAttackWarning();
+        if (!this.canRespondToPlayerAttack(player)) return;
+        if (this.getTarget() != null || amount < 2.0F) return;
+        if (this.playerAttackWarningPlayer != null) {
+            this.playerAttackRetaliationReady = true;
+            return;
+        }
+        this.playerAttackWarningPlayer = player.getUUID();
+        this.playerAttackWarningTick = this.tickCount;
+        this.playerAttackRetaliationReady = false;
+        ((ServerLevel) this.level()).sendParticles(ParticleTypes.ANGRY_VILLAGER, this.getX(), this.getY(), this.getZ(), 20,
+                0.5, 1.0, 0.5, 0.1);
+        this.playSound(SoundEvents.VILLAGER_NO, 1.2F, 1.0F);
+    }
+
+    private void clearExpiredPlayerAttackWarning() {
+        if (this.playerAttackWarningPlayer != null && this.tickCount - this.playerAttackWarningTick > PLAYER_ATTACK_WARNING_TICKS) {
+            this.playerAttackWarningPlayer = null;
+            this.playerAttackWarningTick = 0;
+            this.playerAttackRetaliationReady = false;
+        }
+    }
+
+    public boolean shouldRetaliate() {
+        return this.playerAttackRetaliationReady && this.playerAttackWarningPlayer != null
+                && this.tickCount - this.playerAttackWarningTick <= PLAYER_ATTACK_WARNING_TICKS;
+    }
+
+    public boolean shouldRetaliateAgainst(Player player) {
+        return this.shouldRetaliate() && this.canRespondToPlayerAttack(player);
+    }
+
+    private boolean canRespondToPlayerAttack(Player player) {
+        return !player.isCreative() && !player.isSpectator() && this.level().getDifficulty() != Difficulty.PEACEFUL;
     }
 
     @Override
@@ -554,6 +599,9 @@ public abstract class AbstractMillager extends PathfinderMob implements NeutralM
         HOLDING_ITEM,
         SWINGING_ARM,
         SUMMONING,
+        //Lancer
+        SPEAR,
+        SPELLCASTING,
         //Swordmaster,
         SWORD_SHIELDING,
         REGAINING_SWORD,

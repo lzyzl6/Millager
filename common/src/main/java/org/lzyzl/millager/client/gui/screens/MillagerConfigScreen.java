@@ -22,6 +22,7 @@ public final class MillagerConfigScreen extends Screen {
     private List<FormattedCharSequence> overviewLines = List.of();
     private MillagerConfig.ConfigData data;
     private Category category = Category.GAME_RULES;
+    private boolean overviewExpanded = true;
     private int page;
     private int rowsTop;
     private Component error;
@@ -41,7 +42,9 @@ public final class MillagerConfigScreen extends Screen {
         clearWidgets();
         rows.clear();
 
-        int categoryLeft = (this.width - 310) / 2;
+        int categoryCount = Category.values().length;
+        int categoryButtonWidth = Math.min(100, Math.max(40, (this.width - 30) / categoryCount - 5));
+        int categoryLeft = (this.width - categoryCount * (categoryButtonWidth + 5) - 20) / 2;
         for (int i = 0; i < Category.values().length; i++) {
             Category value = Category.values()[i];
             Button button = addRenderableWidget(Button.builder(value.title, ignored -> {
@@ -50,14 +53,20 @@ public final class MillagerConfigScreen extends Screen {
                 this.page = 0;
                 this.error = null;
                 rebuild();
-            }).bounds(categoryLeft + i * 105, 28, 100, 20).build());
+            }).bounds(categoryLeft + i * (categoryButtonWidth + 5), 28, categoryButtonWidth, 20).build());
             button.active = value != this.category;
         }
+        addRenderableWidget(Button.builder(Component.literal(this.overviewExpanded ? "-" : "+"), ignored -> {
+            if (!commitPage()) return;
+            this.overviewExpanded = !this.overviewExpanded;
+            this.error = null;
+            rebuild();
+        }).bounds(categoryLeft + categoryCount * (categoryButtonWidth + 5), 28, 20, 20).build());
 
         int contentWidth = Math.min(560, this.width - 20);
         int left = (this.width - contentWidth) / 2;
-        this.overviewLines = this.font.split(this.category.overview, contentWidth);
-        this.rowsTop = 57 + this.overviewLines.size() * 9 + 7;
+        this.overviewLines = this.overviewExpanded ? this.font.split(this.category.overview, contentWidth) : List.of();
+        this.rowsTop = 57 + this.overviewLines.size() * 9 + (this.overviewExpanded ? 7 : 0);
 
         List<Field> fields = fields();
         int rowsPerPage = rowsPerPage();
@@ -248,7 +257,11 @@ public final class MillagerConfigScreen extends Screen {
         PATROL("patrol",
                 Component.translatable("millager.config.category.patrol"),
                 Component.translatable("millager.config.overview.patrol"),
-                MillagerConfig.Patrol.class);
+                MillagerConfig.Patrol.class),
+        MISC("misc",
+                Component.translatable("millager.config.category.misc"),
+                Component.translatable("millager.config.overview.misc"),
+                MillagerConfig.Misc.class);
 
         private final String key;
         private final Component title;
@@ -267,6 +280,7 @@ public final class MillagerConfigScreen extends Screen {
                 case GAME_RULES -> data.gameRuleDefaults;
                 case DEFENDER -> data.defender;
                 case PATROL -> data.patrol;
+                case MISC -> data.misc;
             };
         }
     }

@@ -9,6 +9,7 @@ import net.minecraft.server.level.progress.ChunkProgressListener;
 import net.minecraft.world.level.levelgen.structure.pools.StructurePoolElement;
 import net.minecraft.world.level.levelgen.structure.pools.StructureTemplatePool;
 import org.lzyzl.millager.Millager;
+import org.lzyzl.millager.behavior.MiscConfig;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
@@ -23,6 +24,7 @@ public abstract class MinecraftServerMixin {
 
     @Inject(method = "createLevels", at = @At("TAIL"))
     private void millager$addInfantryHuts(ChunkProgressListener listener, CallbackInfo ci) {
+        if (!MiscConfig.GENERATE_INFANTRY_HUTS) return;
         Registry<StructureTemplatePool> pools = ((MinecraftServer) (Object) this).registryAccess().registryOrThrow(Registries.TEMPLATE_POOL);
         for (String style : List.of("plains", "desert", "savanna", "snowy", "taiga")) {
             millager$appendInfantryHuts(pools, style);

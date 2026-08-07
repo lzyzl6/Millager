@@ -10,8 +10,9 @@ import java.util.List;
 public final class MillagerEntityPool {
 
     public static final List<Entry> CAVALRY = List.of(
-            new Entry(MillagerEntityTypes.Breachers.get(), 34f, 50),
-            new Entry(MillagerEntityTypes.Scouters.get(), 26f, 50)
+            new Entry(MillagerEntityTypes.Breachers.get(), 34f, 30),
+            new Entry(MillagerEntityTypes.Lancers.get(), 28f, 30),
+            new Entry(MillagerEntityTypes.Scouters.get(), 26f, 40)
     );
     public static final List<Entry> INFANTRY = List.of(
             new Entry(MillagerEntityTypes.Archers.get(), 24f, 30),

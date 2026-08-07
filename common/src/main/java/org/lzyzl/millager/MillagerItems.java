@@ -71,6 +71,19 @@ public class MillagerItems {
             "scouter_profession_order", props -> new ProfessionOrderItem(MillagerEntityTypes.Scouters,
                     ProfessionOrderItem.Equipment.IRON_HORSE_ARMOR, props));
 
+    public static final DeferredItem<ProfessionOrderItem> lancerProfessionOrder = ITEMS.registerItem(
+            "lancer_profession_order", props -> new ProfessionOrderItem(MillagerEntityTypes.Lancers,
+                    ProfessionOrderItem.Equipment.IRON_SPEAR_AND_HORSE_ARMOR, props));
+
+    public static final DeferredItem<LancerSpearItem> ironLancerSpear = ITEMS.registerItem(
+            "iron_lancer_spear", props -> new LancerSpearItem(LancerSpearItem.Material.IRON, props));
+
+    public static final DeferredItem<LancerSpearItem> goldenLancerSpear = ITEMS.registerItem(
+            "golden_lancer_spear", props -> new LancerSpearItem(LancerSpearItem.Material.GOLD, props));
+
+    public static final DeferredItem<LancerSpearItem> diamondLancerSpear = ITEMS.registerItem(
+            "diamond_lancer_spear", props -> new LancerSpearItem(LancerSpearItem.Material.DIAMOND, props));
+
     public static final DeferredItem<ProfessionOrderItem> maulerProfessionOrder = ITEMS.registerItem(
             "mauler_profession_order", props -> new ProfessionOrderItem(MillagerEntityTypes.Maulers,
                     ProfessionOrderItem.Equipment.DEFAULT, props));
@@ -175,6 +188,10 @@ public class MillagerItems {
     public static final DeferredItem<SpawnEggItem> BREACHER_SPAWN_EGG = ITEMS.registerItem(
             "breacher_spawn_egg",
             props -> new SpawnEggItem(MillagerEntityTypes.Breachers.get(), 5651507, 14272879, props));
+
+    public static final DeferredItem<SpawnEggItem> LANCER_SPAWN_EGG = ITEMS.registerItem(
+            "lancer_spawn_egg",
+            props -> new SpawnEggItem(MillagerEntityTypes.Lancers.get(), 5651507, 11984326, props));
 
     public static final DeferredItem<SpawnEggItem> SWORDMASTER_SPAWN_EGG = ITEMS.registerItem(
             "swordmaster_spawn_egg",

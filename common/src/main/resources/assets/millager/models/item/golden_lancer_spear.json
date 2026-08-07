@@ -1,0 +1,7 @@
+{
+  "parent": "minecraft:item/generated",
+  "textures": { "layer0": "millager:item/golden_lancer_spear" },
+  "overrides": [
+    { "predicate": { "custom_model_data": 1 }, "model": "millager:item/golden_lancer_spear_in_hand" }
+  ]
+}

@@ -3,7 +3,11 @@ package org.lzyzl.millager.mixin;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.animal.horse.Horse;
+import net.minecraft.world.entity.player.Player;
 import org.lzyzl.millager.MillagerGameRules;
+import org.lzyzl.millager.entity.millager.AbstractMillager;
+import org.lzyzl.millager.entity.millager.Rider;
 import org.lzyzl.millager.entity.projectile.RioterProjectile;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -30,6 +34,18 @@ public class AllyHurtMixin {
         }
         if (isMillagerFaction(self) && isMillagerFaction(directEntity)) {
             cir.setReturnValue(false);
+        }
+    }
+
+    @Inject(method = "hurt", at = @At("TAIL"))
+    private void millager$onHorseHurt(DamageSource source, float amount, CallbackInfoReturnable<Boolean> cir) {
+        if (!cir.getReturnValue() || !(source.getEntity() instanceof Player player)) return;
+        if (!((Object) this instanceof Horse horse)) return;
+        for (Entity passenger : horse.getPassengers()) {
+            if (passenger instanceof AbstractMillager millager && millager instanceof Rider) {
+                millager.recordPlayerAttack(player, amount);
+                return;
+            }
         }
     }
 }

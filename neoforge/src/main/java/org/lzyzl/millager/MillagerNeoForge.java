@@ -88,6 +88,7 @@ public class MillagerNeoForge {
         event.put(MillagerEntityTypes.Bee_Golem.get(), BeeGolem.createAttributes().build());
         event.put(MillagerEntityTypes.Archers.get(), Archer.createAttributes().build());
         event.put(MillagerEntityTypes.Breachers.get(), Breacher.createAttributes().build());
+        event.put(MillagerEntityTypes.Lancers.get(), Lancer.createAttributes().build());
         event.put(MillagerEntityTypes.Doctors.get(), Doctor.createAttributes().build());
         event.put(MillagerEntityTypes.Maulers.get(), Mauler.createAttributes().build());
         event.put(MillagerEntityTypes.Swordmasters.get(), Swordmaster.createAttributes().build());
