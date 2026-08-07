@@ -4,7 +4,11 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.animal.equine.Horse;
+import net.minecraft.world.entity.player.Player;
 import org.lzyzl.millager.MillagerGameRules;
+import org.lzyzl.millager.entity.millager.AbstractMillager;
+import org.lzyzl.millager.entity.millager.Rider;
 import org.lzyzl.millager.entity.projectile.RioterProjectile;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -31,6 +35,18 @@ public class AllyHurtMixin {
         }
         if (isMillagerFaction(self) && isMillagerFaction(directEntity)) {
             cir.setReturnValue(false);
+        }
+    }
+
+    @Inject(method = "hurtServer", at = @At("TAIL"))
+    private void millager$onHorseHurt(ServerLevel serverLevel, DamageSource damageSource, float amount, CallbackInfoReturnable<Boolean> cir) {
+        if (!cir.getReturnValue() || !(damageSource.getEntity() instanceof Player player)) return;
+        if (!((Object) this instanceof Horse horse)) return;
+        for (Entity passenger : horse.getPassengers()) {
+            if (passenger instanceof AbstractMillager millager && millager instanceof Rider) {
+                millager.recordPlayerAttack(player, amount);
+                return;
+            }
         }
     }
 }

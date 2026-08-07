@@ -8,8 +8,8 @@ import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.phys.AABB;
-import org.lzyzl.millager.MillagerSounds;
 import org.lzyzl.millager.entity.millager.Scouter;
+import org.lzyzl.millager.entity.millager.RaidHornPlayer;
 
 import java.util.List;
 
@@ -57,7 +57,7 @@ public class ScouterTootHornGoal extends Goal {
         this.scouter.setTooting(true);
         this.scouter.startUsingItem(InteractionHand.OFF_HAND);
         this.scouter.setActivityTicks(110);
-        this.scouter.playSound(MillagerSounds.REINFORCE_HORN, 16.0F, 0.8F);
+        RaidHornPlayer.play(this.scouter);
     }
 
     @Override

@@ -34,4 +34,6 @@ public final class DefenderConfig {
     public static volatile double SURGE_ENEMY_WEIGHT_EASY = 0.5D;
     public static volatile double SURGE_ENEMY_WEIGHT_NORMAL = 0.4D;
     public static volatile double SURGE_ENEMY_WEIGHT_HARD = 0.2D;
+    public static volatile int MAX_CONSECUTIVE_SPAWN_FAILURES = 3;
+    public static volatile int SPAWN_FAILURE_RETRY_TICKS = 20;
 }
