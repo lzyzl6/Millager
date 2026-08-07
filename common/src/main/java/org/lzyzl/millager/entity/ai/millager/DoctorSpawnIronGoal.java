@@ -18,6 +18,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import org.jetbrains.annotations.Nullable;
 import org.lzyzl.millager.MillagerBlocks;
+import org.lzyzl.millager.behavior.MiscConfig;
 import org.lzyzl.millager.entity.millager.Doctor;
 import org.lzyzl.millager.entity.golem.IronGolemAccessor;
 
@@ -68,7 +69,8 @@ public class DoctorSpawnIronGoal extends Goal {
 
         if (this.structureOrigin != null && this.buildStage > 0) return true;
 
-        if (this.doctor.getIronGolemsBuilt() >= 3) return false;
+        if (MiscConfig.DOCTOR_IRON_GOLEM_LIMIT >= 0
+                && this.doctor.getIronGolemsBuilt() >= MiscConfig.DOCTOR_IRON_GOLEM_LIMIT) return false;
 
         if (this.doctor.getIronBuildCooldown() > 0) return false;
 

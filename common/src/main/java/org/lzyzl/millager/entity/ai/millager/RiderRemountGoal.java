@@ -1,8 +1,8 @@
 package org.lzyzl.millager.entity.ai.millager;
 
-import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.goal.Goal;
+import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.animal.equine.Horse;
 import net.minecraft.world.item.ItemStack;
 import org.lzyzl.millager.entity.millager.AbstractMillager;

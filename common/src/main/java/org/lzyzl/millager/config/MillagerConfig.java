@@ -8,6 +8,7 @@ import com.google.gson.JsonParser;
 import com.google.gson.annotations.SerializedName;
 import org.lzyzl.millager.Millager;
 import org.lzyzl.millager.MillagerGameRules;
+import org.lzyzl.millager.behavior.MiscConfig;
 import org.lzyzl.millager.behavior.patrol.PatrolConfig;
 import org.lzyzl.millager.behavior.raid.DefenderConfig;
 
@@ -105,6 +106,7 @@ public final class MillagerConfig {
         if (data.gameRuleDefaults == null) data.gameRuleDefaults = new GameRuleDefaults();
         if (data.defender == null) data.defender = new Defender();
         if (data.patrol == null) data.patrol = new Patrol();
+        if (data.misc == null) data.misc = new Misc();
 
         Defender defender = data.defender;
         if (defender.teamName == null || !defender.teamName.matches("[A-Za-z0-9_.+-]{1,16}")) {
@@ -138,6 +140,8 @@ public final class MillagerConfig {
         defender.empoweredRaiderCountMultiplierEasy = clamp("defender.empowered_raider_count_multiplier_easy", defender.empoweredRaiderCountMultiplierEasy, 0.0D, 10.0D);
         defender.empoweredRaiderCountMultiplierNormal = clamp("defender.empowered_raider_count_multiplier_normal", defender.empoweredRaiderCountMultiplierNormal, 0.0D, 10.0D);
         defender.empoweredRaiderCountMultiplierHard = clamp("defender.empowered_raider_count_multiplier_hard", defender.empoweredRaiderCountMultiplierHard, 0.0D, 10.0D);
+        defender.maxConsecutiveSpawnFailures = clamp("defender.max_consecutive_spawn_failures", defender.maxConsecutiveSpawnFailures, 1, 100);
+        defender.spawnFailureRetryTicks = clamp("defender.spawn_failure_retry_ticks", defender.spawnFailureRetryTicks, 0, 72000);
 
         Patrol patrol = data.patrol;
         patrol.wildTimerBase = clamp("patrol.wild_timer_base", patrol.wildTimerBase, 1, 720000);
@@ -163,6 +167,11 @@ public final class MillagerConfig {
         patrol.ruinedCpPatrolSizeMin = clamp("patrol.ruined_cp_patrol_size_min", patrol.ruinedCpPatrolSizeMin, 1, 100);
         patrol.ruinedCpPatrolSizeMax = clamp("patrol.ruined_cp_patrol_size_max", patrol.ruinedCpPatrolSizeMax, patrol.ruinedCpPatrolSizeMin, 100);
         patrol.ruinedCpPatrolNearDist = clamp("patrol.ruined_cp_patrol_near_dist", patrol.ruinedCpPatrolNearDist, 0, 512);
+
+        Misc misc = data.misc;
+        misc.fastHorseDespawnTicks = clamp("misc.fast_horse_despawn_ticks", misc.fastHorseDespawnTicks, 0, 72000);
+        misc.mountHorseDespawnTicks = clamp("misc.mount_horse_despawn_ticks", misc.mountHorseDespawnTicks, 0, 72000);
+        misc.doctorIronGolemLimit = clamp("misc.doctor_iron_golem_limit", misc.doctorIronGolemLimit, -1, 1000);
         return data;
     }
 
@@ -182,6 +191,8 @@ public final class MillagerConfig {
             addComments(comments, translations, "defender", Defender.class);
             addOverview(comments, translations, "patrol");
             addComments(comments, translations, "patrol", Patrol.class);
+            addOverview(comments, translations, "misc");
+            addComments(comments, translations, "misc", Misc.class);
         } catch (Exception exception) {
             Millager.LOGGER.warn("Could not load English config comments", exception);
         }
@@ -248,6 +259,8 @@ public final class MillagerConfig {
         DefenderConfig.SURGE_ENEMY_WEIGHT_EASY = defender.empoweredRaiderCountMultiplierEasy;
         DefenderConfig.SURGE_ENEMY_WEIGHT_NORMAL = defender.empoweredRaiderCountMultiplierNormal;
         DefenderConfig.SURGE_ENEMY_WEIGHT_HARD = defender.empoweredRaiderCountMultiplierHard;
+        DefenderConfig.MAX_CONSECUTIVE_SPAWN_FAILURES = defender.maxConsecutiveSpawnFailures;
+        DefenderConfig.SPAWN_FAILURE_RETRY_TICKS = defender.spawnFailureRetryTicks;
 
         Patrol patrol = data.patrol;
         PatrolConfig.WILD_TIMER_BASE = patrol.wildTimerBase;
@@ -273,6 +286,17 @@ public final class MillagerConfig {
         PatrolConfig.RUINED_CP_PATROL_SIZE_MIN = patrol.ruinedCpPatrolSizeMin;
         PatrolConfig.RUINED_CP_PATROL_SIZE_MAX = patrol.ruinedCpPatrolSizeMax;
         PatrolConfig.RUINED_CP_PATROL_NEAR_DIST = patrol.ruinedCpPatrolNearDist;
+
+        Misc misc = data.misc;
+        MiscConfig.GENERATE_COMMAND_POSTS = misc.generateCommandPosts;
+        MiscConfig.GENERATE_RUINED_COMMAND_POSTS = misc.generateRuinedCommandPosts;
+        MiscConfig.GENERATE_FLOATING_ISLANDS = misc.generateFloatingIslands;
+        MiscConfig.GENERATE_STRONG_ROOMS = misc.generateStrongRooms;
+        MiscConfig.GENERATE_TRADING_HALLS = misc.generateTradingHalls;
+        MiscConfig.GENERATE_INFANTRY_HUTS = misc.generateInfantryHuts;
+        MiscConfig.FAST_HORSE_DESPAWN_TICKS = misc.fastHorseDespawnTicks;
+        MiscConfig.MOUNT_HORSE_DESPAWN_TICKS = misc.mountHorseDespawnTicks;
+        MiscConfig.DOCTOR_IRON_GOLEM_LIMIT = misc.doctorIronGolemLimit;
     }
 
     private static void write(ConfigData data) throws IOException {
@@ -297,6 +321,7 @@ public final class MillagerConfig {
         public GameRuleDefaults gameRuleDefaults = new GameRuleDefaults();
         public Defender defender = new Defender();
         public Patrol patrol = new Patrol();
+        public Misc misc = new Misc();
     }
 
     public static final class GameRuleDefaults {
@@ -343,6 +368,8 @@ public final class MillagerConfig {
         public double empoweredRaiderCountMultiplierNormal = 0.4D;
         @SerializedName(value = "empowered_raider_count_multiplier_hard", alternate = {"empowered_enemy_count_multiplier_hard", "surge_enemy_weight_hard"})
         public double empoweredRaiderCountMultiplierHard = 0.2D;
+        public int maxConsecutiveSpawnFailures = 3;
+        public int spawnFailureRetryTicks = 20;
     }
 
     public static final class Patrol {
@@ -369,5 +396,17 @@ public final class MillagerConfig {
         public int ruinedCpPatrolSizeMin = 5;
         public int ruinedCpPatrolSizeMax = 7;
         public int ruinedCpPatrolNearDist = 24;
+    }
+
+    public static final class Misc {
+        public boolean generateCommandPosts = true;
+        public boolean generateRuinedCommandPosts = true;
+        public boolean generateFloatingIslands = true;
+        public boolean generateStrongRooms = true;
+        public boolean generateTradingHalls = true;
+        public boolean generateInfantryHuts = true;
+        public int fastHorseDespawnTicks = 140;
+        public int mountHorseDespawnTicks = 900;
+        public int doctorIronGolemLimit = 3;
     }
 }
