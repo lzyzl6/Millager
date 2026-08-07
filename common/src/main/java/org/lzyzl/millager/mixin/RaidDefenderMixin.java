@@ -3,16 +3,22 @@ package org.lzyzl.millager.mixin;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.SectionPos;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.protocol.game.ClientboundSoundPacket;
 import net.minecraft.server.level.ServerBossEvent;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.tags.StructureTags;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.BossEvent;
 import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.animal.equine.Horse;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.entity.ai.village.poi.PoiManager;
 import net.minecraft.world.entity.ai.village.poi.PoiTypes;
 import net.minecraft.world.entity.raid.Raid;
@@ -21,14 +27,18 @@ import net.minecraft.world.level.chunk.status.ChunkStatus;
 import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.level.levelgen.structure.StructureStart;
 import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.scores.PlayerTeam;
 import net.minecraft.world.scores.Scoreboard;
 import org.lzyzl.millager.MillagerGameRules;
+import org.lzyzl.millager.MillagerSounds;
 import org.lzyzl.millager.advancement.MillagerCriteria;
 import org.lzyzl.millager.behavior.MillagerEntityPool;
 import org.lzyzl.millager.behavior.raid.DefenderConfig;
 import org.lzyzl.millager.behavior.raid.MillagerRaidsData;
 import org.lzyzl.millager.entity.millager.AbstractMillager;
+import org.lzyzl.millager.entity.millager.Rider;
+import org.lzyzl.millager.entity.millager.RaidHornPlayer;
 import org.lzyzl.millager.entity.millager.Scouter;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -45,7 +55,30 @@ import java.util.Set;
 import java.util.UUID;
 
 @Mixin(Raid.class)
-public class RaidDefenderMixin {
+public class RaidDefenderMixin implements RaidHornPlayer {
+
+    @Override
+    @Unique
+    public void millager$playReinforcementHorn(ServerLevel level, BlockPos sourcePos) {
+        Vec3 source = Vec3.atCenterOf(sourcePos);
+        for (ServerPlayer player : level.players()) {
+            if (player.distanceToSqr(source) > 4096.0D && !this.raidEvent.getPlayers().contains(player)) continue;
+            double deltaX = source.x - player.getX();
+            double deltaZ = source.z - player.getZ();
+            double distance = Math.sqrt(deltaX * deltaX + deltaZ * deltaZ);
+            if (distance == 0.0D) continue;
+            player.connection.send(new ClientboundSoundPacket(
+                    BuiltInRegistries.SOUND_EVENT.wrapAsHolder(MillagerSounds.REINFORCE_HORN),
+                    SoundSource.NEUTRAL,
+                    player.getX() + deltaX * 13.0D / distance,
+                    player.getY(),
+                    player.getZ() + deltaZ * 13.0D / distance,
+                    64.0F,
+                    0.8F,
+                    this.random.nextLong()
+            ));
+        }
+    }
 
     @Shadow private boolean started;
     @Shadow private int groupsSpawned;
@@ -172,7 +205,7 @@ public class RaidDefenderMixin {
             millager$saveState(level);
         } else {
             millager$maxTimer = millager$computeMaxTimer();
-            millager$defenderTickTimer = waveSpawned ? millager$maxTimer : 20;
+            millager$defenderTickTimer = waveSpawned ? millager$maxTimer : DefenderConfig.SPAWN_FAILURE_RETRY_TICKS;
         }
     }
 
@@ -229,7 +262,7 @@ public class RaidDefenderMixin {
         if (millager$villagerBossEvent == null) return;
         if (millager$defenseComplete) {
             millager$villagerBossEvent.setProgress(1.0f);
-            millager$villagerBossEvent.setName(Component.translatable(millager$failedSpawnAttempts >= 3
+            millager$villagerBossEvent.setName(Component.translatable(millager$failedSpawnAttempts >= DefenderConfig.MAX_CONSECUTIVE_SPAWN_FAILURES
                     ? "raid.millager.reinforcements.unavailable"
                     : "raid.millager.defense.complete"));
             return;
@@ -388,8 +421,8 @@ public class RaidDefenderMixin {
 
         if (squadsSpawned == 0) {
             millager$failedSpawnAttempts++;
-            millager$defenderTickTimer = 20;
-            if (millager$failedSpawnAttempts >= 3) {
+            millager$defenderTickTimer = DefenderConfig.SPAWN_FAILURE_RETRY_TICKS;
+            if (millager$failedSpawnAttempts >= DefenderConfig.MAX_CONSECUTIVE_SPAWN_FAILURES) {
                 millager$defenseComplete = true;
                 millager$finalDeploymentDisplay = true;
                 millager$deployedDisplayTimer = DefenderConfig.DEPLOYED_DISPLAY_TICKS;
@@ -506,6 +539,7 @@ public class RaidDefenderMixin {
 
             entity.setPos(memberPos.getX() + 0.5, memberPos.getY(), memberPos.getZ() + 0.5);
             entity.finalizeSpawn(level, difficulty, EntitySpawnReason.EVENT, null);
+            millager$ensureCavalryHorseArmor(entity);
             entity.setRaidReinforcementCenter(center);
             entity.setSquad(squadId, spawnedCount == 0);
             entity.setPersistenceRequired();
@@ -526,6 +560,13 @@ public class RaidDefenderMixin {
             totalHp += (int) entry.maxHealth() * difficulty.getDifficulty().getId();
         }
         return totalHp;
+    }
+
+    @Unique
+    private void millager$ensureCavalryHorseArmor(AbstractMillager entity) {
+        if (entity.getVehicle() instanceof Horse horse && horse.getItemBySlot(EquipmentSlot.BODY).isEmpty()) {
+            horse.setItemSlot(EquipmentSlot.BODY, new ItemStack(Rider.getRandomHorseArmor(this.random, 3)));
+        }
     }
 
     @Unique

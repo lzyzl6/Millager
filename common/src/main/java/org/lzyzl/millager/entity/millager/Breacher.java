@@ -200,7 +200,7 @@ public class Breacher extends AbstractMillager implements Rider {
         var explosionKnockback = horse.getAttribute(Attributes.EXPLOSION_KNOCKBACK_RESISTANCE);
         if (explosionKnockback != null) explosionKnockback.setBaseValue(0.5D);
         horse.setHealth(horse.getMaxHealth());
-        horse.setBodyArmorItem(new ItemStack(Rider.getRandomHorseArmor(level.getRandom(), 1, 4)));
+        horse.setItemSlot(EquipmentSlot.BODY, new ItemStack(Rider.getRandomHorseArmor(level.getRandom(), 1, 4)));
         horse.setTamed(true);
         horse.addTag("millager_mount");
         this.startRiding(horse);

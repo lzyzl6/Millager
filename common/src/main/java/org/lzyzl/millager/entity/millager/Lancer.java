@@ -190,7 +190,7 @@ public class Lancer extends AbstractMillager implements Rider {
                 explosionKnockbackAttribute.setBaseValue(0.5);
             }
             horse.setHealth(horse.getMaxHealth());
-            horse.setBodyArmorItem(new ItemStack(Rider.getRandomHorseArmor(level.getRandom(), 1,4)));
+            horse.setItemSlot(EquipmentSlot.BODY, new ItemStack(Rider.getRandomHorseArmor(level.getRandom(), 1,4)));
             horse.setTamed(true);
             horse.addTag("millager_mount");
 

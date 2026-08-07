@@ -126,7 +126,7 @@ public class ProfessionOrderItem extends Item {
 
         static void setHorseArmor(AbstractMillager millager) {
             if (millager.getVehicle() instanceof Horse horse) {
-                horse.setBodyArmorItem(new ItemStack(Items.IRON_HORSE_ARMOR));
+                horse.setItemSlot(EquipmentSlot.BODY, new ItemStack(Items.IRON_HORSE_ARMOR));
             }
         }
     }
