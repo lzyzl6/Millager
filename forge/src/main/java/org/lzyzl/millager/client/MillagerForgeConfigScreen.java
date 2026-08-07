@@ -9,6 +9,7 @@ public final class MillagerForgeConfigScreen {
     private MillagerForgeConfigScreen() {
     }
 
+    @SuppressWarnings("removal")
     public static void register() {
         ModLoadingContext.get().registerExtensionPoint(
                 ConfigScreenHandler.ConfigScreenFactory.class,

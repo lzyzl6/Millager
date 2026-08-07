@@ -18,8 +18,10 @@ public class MillagerModelLayers {
 
     public static final ModelLayerLocation DOCTOR = new ModelLayerLocation(ResourceLocationHelper.create(MOD_ID, "doctor"), "main");
     public static final ModelLayerLocation BREACHER = new ModelLayerLocation(ResourceLocationHelper.create(MOD_ID, "breacher"), "main");
+    public static final ModelLayerLocation LANCER = new ModelLayerLocation(ResourceLocationHelper.create(MOD_ID, "lancer"), "main");
     public static final ModelLayerLocation ARCHER = new ModelLayerLocation(ResourceLocationHelper.create(MOD_ID, "archer"), "main");
     public static final ModelLayerLocation SWORDMASTER = new ModelLayerLocation(ResourceLocationHelper.create(MOD_ID, "swordmaster"), "main");
+    public static final ModelLayerLocation MAULER = new ModelLayerLocation(ResourceLocationHelper.create(MOD_ID, "mauler"), "main");
     public static final ModelLayerLocation RIOTER = new ModelLayerLocation(ResourceLocationHelper.create(MOD_ID, "rioter"), "main");
     public static final ModelLayerLocation SCOUTER = new ModelLayerLocation(ResourceLocationHelper.create(MOD_ID, "scouter"), "main");
 
@@ -34,8 +36,10 @@ public class MillagerModelLayers {
 
         ctx.registerLayerDefinition(DOCTOR, MillagerModel::createLayer);
         ctx.registerLayerDefinition(BREACHER, MillagerModel::createLayer);
+        ctx.registerLayerDefinition(LANCER, MillagerModel::createLayer);
         ctx.registerLayerDefinition(ARCHER, MillagerModel::createLayer);
         ctx.registerLayerDefinition(SWORDMASTER, MillagerModel::createLayer);
+        ctx.registerLayerDefinition(MAULER, MillagerModel::createLayer);
         ctx.registerLayerDefinition(RIOTER, MillagerModel::createLayer);
         ctx.registerLayerDefinition(SCOUTER, MillagerModel::createLayer);
         ctx.registerLayerDefinition(VILLAGER_HEAD, VillagerHeadModel::createLayer);

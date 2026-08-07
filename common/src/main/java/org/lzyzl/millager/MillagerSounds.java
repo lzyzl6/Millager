@@ -26,7 +26,13 @@ public class MillagerSounds {
 
     public static final SoundEvent DOCTOR_DRINKING_POTION = registerSound("entity.doctor.drinking_potion");
 
+    public static final SoundEvent LANCER_CAST_SPELL = registerSound("entity.lancer.cast_spell");
+    public static final SoundEvent LANCER_SPEAR_HIT = registerSound("item.lancer_spear.hit");
+
     public static final SoundEvent SWORD_SHIELD_BLOCK = registerSound("entity.swordmaster.shield_block");
+
+    public static final SoundEvent MAULER_FIXING = registerSound("entity.mauler.fixing");
+    public static final SoundEvent MAULER_SMASH = registerSound("entity.mauler.smash");
 
     public static final SoundEvent RIOTER_TAUNTING = registerSound("entity.rioter.taunting");
 

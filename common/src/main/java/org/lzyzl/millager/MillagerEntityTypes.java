@@ -27,8 +27,16 @@ public class MillagerEntityTypes {
             ENTITY_TYPES.registerEntityType("breacher", Breacher::new, MobCategory.MISC,
                     b -> b.sized(0.6F, 1.95F).clientTrackingRange(8));
 
+    public static final DeferredHolder<EntityType<?>, EntityType<Lancer>> Lancers =
+            ENTITY_TYPES.registerEntityType("lancer", Lancer::new, MobCategory.MISC,
+                    b -> b.sized(0.6F, 1.95F).clientTrackingRange(8));
+
     public static final DeferredHolder<EntityType<?>, EntityType<Doctor>> Doctors =
             ENTITY_TYPES.registerEntityType("doctor", Doctor::new, MobCategory.MISC,
+                    b -> b.sized(0.6F, 1.95F).clientTrackingRange(8));
+
+    public static final DeferredHolder<EntityType<?>, EntityType<Mauler>> Maulers =
+            ENTITY_TYPES.registerEntityType("mauler", Mauler::new, MobCategory.MISC,
                     b -> b.sized(0.6F, 1.95F).clientTrackingRange(8));
 
     public static final DeferredHolder<EntityType<?>, EntityType<Rioter>> Rioters =

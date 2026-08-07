@@ -3,9 +3,11 @@
   "values": [
     "minecraft:villager",
     "minecraft:wandering_trader",
+    "millager:lancer",
     "millager:doctor",
     "millager:breacher",
     "millager:archer",
+    "millager:mauler",
     "millager:swordmaster",
     "millager:rioter",
     "millager:scouter",

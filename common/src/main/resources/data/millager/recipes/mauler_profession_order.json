@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    " E ",
+    "APB",
+    " C "
+  ],
+  "key": {
+    "E": { "item": "minecraft:emerald_block" },
+    "P": { "item": "minecraft:paper" },
+    "A": { "item": "minecraft:iron_block" },
+    "B": { "item": "minecraft:iron_ingot" },
+    "C": { "item": "minecraft:amethyst_block" }
+  },
+  "result": {
+    "item": "millager:mauler_profession_order",
+    "count": 1
+  }
+}

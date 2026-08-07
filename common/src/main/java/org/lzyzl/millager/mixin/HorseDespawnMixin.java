@@ -9,6 +9,7 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.animal.horse.AbstractHorse;
 import net.minecraft.world.entity.animal.horse.Horse;
 import net.minecraft.world.entity.player.Player;
+import org.lzyzl.millager.behavior.MiscConfig;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
@@ -21,11 +22,6 @@ public abstract class HorseDespawnMixin {
 
     @Unique
     private int millager$despawnTicks = 0;
-    @Unique
-    private static final int MILLAGER_FAST_DESPAWN_DELAY = 140;
-    @Unique
-    private static final int MILLAGER_MOUNT_DESPAWN_DELAY = 900;
-
     @Inject(method = "aiStep", at = @At("HEAD"))
     private void millager$tickFastDespawn(CallbackInfo ci) {
         if ((Object) this instanceof Horse horse) {
@@ -34,8 +30,8 @@ public abstract class HorseDespawnMixin {
                     horse.getTags().remove("millager_fast_despawn");
                     millager$despawnTicks = 0;
                 } else {
-                    if (millager$despawnTicks <= 0 || millager$despawnTicks > MILLAGER_FAST_DESPAWN_DELAY) {
-                        millager$despawnTicks = MILLAGER_FAST_DESPAWN_DELAY;
+                    if (millager$despawnTicks <= 0 || millager$despawnTicks > MiscConfig.FAST_HORSE_DESPAWN_TICKS) {
+                        millager$despawnTicks = MiscConfig.FAST_HORSE_DESPAWN_TICKS;
                     }
                     millager$despawnTicks--;
                     if (millager$despawnTicks <= 0) {
@@ -43,8 +39,8 @@ public abstract class HorseDespawnMixin {
                     }
                 }
             } else if (horse.getTags().contains("millager_mount") && !millager$hasLivingPassenger(horse)) {
-                if (millager$despawnTicks <= 0) {
-                    millager$despawnTicks = MILLAGER_MOUNT_DESPAWN_DELAY;
+                if (millager$despawnTicks <= 0 || millager$despawnTicks > MiscConfig.MOUNT_HORSE_DESPAWN_TICKS) {
+                    millager$despawnTicks = MiscConfig.MOUNT_HORSE_DESPAWN_TICKS;
                 }
                 millager$despawnTicks--;
                 if (millager$despawnTicks <= 0) {

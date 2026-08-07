@@ -166,7 +166,7 @@ public class Breacher extends AbstractMillager implements Rider {
             if (healthAttr != null && healthAttr.getBaseValue() < 25) healthAttr.setBaseValue(25);
 
             horse.setHealth(horse.getMaxHealth());
-            horse.setItemSlot(EquipmentSlot.CHEST, new ItemStack(Rider.getRandomHorseArmor(level.getRandom(), 1, 3)));
+            horse.inventory.setItem(1, new ItemStack(Rider.getRandomHorseArmor(level.getRandom(), 1, 3)));
             horse.setTamed(true);
             horse.addTag("millager_mount");
 

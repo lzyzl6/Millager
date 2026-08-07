@@ -71,6 +71,23 @@ public class MillagerItems {
             "scouter_profession_order", props -> new ProfessionOrderItem(MillagerEntityTypes.Scouters,
                     ProfessionOrderItem.Equipment.IRON_HORSE_ARMOR, props));
 
+    public static final DeferredItem<ProfessionOrderItem> lancerProfessionOrder = ITEMS.registerItem(
+            "lancer_profession_order", props -> new ProfessionOrderItem(MillagerEntityTypes.Lancers,
+                    ProfessionOrderItem.Equipment.IRON_SPEAR_AND_HORSE_ARMOR, props));
+
+    public static final DeferredItem<LancerSpearItem> ironLancerSpear = ITEMS.registerItem(
+            "iron_lancer_spear", props -> new LancerSpearItem(LancerSpearItem.Material.IRON, props));
+
+    public static final DeferredItem<LancerSpearItem> goldenLancerSpear = ITEMS.registerItem(
+            "golden_lancer_spear", props -> new LancerSpearItem(LancerSpearItem.Material.GOLD, props));
+
+    public static final DeferredItem<LancerSpearItem> diamondLancerSpear = ITEMS.registerItem(
+            "diamond_lancer_spear", props -> new LancerSpearItem(LancerSpearItem.Material.DIAMOND, props));
+
+    public static final DeferredItem<ProfessionOrderItem> maulerProfessionOrder = ITEMS.registerItem(
+            "mauler_profession_order", props -> new ProfessionOrderItem(MillagerEntityTypes.Maulers,
+                    ProfessionOrderItem.Equipment.DEFAULT, props));
+
     public static final DeferredItem<ProfessionOrderItem> rioterProfessionOrder = ITEMS.registerItem(
             "rioter_profession_order", props -> new ProfessionOrderItem(MillagerEntityTypes.Rioters,
                     ProfessionOrderItem.Equipment.DEFAULT, props));
@@ -124,6 +141,9 @@ public class MillagerItems {
     public static final DeferredItem<BucklerItem> buckler = ITEMS.registerItem(
             "buckler", BucklerItem::new, () -> new Item.Properties().durability(255));
 
+    public static final DeferredItem<IronMaceItem> IRON_MACE = ITEMS.registerItem(
+            "iron_mace", IronMaceItem::new, () -> new Item.Properties().durability(250));
+
     public static final DeferredItem<BlockItem> rose = ITEMS.registerItem(
             "rose", props -> new BlockItem(MillagerBlocks.ROSE.get(), props),
             Item.Properties::new);
@@ -168,8 +188,14 @@ public class MillagerItems {
     public static final DeferredItem<SpawnEggItem> BREACHER_SPAWN_EGG = ITEMS.registerSpawnEgg(
             "breacher_spawn_egg", MillagerEntityTypes.Breachers, 5651507, 14272879, Item.Properties::new);
 
+    public static final DeferredItem<SpawnEggItem> LANCER_SPAWN_EGG = ITEMS.registerSpawnEgg(
+            "lancer_spawn_egg", MillagerEntityTypes.Lancers, 5651507, 11984326, Item.Properties::new);
+
     public static final DeferredItem<SpawnEggItem> SWORDMASTER_SPAWN_EGG = ITEMS.registerSpawnEgg(
             "swordmaster_spawn_egg", MillagerEntityTypes.Swordmasters, 5651507, 8833415, Item.Properties::new);
+
+    public static final DeferredItem<SpawnEggItem> MAULER_SPAWN_EGG = ITEMS.registerSpawnEgg(
+            "mauler_spawn_egg", MillagerEntityTypes.Maulers, 5651507, 7980228, Item.Properties::new);
 
     public static final DeferredItem<SpawnEggItem> RIOTER_SPAWN_EGG = ITEMS.registerSpawnEgg(
             "rioter_spawn_egg", MillagerEntityTypes.Rioters, 5651507, 8560593, Item.Properties::new);

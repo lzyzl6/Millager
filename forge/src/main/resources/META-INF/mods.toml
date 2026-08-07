@@ -9,7 +9,7 @@ version="${version}"
 displayName="${mod_name}"
 displayURL="https://www.curseforge.com/minecraft/mc-mods/millager"
 logoFile="icon.png"
-credits="${credits}"
+credits='''${credits}'''
 authors="${mod_author}"
 description='''${description}'''
 

@@ -1,6 +1,5 @@
 package org.lzyzl.millager.entity.ai.millager;
 
-import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.entity.animal.horse.Horse;
@@ -82,7 +81,7 @@ public class RiderRemountGoal<T extends AbstractMillager & Rider> extends Goal {
                     if (healthAtt != null && healthAtt.getBaseValue() < minHealth)
                         healthAtt.setBaseValue(minHealth);
                     this.targetHorse.setHealth(this.targetHorse.getMaxHealth());
-                    this.targetHorse.setItemSlot(EquipmentSlot.CHEST,
+                    this.targetHorse.inventory.setItem(1,
                             new ItemStack(Rider.getRandomHorseArmor(this.rider.getRandom(), 2)));
                     this.targetHorse.addTag("millager_mount");
                 }

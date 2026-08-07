@@ -2,6 +2,7 @@ package org.lzyzl.millager.client.render.entity.horse;
 
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.animal.horse.Horse;
+import org.lzyzl.millager.util.ResourceLocationHelper;
 
 import java.util.Locale;
 
@@ -13,7 +14,7 @@ public final class MillagerHorseTextures {
     }
 
     public static ResourceLocation getTexture(Horse horse) {
-        return new ResourceLocation(MOD_ID, "textures/entity/horse/" + horse.getVariant().name().toLowerCase(Locale.ROOT)
+        return ResourceLocationHelper.create(MOD_ID, "textures/entity/horse/" + horse.getVariant().name().toLowerCase(Locale.ROOT)
                 + "_" + horse.getMarkings().name().toLowerCase(Locale.ROOT) + ".png");
     }
 }

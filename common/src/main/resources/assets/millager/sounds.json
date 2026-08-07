@@ -103,9 +103,33 @@
     "subtitle": "sound.millager.entity.doctor.drinking_potion",
     "sounds": [{"type":"event", "name": "minecraft:entity.wandering_trader.drink_potion"}]
   },
+  "entity.lancer.cast_spell": {
+    "subtitle": "sound.millager.entity.lancer.cast_spell",
+    "sounds": [{"type":"event", "name": "minecraft:entity.evoker.cast_spell"}]
+  },
+  "item.lancer_spear.hit": {
+    "sounds": [
+      {"name": "millager:item/lancer_spear_hit1"},
+      {"name": "millager:item/lancer_spear_hit2"},
+      {"name": "millager:item/lancer_spear_hit3"}
+    ]
+  },
   "entity.swordmaster.shield_block": {
     "subtitle": "sound.millager.entity.swordmaster.shield_block",
     "sounds": [{"type":"event", "name": "minecraft:item.shield.block"}]
+  },
+  "entity.mauler.fixing": {
+    "subtitle": "sound.millager.entity.mauler.fixing",
+    "sounds": [{"type":"event", "name": "minecraft:entity.villager.work_toolsmith"}]
+  },
+  "entity.mauler.smash": {
+    "subtitle": "sound.millager.entity.mauler.smash",
+    "sounds": [
+      {"name": "millager:mauler_smash_1"},
+      {"name": "millager:mauler_smash_2"},
+      {"name": "millager:mauler_smash_3"},
+      {"name": "millager:mauler_smash_4"}
+    ]
   },
   "entity.rioter.taunting": {
     "subtitle": "sound.millager.entity.rioter.taunting",

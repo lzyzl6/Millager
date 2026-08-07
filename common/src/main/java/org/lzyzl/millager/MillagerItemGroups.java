@@ -49,8 +49,10 @@ public class MillagerItemGroups {
                         output.accept(MillagerItems.doctorProfessionOrder);
                         output.accept(MillagerItems.archerProfessionOrder);
                         output.accept(MillagerItems.scouterProfessionOrder);
+                        output.accept(MillagerItems.lancerProfessionOrder);
                         output.accept(MillagerItems.breacherProfessionOrder);
                         output.accept(MillagerItems.swordmasterProfessionOrder);
+                        output.accept(MillagerItems.maulerProfessionOrder);
                         output.accept(MillagerItems.rioterProfessionOrder);
                         output.accept(MillagerItems.infantryMusterOrder);
                         output.accept(MillagerItems.cavalryMusterOrder);
@@ -68,8 +70,10 @@ public class MillagerItemGroups {
                         output.accept(MillagerItems.DOCTOR_SPAWN_EGG);
                         output.accept(MillagerItems.ARCHER_SPAWN_EGG);
                         output.accept(MillagerItems.SCOUTER_SPAWN_EGG);
+                        output.accept(MillagerItems.LANCER_SPAWN_EGG);
                         output.accept(MillagerItems.BREACHER_SPAWN_EGG);
                         output.accept(MillagerItems.SWORDMASTER_SPAWN_EGG);
+                        output.accept(MillagerItems.MAULER_SPAWN_EGG);
                         output.accept(MillagerItems.RIOTER_SPAWN_EGG);
 //                        output.accept(MillagerItems.SCHOLAR_SPAWN_EGG);
 //                        output.accept(MillagerItems.CONJURER_SPAWN_EGG);

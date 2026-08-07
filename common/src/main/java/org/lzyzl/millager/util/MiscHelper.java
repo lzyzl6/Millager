@@ -3,8 +3,8 @@ package org.lzyzl.millager.util;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.DustParticleOptions;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.network.chat.Component;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
@@ -14,13 +14,12 @@ import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
-import net.minecraft.world.entity.PlayerRideable;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.navigation.PathNavigation;
-import net.minecraft.world.entity.animal.horse.Horse;
 import net.minecraft.world.entity.animal.IronGolem;
+import net.minecraft.world.entity.animal.horse.Horse;
 import net.minecraft.world.entity.decoration.ArmorStand;
 import net.minecraft.world.entity.decoration.PaintingVariant;
 import net.minecraft.world.entity.npc.Villager;
@@ -39,17 +38,17 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
+import org.joml.Vector3f;
+import org.jspecify.annotations.Nullable;
 import org.lzyzl.millager.MillagerBlocks;
 import org.lzyzl.millager.MillagerGameRules;
 import org.lzyzl.millager.entity.golem.BeeGolem;
 import org.lzyzl.millager.entity.millager.AbstractMillager;
 import org.lzyzl.millager.entity.millager.Rioter;
-import org.jspecify.annotations.Nullable;
-import org.joml.Vector3f;
 
-import java.util.function.IntFunction;
 import java.util.List;
 import java.util.UUID;
+import java.util.function.IntFunction;
 
 import static org.lzyzl.millager.Millager.MOD_ID;
 
@@ -133,7 +132,7 @@ public class MiscHelper {
         return current + f;
     }
 
-    public static boolean isMillagerFaction(Object entity) {
+    public static boolean isMillagerFaction(@Nullable Object entity) {
         if (entity == null) return false;
 
         if(entity instanceof IronGolem golem) return !MultigolemDetector.isZombieGolem(golem);
