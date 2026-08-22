@@ -2,7 +2,7 @@
 
 ![Minecraft](https://img.shields.io/badge/Minecraft-1.20.1+-62b47a?style=flat-square)
 ![Loaders](https://img.shields.io/badge/加载器-Fabric_%7C_NeoForge_%7C_Forge-bac92c?style=flat-square)
-[![Version](https://img.shields.io/badge/%E7%89%88%E6%9C%AC-0.7.6.2-e8a87c?style=flat-square)](https://modrinth.com/mod/millager/versions)
+[![Version](https://img.shields.io/badge/%E7%89%88%E6%9C%AC-0.7.7-e8a87c?style=flat-square)](https://modrinth.com/mod/millager/versions)
 ![Environment](https://img.shields.io/badge/环境-客户端_%26_服务端-7ec8e3?style=flat-square)
 
 > *"Millager——militia（民兵）与 villager（村民）的合成词——指的是守卫在村庄与灾厄威胁之间的武装村民们。"*
