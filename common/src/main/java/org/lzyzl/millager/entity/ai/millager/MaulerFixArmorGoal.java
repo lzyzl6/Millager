@@ -4,6 +4,7 @@ import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.goal.Goal;
 import org.lzyzl.millager.MillagerSounds;
 import org.lzyzl.millager.entity.millager.Mauler;
@@ -58,7 +59,8 @@ public class MaulerFixArmorGoal extends Goal {
             }
             this.mauler.playSound(SoundEvents.VILLAGER_YES);
             float num = 2 + this.mauler.getRandom().nextInt(2);
-            this.mauler.getAttribute(Attributes.ARMOR).setBaseValue(Math.min(this.mauler.getArmorValue() + num, 20f));
+            AttributeInstance armor = this.mauler.getAttribute(Attributes.ARMOR);
+            if (armor != null) armor.setBaseValue(Math.min(this.mauler.getArmorValue() + num, 20F));
             this.mauler.setFixCooldown(320 + this.mauler.getRandom().nextInt(160));
         }
         this.mauler.setFixing(false);

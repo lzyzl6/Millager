@@ -2,8 +2,6 @@ package org.lzyzl.millager.entity.millager;
 
 import it.unimi.dsi.fastutil.ints.IntList;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Holder;
-import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
@@ -33,7 +31,6 @@ import net.minecraft.world.entity.projectile.FireworkRocketEntity;
 import net.minecraft.world.entity.projectile.ProjectileUtil;
 import net.minecraft.world.item.CrossbowItem;
 import net.minecraft.world.item.DyeColor;
-import net.minecraft.world.item.Instrument;
 import net.minecraft.world.item.InstrumentItem;
 import net.minecraft.world.item.Instruments;
 import net.minecraft.world.item.ItemStack;
@@ -58,15 +55,11 @@ import org.lzyzl.millager.entity.golem.BeeGolem;
 import org.lzyzl.millager.util.MiscHelper;
 
 import java.util.List;
-import java.util.Optional;
 
 public class Scouter extends AbstractMillager implements CrossbowAttackMob, Rider {
 
     private static final EntityDataAccessor<Boolean> IS_CHARGING_CROSSBOW = SynchedEntityData.defineId(Scouter.class, EntityDataSerializers.BOOLEAN);
     private static final EntityDataAccessor<Boolean> IS_TOOTING = SynchedEntityData.defineId(Scouter.class, EntityDataSerializers.BOOLEAN);
-
-    private final ItemStack rocketAmmo = createFireworkRocket();
-    private final ItemStack goatHorn = createHorn();
 
     private boolean hasTooted = false;
     private boolean pendingRaidToot = false;
@@ -169,7 +162,7 @@ public class Scouter extends AbstractMillager implements CrossbowAttackMob, Ride
     @Override
     protected void populateDefaultEquipmentSlots(@NonNull RandomSource random, @NonNull DifficultyInstance difficulty) {
         this.setItemSlot(EquipmentSlot.MAINHAND, Items.CROSSBOW.getDefaultInstance());
-        this.setItemSlot(EquipmentSlot.OFFHAND, this.goatHorn.copy());
+        this.setItemSlot(EquipmentSlot.OFFHAND, this.createHorn());
     }
 
     @Override
@@ -188,7 +181,7 @@ public class Scouter extends AbstractMillager implements CrossbowAttackMob, Ride
     @Override
     public @NonNull ItemStack getProjectile(ItemStack itemStack) {
         if (itemStack.getItem() instanceof CrossbowItem) {
-            return this.rocketAmmo.copy();
+            return this.createFireworkRocket();
         } else {
             return ItemStack.EMPTY;
         }
@@ -254,6 +247,9 @@ public class Scouter extends AbstractMillager implements CrossbowAttackMob, Ride
         Horse horse = EntityType.HORSE.create(level.getLevel());
         if (horse != null) {
             horse.setPos(this.getX(), this.getY(), this.getZ());
+            horse.setYRot(this.getYRot());
+            horse.setYBodyRot(this.getYRot());
+            horse.setYHeadRot(this.getYRot());
             horse.finalizeSpawn(level, level.getCurrentDifficultyAt(horse.blockPosition()), spawnReason, spawnGroupData);
             double minSpeed = 0.25;
             var speedAttribute = horse.getAttribute(Attributes.MOVEMENT_SPEED);
@@ -304,10 +300,10 @@ public class Scouter extends AbstractMillager implements CrossbowAttackMob, Ride
     }
 
     private ItemStack createHorn() {
-        RegistryAccess registryAccess = this.level().registryAccess();
-        var instrumentRegistry = registryAccess.lookupOrThrow(Registries.INSTRUMENT);
-        Optional<Holder.Reference<Instrument>> holder = instrumentRegistry.get(Instruments.FEEL_GOAT_HORN);
-        return holder.map(instrumentReference -> InstrumentItem.create(Items.GOAT_HORN, instrumentReference)).orElse(ItemStack.EMPTY);
+        return this.level().registryAccess().lookup(Registries.INSTRUMENT)
+                .flatMap(registry -> registry.get(Instruments.FEEL_GOAT_HORN))
+                .map(instrument -> InstrumentItem.create(Items.GOAT_HORN, instrument))
+                .orElse(ItemStack.EMPTY);
     }
 
     public boolean hasTooted() {

@@ -14,6 +14,7 @@ import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.damagesource.DamageTypes;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.MobSpawnType;
 import net.minecraft.world.entity.SpawnGroupData;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
@@ -21,6 +22,7 @@ import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.goal.AvoidEntityGoal;
 import net.minecraft.world.entity.animal.IronGolem;
 import net.minecraft.world.entity.animal.horse.Horse;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.component.WrittenBookContent;
@@ -41,6 +43,7 @@ import java.util.List;
 
 public class Lancer extends AbstractMillager implements Rider {
     private static final EntityDataAccessor<Boolean> IS_HEALING = SynchedEntityData.defineId(Lancer.class, EntityDataSerializers.BOOLEAN);
+    private static final EntityDataAccessor<Integer> LAST_SPEAR_HIT_TICK = SynchedEntityData.defineId(Lancer.class, EntityDataSerializers.INT);
     private long nextHealTime;
     private int castTicks;
     public Lancer(EntityType<? extends Lancer> entityType, Level level) {
@@ -50,9 +53,18 @@ public class Lancer extends AbstractMillager implements Rider {
     }
 
     @Override
+    public void setTarget(@Nullable LivingEntity target) {
+        super.setTarget(target);
+        if (target != null && !LancerSpearUseGoal.isLancerSpear(this.getMainHandItem())) {
+            this.setItemSlot(EquipmentSlot.MAINHAND, new ItemStack(this.getRandomSpear(this.getRandom())));
+            this.setDropChance(EquipmentSlot.MAINHAND, 0.0F);
+        }
+    }
+
+    @Override
     public MillagerPose getMillagerPose() {
         if (this.isHealing()) return MillagerPose.SPELLCASTING;
-        if (this.isUsingItem() && LancerSpearUseGoal.isLancerSpear(this.getUseItem())) return MillagerPose.SPEAR;
+        if (LancerSpearUseGoal.isLancerSpear(this.getMainHandItem())) return MillagerPose.SPEAR;
         return this.getMainHandItem().isEmpty() ? MillagerPose.NEUTRAL : MillagerPose.HOLDING_ITEM;
     }
 
@@ -70,8 +82,8 @@ public class Lancer extends AbstractMillager implements Rider {
     protected void registerGoals() {
         this.goalSelector.addGoal(0, new RiderRemountGoal<>(this, 1.2D));
         this.goalSelector.addGoal(1, new LancerHealAuraGoal(this));
+        this.goalSelector.addGoal(2, new AvoidEntityGoal<>(this, Horse.class, 4.0F, 1.0D, 1.2D));
         this.goalSelector.addGoal(2, new LancerSpearUseGoal<>(this, 1.5D, 1.3D, 10.0F, 2.0F));
-        this.goalSelector.addGoal(3, new AvoidEntityGoal<>(this, Horse.class, 4.0F, 1.0D, 1.2D));
         this.targetSelector.addGoal(1, new RiderAvoidAllyGoal<>(this, true));
         this.targetSelector.addGoal(1, new RiderHorseHurtByTargetGoal<>(this, AbstractMillager.class, BeeGolem.class, IronGolem.class));
         super.registerGoals();
@@ -81,6 +93,7 @@ public class Lancer extends AbstractMillager implements Rider {
     protected void defineSynchedData(SynchedEntityData.@NonNull Builder builder) {
         super.defineSynchedData(builder);
         builder.define(IS_HEALING, false);
+        builder.define(LAST_SPEAR_HIT_TICK, -1);
     }
 
     @Override
@@ -143,6 +156,18 @@ public class Lancer extends AbstractMillager implements Rider {
         this.castTicks = castTicks;
     }
 
+    public void onSpearHit() {
+        int lastHitTick = this.entityData.get(LAST_SPEAR_HIT_TICK);
+        if (lastHitTick < 0 || this.tickCount - lastHitTick > 10) {
+            this.entityData.set(LAST_SPEAR_HIT_TICK, this.tickCount);
+        }
+    }
+
+    public float getTicksSinceSpearHit(float partialTick) {
+        int lastHitTick = this.entityData.get(LAST_SPEAR_HIT_TICK);
+        return lastHitTick < 0 ? 0.0F : this.tickCount - lastHitTick + partialTick;
+    }
+
     @Override
     public SpawnGroupData finalizeSpawn(@NonNull ServerLevelAccessor level, @NonNull DifficultyInstance difficulty,
                                         @NonNull MobSpawnType spawnReason, @Nullable SpawnGroupData spawnGroupData) {
@@ -155,13 +180,17 @@ public class Lancer extends AbstractMillager implements Rider {
 
     @Override
     protected void populateDefaultEquipmentSlots(@NonNull RandomSource random, @NonNull DifficultyInstance difficulty) {
-        this.setItemSlot(EquipmentSlot.MAINHAND, new ItemStack(switch (random.nextInt(3)) {
+        this.setItemSlot(EquipmentSlot.MAINHAND, new ItemStack(this.getRandomSpear(random)));
+        this.setDropChance(EquipmentSlot.MAINHAND, 0.0F);
+        this.setItemSlot(EquipmentSlot.OFFHAND, this.createLancerBook());
+    }
+
+    private Item getRandomSpear(RandomSource random) {
+        return switch (random.nextInt(3)) {
             case 0 -> MillagerItems.ironLancerSpear.get();
             case 1 -> MillagerItems.goldenLancerSpear.get();
             default -> MillagerItems.diamondLancerSpear.get();
-        }));
-        this.setDropChance(EquipmentSlot.MAINHAND, 0.0F);
-        this.setItemSlot(EquipmentSlot.OFFHAND, this.createLancerBook());
+        };
     }
 
     private ItemStack createLancerBook() {
@@ -181,6 +210,9 @@ public class Lancer extends AbstractMillager implements Rider {
         Horse horse = EntityType.HORSE.create(level.getLevel());
         if (horse == null) return;
         horse.setPos(this.getX(), this.getY(), this.getZ());
+        horse.setYRot(this.getYRot());
+        horse.setYBodyRot(this.getYRot());
+        horse.setYHeadRot(this.getYRot());
         horse.finalizeSpawn(level, level.getCurrentDifficultyAt(horse.blockPosition()), spawnReason, spawnGroupData);
         var speedAttr = horse.getAttribute(Attributes.MOVEMENT_SPEED);
         if (speedAttr != null && speedAttr.getBaseValue() < 0.3) speedAttr.setBaseValue(0.3);

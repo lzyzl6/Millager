@@ -35,32 +35,27 @@ public class LiquorCauldronHelper {
 
     public static void registerLiquorInteraction() {
 
-        liquorIngredients.forEach(item -> CauldronInteraction.WATER.map().put(item, new CauldronInteraction() {
-            public ItemInteractionResult interact(BlockState state, Level world, BlockPos pos, Player player, InteractionHand hand, ItemStack stack) {
-                return startBrewing(state, world, pos, player, hand, stack);
-            }
-        }));
+        liquorIngredients.forEach(item -> CauldronInteraction.WATER.map().put(item,
+                (state, world, pos, player, hand, stack) -> startBrewing(state, world, pos, player, hand, stack)));
 
-        CauldronInteraction.EMPTY.map().put(Items.GLASS_BOTTLE, new CauldronInteraction() {
-            public ItemInteractionResult interact(BlockState state, Level world, BlockPos pos, Player player, InteractionHand hand, ItemStack stack) {
-                if (state.is(MillagerBlocks.LIQUOR_CAULDRON.get())) {
-                    if (!world.isClientSide()) {
-                        player.setItemInHand(hand, ItemUtils.createFilledResult(stack, player, new ItemStack(MillagerItems.liquor.get())));
-                        int currentLevel = state.getValue(LiquorCauldronBlock.LEVEL);
-                        if (currentLevel > 1) {
-                            world.setBlock(pos, state.setValue(LiquorCauldronBlock.LEVEL, currentLevel - 1), 3);
-                        } else {
-                            world.setBlock(pos, Blocks.CAULDRON.defaultBlockState(), 3);
-                        }
-                        world.playSound(null, pos, SoundEvents.BOTTLE_FILL, SoundSource.BLOCKS, 1.0f, 1.0f);
-                        if (player instanceof ServerPlayer serverPlayer) {
-                            MillagerCriteria.OBTAIN_LIQUOR.get().trigger(serverPlayer);
-                        }
+        CauldronInteraction.EMPTY.map().put(Items.GLASS_BOTTLE, (state, world, pos, player, hand, stack) -> {
+            if (state.is(MillagerBlocks.LIQUOR_CAULDRON.get())) {
+                if (!world.isClientSide()) {
+                    player.setItemInHand(hand, ItemUtils.createFilledResult(stack, player, new ItemStack(MillagerItems.liquor.get())));
+                    int currentLevel = state.getValue(LiquorCauldronBlock.LEVEL);
+                    if (currentLevel > 1) {
+                        world.setBlock(pos, state.setValue(LiquorCauldronBlock.LEVEL, currentLevel - 1), 3);
+                    } else {
+                        world.setBlock(pos, Blocks.CAULDRON.defaultBlockState(), 3);
                     }
-                    return ItemInteractionResult.SUCCESS;
+                    world.playSound(null, pos, SoundEvents.BOTTLE_FILL, SoundSource.BLOCKS, 1.0f, 1.0f);
+                    if (player instanceof ServerPlayer serverPlayer) {
+                        MillagerCriteria.OBTAIN_LIQUOR.get().trigger(serverPlayer);
+                    }
                 }
-                return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
+                return ItemInteractionResult.SUCCESS;
             }
+            return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
         });
     }
 

@@ -12,6 +12,8 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.decoration.ArmorStand;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.alchemy.PotionBrewing;
 import net.minecraft.world.item.alchemy.Potions;
@@ -36,6 +38,7 @@ import net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent;
 import net.neoforged.neoforge.event.brewing.RegisterBrewingRecipesEvent;
 import net.neoforged.neoforge.event.entity.EntityAttributeCreationEvent;
 import net.neoforged.neoforge.event.entity.EntityJoinLevelEvent;
+import net.neoforged.neoforge.event.entity.living.LivingEntityUseItemEvent;
 import net.neoforged.neoforge.event.level.ExplosionEvent;
 import net.neoforged.neoforge.event.village.VillagerTradesEvent;
 import org.lzyzl.millager.block.MillagerMenuType;
@@ -45,6 +48,7 @@ import org.lzyzl.millager.client.MillagerModelLayers;
 import org.lzyzl.millager.client.MillagerNeoForgeConfigScreen;
 import org.lzyzl.millager.client.gui.screens.TotemInfuserScreen;
 import org.lzyzl.millager.client.util.BlockRenderHelper;
+import org.lzyzl.millager.compat.goety.GoetyCompat;
 import org.lzyzl.millager.config.MillagerConfig;
 import org.lzyzl.millager.entity.golem.BeeGolem;
 import org.lzyzl.millager.entity.millager.*;
@@ -109,6 +113,13 @@ public class MillagerNeoForge {
     }
 
     @SubscribeEvent
+    public void onLivingEntityUseItemFinish(LivingEntityUseItemEvent.Finish event) {
+        if (event.getEntity() instanceof Player player && isGoetyRaidingHorn(event.getItem())) {
+            GoetyCompat.onRaidingHornUsed(player);
+        }
+    }
+
+    @SubscribeEvent
     public void onExplosionDetonate(ExplosionEvent.Detonate event) {
         if (event.getExplosion().getDirectSourceEntity() instanceof RioterProjectile rioterProjectile && rioterProjectile.isRioterProjectile()) {
             event.getAffectedEntities().removeIf(entity -> !(entity instanceof LivingEntity) || entity instanceof ArmorStand);
@@ -120,6 +131,10 @@ public class MillagerNeoForge {
         VillagerTradeHelper.registerVillagerTrades(
                 BuiltInRegistries.VILLAGER_PROFESSION.getResourceKey(event.getType()).orElseThrow(),
                 (level, listing) -> event.getTrades().get(level.intValue()).add(listing));
+    }
+
+    private static boolean isGoetyRaidingHorn(ItemStack stack) {
+        return "goety:raiding_horn".equals(String.valueOf(BuiltInRegistries.ITEM.getKey(stack.getItem())));
     }
 
     @EventBusSubscriber(modid = Millager.MOD_ID, value = Dist.CLIENT)

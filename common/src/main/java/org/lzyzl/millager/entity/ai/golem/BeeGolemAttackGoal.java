@@ -1,14 +1,11 @@
 package org.lzyzl.millager.entity.ai.golem;
 
-import net.minecraft.world.damagesource.DamageTypes;
-import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import org.lzyzl.millager.entity.golem.BeeGolem;
 
-import java.util.Optional;
 
 public class BeeGolemAttackGoal extends Goal {
 

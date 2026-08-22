@@ -35,11 +35,11 @@ import org.jspecify.annotations.NonNull;
 import org.lzyzl.millager.entity.ai.millager.SwordmasterMeleeAttackGoal;
 import org.lzyzl.millager.entity.ai.millager.SwordmasterRespawnGoal;
 import org.lzyzl.millager.entity.ai.millager.SwordmasterSwordShieldGoal;
+import org.lzyzl.millager.util.MillagerTargetingHelper;
 
 import java.util.List;
 
 import static org.lzyzl.millager.util.MiscHelper.isAllyCaused;
-import static org.lzyzl.millager.util.MiscHelper.isMillagerFaction;
 
 public class Swordmaster extends AbstractMillager {
 
@@ -210,7 +210,7 @@ public class Swordmaster extends AbstractMillager {
             List<LivingEntity> targets = this.level().getEntitiesOfClass(
                     LivingEntity.class,
                     this.getBoundingBox().inflate(4.0),
-                    entity -> !isMillagerFaction(entity) && entity.isAlive()
+                    entity -> !MillagerTargetingHelper.isFriendlyToMillager(entity) && entity.isAlive()
             );
 
             for (LivingEntity target : targets) {

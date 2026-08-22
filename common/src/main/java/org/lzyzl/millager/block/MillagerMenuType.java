@@ -2,7 +2,6 @@ package org.lzyzl.millager.block;
 
 import net.minecraft.core.registries.Registries;
 import net.minecraft.world.flag.FeatureFlags;
-import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.MenuType;
 import org.lzyzl.millager.registry.DeferredHolder;
 import org.lzyzl.millager.registry.DeferredRegister;
@@ -17,7 +16,7 @@ public class MillagerMenuType {
 
     public static final DeferredHolder<MenuType<?>, MenuType<TotemInfuserMenu>> TOTEM_INFUSER =
             MENU_TYPES.register("totem_infuser",
-                    () -> new MenuType<TotemInfuserMenu>(TotemInfuserMenu::new, FeatureFlags.DEFAULT_FLAGS));
+                    () -> new MenuType<>(TotemInfuserMenu::new, FeatureFlags.DEFAULT_FLAGS));
 
     public static void initialize() {
         MENU_TYPES.register();

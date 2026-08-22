@@ -158,6 +158,9 @@ public class Breacher extends AbstractMillager implements Rider {
         Horse horse = EntityType.HORSE.create(level.getLevel());
         if (horse != null) {
             horse.setPos(this.getX(), this.getY(), this.getZ());
+            horse.setYRot(this.getYRot());
+            horse.setYBodyRot(this.getYRot());
+            horse.setYHeadRot(this.getYRot());
             horse.finalizeSpawn(level, level.getCurrentDifficultyAt(horse.blockPosition()), spawnReason, spawnGroupData);
 
             var speedAttr = horse.getAttribute(Attributes.MOVEMENT_SPEED);
@@ -209,7 +212,6 @@ public class Breacher extends AbstractMillager implements Rider {
     public void setAxeCooldown(int cooldown) { this.axeCooldown = cooldown; }
     public int getBashCooldown() { return this.bashCooldown; }
     public void setBashCooldown(int cooldown) { this.bashCooldown = cooldown; }
-    public int getShieldCooldown() { return this.shieldCooldown; }
     public void setShieldCooldown(int cooldown) { this.shieldCooldown = cooldown; }
     public boolean canUseShield() { return this.shieldCooldown <= 0 && this.getOffhandItem().is(MillagerItems.buckler.get()); }
 }

@@ -44,7 +44,7 @@ public class BeeGolemFlashLayer extends RenderLayer<BeeGolem, BeeGolemModel> {
         }
         int a = Math.max(10, (int) (s * 255));
 
-        VertexConsumer consumer = bufferSource.getBuffer(RenderType.entityCutoutNoCull(FLASH_TEXTURE));
+        VertexConsumer consumer = bufferSource.getBuffer(RenderType.entityTranslucentEmissive(FLASH_TEXTURE));
         this.flashModel.setupAnim(entity, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch);
         this.flashModel.renderToBuffer(poseStack, consumer, 0xF000F0, OverlayTexture.NO_OVERLAY, (a << 24) | (r << 16) | (g << 8) | b);
     }

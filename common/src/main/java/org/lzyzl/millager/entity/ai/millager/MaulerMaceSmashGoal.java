@@ -9,12 +9,12 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.goal.Goal;
-import net.minecraft.world.entity.monster.Creeper;
 import net.minecraft.world.entity.monster.Enemy;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.lzyzl.millager.entity.millager.Mauler;
+import org.lzyzl.millager.util.MillagerTargetingHelper;
 
 import java.util.EnumSet;
 import java.util.List;
@@ -96,7 +96,8 @@ public class MaulerMaceSmashGoal extends Goal {
         List<LivingEntity> victims = serverLevel.getEntitiesOfClass(LivingEntity.class, smashArea,
                 e -> {
             if(e instanceof Player player && this.target == player) return true;
-            return !(e instanceof Creeper) && e instanceof Enemy && e.isAlive() && !this.mauler.isAlliedTo(e);
+            return MillagerTargetingHelper.isHostileToMillager(this.mauler, e)
+                    && e instanceof Enemy && e.isAlive() && !this.mauler.isAlliedTo(e);
         });
 
         if (!victims.isEmpty()) {

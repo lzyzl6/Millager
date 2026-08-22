@@ -13,7 +13,7 @@ import org.lzyzl.millager.item.LancerSpearItem;
 import java.util.EnumSet;
 
 public class LancerSpearUseGoal<T extends AbstractMillager> extends Goal {
-    private static final double MAX_FLEEING_TIME = 100.0D;
+    private static final double MAX_FLEEING_TIME = reducedTickDelay(100);
     private final T mob;
     private final double speedModifierWhenCharging;
     private final double speedModifierWhenRepositioning;
@@ -64,6 +64,7 @@ public class LancerSpearUseGoal<T extends AbstractMillager> extends Goal {
         if (target == null) return;
         double distanceSq = this.mob.distanceToSqr(target.getX(), target.getY(), target.getZ());
         float speed = 1.0F;
+        int passengerOffset = this.mob.isPassenger() ? 2 : 0;
         this.mob.lookAt(target, 30.0F, 30.0F);
         this.mob.getLookControl().setLookAt(target, 30.0F, 30.0F);
         if (this.state.notEngagedYet()) {
@@ -72,13 +73,12 @@ public class LancerSpearUseGoal<T extends AbstractMillager> extends Goal {
                 return;
             }
             if (!(this.mob.getMainHandItem().getItem() instanceof LancerSpearItem spear)) return;
-            this.state.startEngagement(spear.getDamageUseDuration());
+            this.state.startEngagement(reducedTickDelay(spear.getDamageUseDuration()));
             this.mob.startUsingItem(InteractionHand.MAIN_HAND);
         }
         if (this.state.tickAndCheckEngagement()) {
             this.mob.stopUsingItem();
             double distance = Math.sqrt(distanceSq);
-            int passengerOffset = this.mob.isPassenger() ? 2 : 0;
             this.state.awayPos = LandRandomPos.getPosAway(this.mob,
                     Math.max(0, (int) (9 + passengerOffset - distance)),
                     Math.max(1, (int) (11 + passengerOffset - distance)), target.position());
@@ -99,8 +99,9 @@ public class LancerSpearUseGoal<T extends AbstractMillager> extends Goal {
                 this.mob.getNavigation().moveTo(target, speed * this.speedModifierWhenCharging);
                 if (distanceSq < this.targetInRangeRadiusSq || this.mob.getNavigation().isDone()) {
                     double distance = Math.sqrt(distanceSq);
-                    this.state.awayPos = LandRandomPos.getPosAway(this.mob, Math.max(0, (int) (6 - distance)),
-                            Math.max(1, (int) (7 - distance)), target.position());
+                    this.state.awayPos = LandRandomPos.getPosAway(this.mob,
+                            Math.max(0, (int) (6 + passengerOffset - distance)),
+                            Math.max(1, (int) (7 + passengerOffset - distance)), target.position());
                 }
             }
         }

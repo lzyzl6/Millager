@@ -40,9 +40,9 @@ public class MillagerFabricClient implements ClientModInitializer {
             }
 
             @Override
-            @SuppressWarnings({"unchecked", "rawtypes"})
+            @SuppressWarnings("unchecked")
             public <T extends BlockEntity> void registerBlockEntityRenderer(BlockEntityType<? extends T> type, BlockEntityRendererProvider<T> provider) {
-                BlockEntityRenderers.register((BlockEntityType) type, (BlockEntityRendererProvider) provider);
+                BlockEntityRenderers.register(type, provider);
             }
 
             @Override

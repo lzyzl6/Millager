@@ -15,8 +15,8 @@ import org.lzyzl.millager.util.MiscHelper;
 
 public class MolotovCocktailPlus extends ThrowableItemProjectile {
 
-    int color = 14589720;
-    float radius = 9f;
+    private static final int COLOR = 14589720;
+    private static final float RADIUS = 9F;
 
     public MolotovCocktailPlus(EntityType<? extends ThrowableItemProjectile> entityType, Level level) {
         super(entityType, level);
@@ -40,7 +40,7 @@ public class MolotovCocktailPlus extends ThrowableItemProjectile {
     @Override
     public void tick() {
         if(this.isOnFire() && !this.level().isClientSide()) {
-            MiscHelper.performFireExplosion(this,(ServerLevel)this.level(), this.position(), radius, color,4.0f,0.8f);
+            MiscHelper.performFireExplosion(this, (ServerLevel)this.level(), this.position(), RADIUS, COLOR, 4.0F, 0.8F);
             this.discard();
         }
         super.tick();
@@ -50,7 +50,7 @@ public class MolotovCocktailPlus extends ThrowableItemProjectile {
     protected void onHit(@NonNull HitResult hitResult) {
         super.onHit(hitResult);
         if (!this.level().isClientSide()) {
-            MiscHelper.performFireExplosion(this,(ServerLevel)this.level(), this.position(), radius, color,4.0f,0.8f);
+            MiscHelper.performFireExplosion(this, (ServerLevel)this.level(), this.position(), RADIUS, COLOR, 4.0F, 0.8F);
             this.level().broadcastEntityEvent(this, (byte)3);
             this.discard();
         }

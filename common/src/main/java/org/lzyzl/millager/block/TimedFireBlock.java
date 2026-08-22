@@ -18,13 +18,11 @@ import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import net.minecraft.world.phys.shapes.CollisionContext;
-import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jspecify.annotations.NonNull;
 import org.lzyzl.millager.block.entity.TimedFireBlockEntity;
 
 import java.util.Map;
-import java.util.function.Function;
 
 public class TimedFireBlock extends BaseFireBlock implements EntityBlock {
 
@@ -36,20 +34,13 @@ public class TimedFireBlock extends BaseFireBlock implements EntityBlock {
     public static final BooleanProperty WEST;
     public static final BooleanProperty UP;
     public static final Map<Direction, BooleanProperty> PROPERTY_BY_DIRECTION;
-    private final Function<BlockState, VoxelShape> shapes;
 
     public TimedFireBlock(Properties properties) {
         super(properties, 2.0f);
         this.registerDefaultState((this.stateDefinition.any().setValue(AGE, 0).setValue(NORTH, false).setValue(EAST, false).setValue(SOUTH, false).setValue(WEST, false)).setValue(UP, false));
-        this.shapes = this.makeShapes();
     }
 
     private static final VoxelShape SHAPE_FIRE = Block.box(0.0, 0.0, 0.0, 16.0, 1.0, 16.0);
-
-    private Function<BlockState, VoxelShape> makeShapes() {
-        VoxelShape fireShape = Block.box(0.0, 0.0, 0.0, 16.0, 1.0, 16.0);
-        return (blockState) -> fireShape;
-    }
 
     @Override
     protected @NonNull MapCodec<? extends BaseFireBlock> codec() {
@@ -63,7 +54,7 @@ public class TimedFireBlock extends BaseFireBlock implements EntityBlock {
 
     @Override
     protected @NonNull VoxelShape getShape(@NonNull BlockState blockState, @NonNull BlockGetter blockGetter, @NonNull BlockPos blockPos, @NonNull CollisionContext collisionContext) {
-        return this.shapes.apply(blockState);
+        return SHAPE_FIRE;
     }
 
     private BlockState getStateWithAge(LevelReader levelReader, BlockPos blockPos, int i) {

@@ -5,12 +5,18 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.google.gson.TypeAdapter;
+import com.google.gson.annotations.JsonAdapter;
 import com.google.gson.annotations.SerializedName;
+import com.google.gson.stream.JsonReader;
+import com.google.gson.stream.JsonToken;
+import com.google.gson.stream.JsonWriter;
 import org.lzyzl.millager.Millager;
 import org.lzyzl.millager.MillagerGameRules;
 import org.lzyzl.millager.behavior.MiscConfig;
 import org.lzyzl.millager.behavior.patrol.PatrolConfig;
 import org.lzyzl.millager.behavior.raid.DefenderConfig;
+import org.lzyzl.millager.util.TargetRelation;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -26,6 +32,7 @@ import java.nio.file.StandardCopyOption;
 import java.util.LinkedHashMap;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Optional;
 
 public final class MillagerConfig {
 
@@ -101,12 +108,28 @@ public final class MillagerConfig {
         return current.gameRuleDefaults.enableWildPatrols;
     }
 
+    public static Optional<TargetRelation> targetRelation(String entityId) {
+        if (current.targeting == null || current.targeting.overrides == null) return Optional.empty();
+        return Optional.ofNullable(TargetRelation.fromSerializedName(current.targeting.overrides.get(entityId)));
+    }
+
+    public static Optional<Boolean> beeGolemOverride(String entityId) {
+        if (current.targeting == null || current.targeting.beeGolemOverrides == null) return Optional.empty();
+        return Optional.ofNullable(current.targeting.beeGolemOverrides.get(entityId));
+    }
+
     private static ConfigData normalize(ConfigData data) {
         data.comments = loadComments();
         if (data.gameRuleDefaults == null) data.gameRuleDefaults = new GameRuleDefaults();
         if (data.defender == null) data.defender = new Defender();
         if (data.patrol == null) data.patrol = new Patrol();
         if (data.misc == null) data.misc = new Misc();
+        if (data.targeting == null) data.targeting = new Targeting();
+        if (data.targeting.overrides == null) data.targeting.overrides = new LinkedHashMap<>();
+        if (data.targeting.beeGolemOverrides == null) data.targeting.beeGolemOverrides = new LinkedHashMap<>();
+        data.targeting.overrides.entrySet().removeIf(entry ->
+                entry.getKey() == null || entry.getValue() == null || TargetRelation.fromSerializedName(entry.getValue()) == null);
+        data.targeting.beeGolemOverrides.entrySet().removeIf(entry -> entry.getKey() == null || entry.getValue() == null);
 
         Defender defender = data.defender;
         if (defender.teamName == null || !defender.teamName.matches("[A-Za-z0-9_.+-]{1,16}")) {
@@ -169,6 +192,7 @@ public final class MillagerConfig {
         patrol.ruinedCpPatrolNearDist = clamp("patrol.ruined_cp_patrol_near_dist", patrol.ruinedCpPatrolNearDist, 0, 512);
 
         Misc misc = data.misc;
+        misc.guardVillagerBannerSpawnChance = clamp("misc.guard_villager_banner_spawn_chance", misc.guardVillagerBannerSpawnChance, 0, 100);
         misc.fastHorseDespawnTicks = clamp("misc.fast_horse_despawn_ticks", misc.fastHorseDespawnTicks, 0, 72000);
         misc.mountHorseDespawnTicks = clamp("misc.mount_horse_despawn_ticks", misc.mountHorseDespawnTicks, 0, 72000);
         misc.doctorIronGolemLimit = clamp("misc.doctor_iron_golem_limit", misc.doctorIronGolemLimit, -1, 1000);
@@ -193,6 +217,7 @@ public final class MillagerConfig {
             addComments(comments, translations, "patrol", Patrol.class);
             addOverview(comments, translations, "misc");
             addComments(comments, translations, "misc", Misc.class);
+            addOverview(comments, translations, "targeting");
         } catch (Exception exception) {
             Millager.LOGGER.warn("Could not load English config comments", exception);
         }
@@ -288,6 +313,8 @@ public final class MillagerConfig {
         PatrolConfig.RUINED_CP_PATROL_NEAR_DIST = patrol.ruinedCpPatrolNearDist;
 
         Misc misc = data.misc;
+        MiscConfig.GUARD_VILLAGER_BANNER_SPAWN_CHANCE = misc.guardVillagerBannerSpawnChance;
+        MiscConfig.ENABLE_GOETY_RAIDS = misc.enableGoetyRaids;
         MiscConfig.GENERATE_COMMAND_POSTS = misc.generateCommandPosts;
         MiscConfig.GENERATE_RUINED_COMMAND_POSTS = misc.generateRuinedCommandPosts;
         MiscConfig.GENERATE_FLOATING_ISLANDS = misc.generateFloatingIslands;
@@ -322,6 +349,7 @@ public final class MillagerConfig {
         public Defender defender = new Defender();
         public Patrol patrol = new Patrol();
         public Misc misc = new Misc();
+        public Targeting targeting = new Targeting();
     }
 
     public static final class GameRuleDefaults {
@@ -399,6 +427,10 @@ public final class MillagerConfig {
     }
 
     public static final class Misc {
+        @SerializedName(value = "guard_villager_banner_spawn_chance", alternate = "guards_spawn_with_village_banners")
+        @JsonAdapter(PercentageAdapter.class)
+        public int guardVillagerBannerSpawnChance = 5;
+        public boolean enableGoetyRaids = true;
         public boolean generateCommandPosts = true;
         public boolean generateRuinedCommandPosts = true;
         public boolean generateFloatingIslands = true;
@@ -408,5 +440,27 @@ public final class MillagerConfig {
         public int fastHorseDespawnTicks = 140;
         public int mountHorseDespawnTicks = 900;
         public int doctorIronGolemLimit = 3;
+    }
+
+    public static final class PercentageAdapter extends TypeAdapter<Integer> {
+        @Override
+        public void write(JsonWriter out, Integer value) throws IOException {
+            out.value(value);
+        }
+
+        @Override
+        public Integer read(JsonReader in) throws IOException {
+            if (in.peek() == JsonToken.BOOLEAN) return in.nextBoolean() ? 5 : 0;
+            if (in.peek() == JsonToken.NULL) {
+                in.nextNull();
+                return 5;
+            }
+            return in.nextInt();
+        }
+    }
+
+    public static final class Targeting {
+        public Map<String, String> overrides = new LinkedHashMap<>();
+        public Map<String, Boolean> beeGolemOverrides = new LinkedHashMap<>();
     }
 }

@@ -13,7 +13,7 @@ import org.lzyzl.millager.block.entity.HeadBlockEntity;
 
 public abstract class AbstractHeadBlock extends SkullBlock {
 
-    static VoxelShape SHAPE_VILLAGER = Block.box(4.0, 0.0, 4.0, 12.0, 10.0, 12.0);
+    static final VoxelShape SHAPE_VILLAGER = Block.box(4.0, 0.0, 4.0, 12.0, 10.0, 12.0);
 
     public AbstractHeadBlock(Type type, Properties properties) {
         super(type, properties);

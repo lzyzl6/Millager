@@ -100,11 +100,10 @@ public class ArcherPickArrowGoal extends Goal {
         }
     }
 
-    // 优化后的 pickUp 逻辑
     private void pickUp() {
         if (this.targetArrow == null || !this.targetArrow.isAlive()) return;
 
-        if (this.archer.level() instanceof ServerLevel serverLevel) {
+        if (this.archer.level() instanceof ServerLevel) {
             this.archer.pickUpItem(this.targetArrow);
         }
         this.targetArrow = null;

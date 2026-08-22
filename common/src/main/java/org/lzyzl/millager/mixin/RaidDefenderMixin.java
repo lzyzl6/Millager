@@ -2,7 +2,6 @@ package org.lzyzl.millager.mixin;
 
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.SectionPos;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.game.ClientboundSoundPacket;
@@ -10,36 +9,21 @@ import net.minecraft.server.level.ServerBossEvent;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundSource;
-import net.minecraft.tags.StructureTags;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.BossEvent;
-import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.EquipmentSlot;
-import net.minecraft.world.entity.MobSpawnType;
-import net.minecraft.world.entity.animal.horse.Horse;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.entity.ai.village.poi.PoiManager;
-import net.minecraft.world.entity.ai.village.poi.PoiTypes;
 import net.minecraft.world.entity.raid.Raid;
 import net.minecraft.world.entity.raid.Raider;
-import net.minecraft.world.level.chunk.status.ChunkStatus;
-import net.minecraft.world.level.levelgen.Heightmap;
-import net.minecraft.world.level.levelgen.structure.StructureStart;
-import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.scores.PlayerTeam;
 import net.minecraft.world.scores.Scoreboard;
 import org.lzyzl.millager.MillagerGameRules;
 import org.lzyzl.millager.MillagerSounds;
 import org.lzyzl.millager.advancement.MillagerCriteria;
-import org.lzyzl.millager.behavior.MillagerEntityPool;
 import org.lzyzl.millager.behavior.raid.DefenderConfig;
 import org.lzyzl.millager.behavior.raid.MillagerRaidsData;
-import org.lzyzl.millager.entity.millager.AbstractMillager;
-import org.lzyzl.millager.entity.millager.Rider;
+import org.lzyzl.millager.behavior.raid.RaidReinforcementSpawner;
 import org.lzyzl.millager.entity.millager.RaidHornPlayer;
-import org.lzyzl.millager.entity.millager.Scouter;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -52,7 +36,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.UUID;
 
 @Mixin(Raid.class)
 public class RaidDefenderMixin implements RaidHornPlayer {
@@ -240,19 +223,7 @@ public class RaidDefenderMixin implements RaidHornPlayer {
 
     @Unique
     private int millager$countValidBeds(ServerLevel level) {
-        StructureStart start = level.structureManager().getStructureWithPieceAt(
-                center, StructureTags.VILLAGE);
-        int radius;
-        if (start != StructureStart.INVALID_START) {
-            var box = start.getBoundingBox();
-            radius = Math.max((box.maxX() - box.minX()) / 2,
-                    (box.maxZ() - box.minZ()) / 2) + 16;
-        } else {
-            radius = 64;
-        }
-        return (int) level.getPoiManager()
-                .getInRange(h -> h.is(PoiTypes.HOME), center, radius, PoiManager.Occupancy.HAS_SPACE)
-                .count();
+        return RaidReinforcementSpawner.countValidBeds(level, center);
     }
 
     @Unique
@@ -381,41 +352,21 @@ public class RaidDefenderMixin implements RaidHornPlayer {
 
     @Unique
     private int millager$getTickDecrement(ServerLevel level) {
-        int diffId = Math.max(1, level.getDifficulty().getId());
-        return switch (diffId) {
-            case 1 -> DefenderConfig.TICK_DECREMENT_EASY;
-            case 3 -> DefenderConfig.TICK_DECREMENT_HARD;
-            default -> DefenderConfig.TICK_DECREMENT_NORMAL;
-        };
+        return RaidReinforcementSpawner.getTickDecrement(level);
     }
 
     @Unique
     private boolean millager$spawnWave(ServerLevel level) {
         int reinforcementWave = millager$defenderSpawnsCount + 1;
-
-        int squadCount;
-        if (reinforcementWave == 1) {
-            squadCount = 1;
-        } else {
-            int baseSquads = Math.max(2, millager$previousSquadCount + 1);
-            squadCount = Math.max(1, baseSquads + this.random.nextInt(
-                    DefenderConfig.SQUAD_COUNT_VARIANCE * 2 + 1) - DefenderConfig.SQUAD_COUNT_VARIANCE);
+        Scoreboard scoreboard = level.getScoreboard();
+        PlayerTeam team = scoreboard.getPlayerTeam(DefenderConfig.TEAM_NAME);
+        if (team == null) {
+            team = scoreboard.addPlayerTeam(DefenderConfig.TEAM_NAME);
+            team.setColor(ChatFormatting.GREEN);
         }
-        squadCount = Math.min(squadCount, DefenderConfig.MAX_SQUADS_PER_WAVE);
-
-        int totalHp = 0;
-        int squadsSpawned = 0;
-        double startAngle = this.random.nextDouble() * Math.PI * 2.0D;
-        for (int squad = 0; squad < squadCount; squad++) {
-            boolean cavalry = reinforcementWave == 1 || this.random.nextBoolean();
-            double angle = startAngle + Math.PI * 2.0D * squad / squadCount;
-            BlockPos pos = millager$findSquadSpawnPos(level, angle, cavalry);
-            if (pos == null) continue;
-            int squadHp = millager$spawnSquad(level, pos, cavalry);
-            if (squadHp <= 0) continue;
-            totalHp += squadHp;
-            squadsSpawned++;
-        }
+        RaidReinforcementSpawner.WaveResult result = RaidReinforcementSpawner.spawnWave(level, center, this.random,
+                reinforcementWave, millager$previousSquadCount, team);
+        int squadsSpawned = result.squadsSpawned();
 
         if (squadsSpawned == 0) {
             millager$failedSpawnAttempts++;
@@ -438,7 +389,7 @@ public class RaidDefenderMixin implements RaidHornPlayer {
         millager$failedSpawnAttempts = 0;
         millager$defenderSpawnsCount = reinforcementWave;
         millager$previousSquadCount = squadsSpawned;
-        millager$lastWaveHp = totalHp;
+        millager$lastWaveHp = result.totalHp();
 
         millager$deployedDisplayTimer = DefenderConfig.DEPLOYED_DISPLAY_TICKS;
         if (millager$villagerBossEvent != null) {
@@ -450,35 +401,8 @@ public class RaidDefenderMixin implements RaidHornPlayer {
     }
 
     @Unique
-    private BlockPos millager$findSquadSpawnPos(ServerLevel level, double angle, boolean cavalry) {
-        for (int attempt = 0; attempt < DefenderConfig.SPAWN_SEARCH_ATTEMPTS; attempt++) {
-            int distance = DefenderConfig.SQUAD_SPAWN_MIN_DISTANCE + this.random.nextInt(
-                    DefenderConfig.SQUAD_SPAWN_MAX_DISTANCE - DefenderConfig.SQUAD_SPAWN_MIN_DISTANCE + 1);
-            double spread = (this.random.nextDouble() - 0.5D) * 0.7D;
-            int x = center.getX() + (int) Math.round(Math.cos(angle + spread) * distance);
-            int z = center.getZ() + (int) Math.round(Math.sin(angle + spread) * distance);
-            int chunkX = SectionPos.blockToSectionCoord(x);
-            int chunkZ = SectionPos.blockToSectionCoord(z);
-            if (level.getChunk(chunkX, chunkZ, ChunkStatus.FULL, false) == null) continue;
-            int y = level.getHeight(Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, x, z);
-            BlockPos candidate = new BlockPos(x, y, z);
-            if (Math.abs(y - center.getY()) > DefenderConfig.MAX_HEIGHT_DIFF) continue;
-            if (!level.getFluidState(candidate).isEmpty()) continue;
-            if (!level.getBlockState(candidate.below()).isSolidRender(level, candidate.below())) continue;
-            if (!level.getBlockState(candidate).isAir()) continue;
-            if (!level.getBlockState(candidate.above()).isAir()) continue;
-            if (cavalry && millager$hasCavalrySpawnObstruction(level, candidate)) continue;
-            return candidate;
-        }
-        return null;
-    }
-
-    @Unique
     private int millager$computeMaxTimer() {
-        int baseReal = Math.max(0, DefenderConfig.TIMER_BASE_REAL
-                - millager$cachedValidBeds * DefenderConfig.TIMER_PER_BED_REAL);
-        return Math.max(DefenderConfig.TIMER_REAL_MIN,
-                Math.min(DefenderConfig.TIMER_REAL_MAX, baseReal + millager$lastWaveHp));
+        return RaidReinforcementSpawner.computeMaxTimer(millager$cachedValidBeds, millager$lastWaveHp);
     }
 
     @Unique
@@ -501,105 +425,6 @@ public class RaidDefenderMixin implements RaidHornPlayer {
         millager$surgePending = state.surgePending();
         millager$failedSpawnAttempts = state.failedSpawnAttempts();
         return true;
-    }
-
-    @Unique private PlayerTeam millager$getMillagerTeam(Scoreboard scoreboard) {
-        PlayerTeam defTeam = scoreboard.getPlayerTeam(DefenderConfig.TEAM_NAME);
-        if (defTeam == null) {
-            defTeam = scoreboard.addPlayerTeam(DefenderConfig.TEAM_NAME);
-            defTeam.setColor(ChatFormatting.GREEN);
-        }
-        return defTeam;
-    }
-
-    @Unique
-    private int millager$spawnSquad(ServerLevel level, BlockPos pos, boolean cavalry) {
-        List<MillagerEntityPool.Entry> pool = cavalry
-                ? MillagerEntityPool.CAVALRY
-                : MillagerEntityPool.INFANTRY;
-        int count = DefenderConfig.SQUAD_MIN_SIZE + this.random.nextInt(
-                DefenderConfig.SQUAD_MAX_SIZE - DefenderConfig.SQUAD_MIN_SIZE + 1);
-        DifficultyInstance difficulty = level.getCurrentDifficultyAt(pos);
-        Scoreboard scoreboard = level.getScoreboard();
-        UUID squadId = UUID.randomUUID();
-
-        int totalHp = 0;
-        int spawnedCount = 0;
-        for (int i = 0; i < count; i++) {
-            BlockPos memberPos = millager$findSquadMemberSpawnPos(level, pos, cavalry);
-            if (memberPos == null) continue;
-
-            MillagerEntityPool.Entry entry = MillagerEntityPool.weightedPick(pool, this.random);
-            if (entry == null) break;
-
-            AbstractMillager entity = entry.type().create(level);
-            if (entity == null) break;
-
-            entity.setPos(memberPos.getX() + 0.5, memberPos.getY(), memberPos.getZ() + 0.5);
-            entity.finalizeSpawn(level, difficulty, MobSpawnType.EVENT, null);
-            millager$ensureCavalryHorseArmor(entity);
-            entity.setRaidReinforcementCenter(center);
-            entity.setSquad(squadId, spawnedCount == 0);
-            entity.setPersistenceRequired();
-            if (spawnedCount == 0) {
-                entity.equipSquadLeaderBanner();
-            }
-            level.addFreshEntityWithPassengers(entity);
-            spawnedCount++;
-
-            entity.setPatrolTarget(center);
-
-            scoreboard.addPlayerToTeam(entity.getScoreboardName(), millager$getMillagerTeam(scoreboard));
-
-            if (entity instanceof Scouter scouter) {
-                scouter.setPendingRaidToot(true);
-            }
-
-            totalHp += (int) entry.maxHealth() * difficulty.getDifficulty().getId();
-        }
-        return totalHp;
-    }
-
-    @Unique
-    private void millager$ensureCavalryHorseArmor(AbstractMillager entity) {
-        if (entity.getVehicle() instanceof Horse horse && horse.getItemBySlot(EquipmentSlot.BODY).isEmpty()) {
-            horse.setItemSlot(EquipmentSlot.BODY, new ItemStack(Rider.getRandomHorseArmor(this.random, 3)));
-        }
-    }
-
-    @Unique
-    private BlockPos millager$findSquadMemberSpawnPos(ServerLevel level, BlockPos origin, boolean cavalry) {
-        if (!cavalry) {
-            int x = origin.getX() + this.random.nextInt(5) - 2;
-            int z = origin.getZ() + this.random.nextInt(5) - 2;
-            int y = level.getHeight(Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, x, z);
-            BlockPos candidate = new BlockPos(x, y, z);
-            return level.getFluidState(candidate).isEmpty()
-                    && level.getBlockState(candidate).isAir()
-                    && level.getBlockState(candidate.above()).isAir() ? candidate : origin;
-        }
-        int radius = DefenderConfig.SQUAD_MEMBER_SPAWN_RADIUS;
-        for (int attempt = 0; attempt < DefenderConfig.SPAWN_SEARCH_ATTEMPTS; attempt++) {
-            int x = attempt == 0 ? origin.getX() : origin.getX() + this.random.nextInt(radius * 2 + 1) - radius;
-            int z = attempt == 0 ? origin.getZ() : origin.getZ() + this.random.nextInt(radius * 2 + 1) - radius;
-            int y = level.getHeight(Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, x, z);
-            BlockPos candidate = new BlockPos(x, y, z);
-            if (!level.getFluidState(candidate).isEmpty()) continue;
-            if (!level.getBlockState(candidate.below()).isSolidRender(level, candidate.below())) continue;
-            if (!level.getBlockState(candidate).isAir()) continue;
-            if (!level.getBlockState(candidate.above()).isAir()) continue;
-            if (millager$hasCavalrySpawnObstruction(level, candidate)) continue;
-            return candidate;
-        }
-        return null;
-    }
-
-    @Unique
-    private boolean millager$hasCavalrySpawnObstruction(ServerLevel level, BlockPos pos) {
-        AABB box = EntityType.HORSE.getDimensions().makeBoundingBox(
-                pos.getX() + 0.5D, pos.getY(), pos.getZ() + 0.5D).inflate(
-                DefenderConfig.CAVALRY_SPAWN_CLEARANCE, 0.0D, DefenderConfig.CAVALRY_SPAWN_CLEARANCE);
-        return !level.noCollision(box);
     }
 
     @Inject(method = "spawnGroup", at = @At("TAIL"))

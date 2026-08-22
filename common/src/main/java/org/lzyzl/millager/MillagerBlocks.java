@@ -82,7 +82,7 @@ public class MillagerBlocks {
     public static final DeferredBlock<IllagerWallHeadBlock> ILLAGER_WALL_HEAD = BLOCKS.registerBlock(
             "illager_wall_head",
             IllagerWallHeadBlock::new,
-            () -> wallVariant(ILLAGER_HEAD.get(), true).strength(1.0F).pushReaction(PushReaction.DESTROY));
+            () -> wallVariant(ILLAGER_HEAD.get()).strength(1.0F).pushReaction(PushReaction.DESTROY));
 
     public static final DeferredBlock<VillagerHeadBlock> VILLAGER_HEAD = BLOCKS.registerBlock(
             "villager_head", VillagerHeadBlock::new,
@@ -92,7 +92,7 @@ public class MillagerBlocks {
     public static final DeferredBlock<VillagerWallHeadBlock> VILLAGER_WALL_HEAD = BLOCKS.registerBlock(
             "villager_wall_head",
             VillagerWallHeadBlock::new,
-            () -> wallVariant(VILLAGER_HEAD.get(), true).strength(1.0F).pushReaction(PushReaction.DESTROY));
+            () -> wallVariant(VILLAGER_HEAD.get()).strength(1.0F).pushReaction(PushReaction.DESTROY));
 
     public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<HeadBlockEntity>> HEAD_BLOCK_ENTITY =
             BLOCK_ENTITY_TYPES.registerBlockEntity("head_block_entity", HeadBlockEntity::new,
@@ -106,7 +106,7 @@ public class MillagerBlocks {
 
     public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<TimedFireBlockEntity>> TIMED_FIRE_ENTITY =
             BLOCK_ENTITY_TYPES.registerBlockEntity("timed_fire_entity", TimedFireBlockEntity::new, TIMED_FIRE);
-    private static BlockBehaviour.Properties wallVariant(Block block, boolean copyDescription) {
+    private static BlockBehaviour.Properties wallVariant(Block block) {
         return BlockBehaviour.Properties.of().dropsLike(block);
     }
 

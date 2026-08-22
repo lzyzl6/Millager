@@ -9,12 +9,10 @@ import net.minecraft.client.model.SkullModelBase;
 
 public class VillagerHeadModel  extends SkullModelBase {
     protected final ModelPart head;
-    protected final ModelPart nose;
 
     public VillagerHeadModel(ModelPart modelPart) {
         super();
         this.head = modelPart.getChild("head");
-        this.nose = this.head.getChild("nose");
     }
 
     public static LayerDefinition createLayer() {

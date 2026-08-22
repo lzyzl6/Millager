@@ -20,8 +20,6 @@ public class BeeGolemModel extends EntityModel<BeeGolem> {
     private final ModelPart frontLeg;
     private final ModelPart midLeg;
     private final ModelPart backLeg;
-    private final ModelPart stinger;
-    private final ModelPart light;
 
     public BeeGolemModel(ModelPart root) {
         this.root = root;
@@ -33,8 +31,6 @@ public class BeeGolemModel extends EntityModel<BeeGolem> {
         this.frontLeg = root.getChild("front_legs");
         this.midLeg = root.getChild("middle_legs");
         this.backLeg = root.getChild("back_legs");
-        this.stinger = root.getChild("stinger");
-        this.light = root.getChild("light");
     }
 
     public static LayerDefinition createLayer() {
@@ -58,8 +54,6 @@ public class BeeGolemModel extends EntityModel<BeeGolem> {
         partdefinition.addOrReplaceChild("middle_legs", CubeListBuilder.create().texOffs(12, 6).addBox(-2.5F, -1.0F, 0.0F, 5.0F, 2.0F, 0.0F, new CubeDeformation(0.0F)), PartPose.offset(0.0F, 23.0F, 0.0F));
 
         partdefinition.addOrReplaceChild("back_legs", CubeListBuilder.create().texOffs(12, 6).addBox(-2.5F, -1.0F, 0.0F, 5.0F, 2.0F, 0.0F, new CubeDeformation(0.0F)), PartPose.offset(0.0F, 23.0F, 2.0F));
-
-        partdefinition.addOrReplaceChild("light", CubeListBuilder.create().texOffs(1, 3).addBox(0.0F, -1.0F, -1.0F, 0.0F, 1.0F, 1.0F, new CubeDeformation(0.0F)), PartPose.offset(0.0F, 22.0F, 5.0F));
 
         return LayerDefinition.create(meshdefinition, 24, 24);
     }

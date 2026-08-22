@@ -27,6 +27,7 @@ import org.lzyzl.millager.item.LancerSpearItem;
 public class MillagerItemInHandLayer<T extends AbstractMillager> extends ItemInHandLayer<T, MillagerModel<T>> {
 
     private final ItemInHandRenderer itemInHandRenderer;
+    private float partialTick;
 
     public MillagerItemInHandLayer(RenderLayerParent<T, MillagerModel<T>> parent, ItemInHandRenderer itemInHandRenderer) {
         super(parent, itemInHandRenderer);
@@ -35,6 +36,7 @@ public class MillagerItemInHandLayer<T extends AbstractMillager> extends ItemInH
 
     @Override
     public void render(PoseStack poseStack, MultiBufferSource buffer, int packedLight, T entity, float limbSwing, float limbSwingAmount, float partialTick, float ageInTicks, float netHeadYaw, float headPitch) {
+        this.partialTick = partialTick;
         boolean rightMainArm = entity.getMainArm() == HumanoidArm.RIGHT;
         ItemStack leftHandItem = rightMainArm ? entity.getOffhandItem() : entity.getMainHandItem();
         ItemStack rightHandItem = rightMainArm ? entity.getMainHandItem() : entity.getOffhandItem();
@@ -57,7 +59,8 @@ public class MillagerItemInHandLayer<T extends AbstractMillager> extends ItemInH
                 && (pose == AbstractMillager.MillagerPose.SWINGING_ARM || pose == AbstractMillager.MillagerPose.HOLDING_ITEM)) {
             leftHandItem = rightMainArm ? Items.CARVED_PUMPKIN.getDefaultInstance() : Items.IRON_BLOCK.getDefaultInstance();
             rightHandItem = rightMainArm ? Items.IRON_BLOCK.getDefaultInstance() : Items.CARVED_PUMPKIN.getDefaultInstance();
-        } else if (entity instanceof Lancer && pose == AbstractMillager.MillagerPose.SPELLCASTING) {
+        } else if (entity instanceof Lancer && (pose == AbstractMillager.MillagerPose.SPELLCASTING
+                || pose == AbstractMillager.MillagerPose.NEUTRAL)) {
             leftHandItem = ItemStack.EMPTY;
             rightHandItem = ItemStack.EMPTY;
         } else if (entity instanceof Rioter && pose == AbstractMillager.MillagerPose.NEUTRAL) {
@@ -106,10 +109,16 @@ public class MillagerItemInHandLayer<T extends AbstractMillager> extends ItemInH
         poseStack.mulPose(Axis.YP.rotationDegrees(180.0F));
         boolean leftHand = arm == HumanoidArm.LEFT;
         poseStack.translate(leftHand ? -0.0625F : 0.0625F, 0.125F, -0.625F);
-        if (entity instanceof Lancer && stack.getItem() instanceof LancerSpearItem spear) {
-            if (isAttackingWith(entity, arm)) applySpearAttackTransform(poseStack, spear, entity.getAttackAnim(0.0F));
-            if (entity.isUsingItem() && entity.getUsedItemHand() == (leftHand ? InteractionHand.OFF_HAND : InteractionHand.MAIN_HAND)) {
-                applySpearUseTransform(poseStack, spear, entity.getTicksUsingItem(), arm, entity.getAttackAnim(0.0F));
+        if (entity instanceof Lancer lancer && stack.getItem() instanceof LancerSpearItem spear) {
+            float attackTime = entity.getAttackAnim(this.partialTick);
+            if (isAttackingWith(entity, arm)) {
+                LancerSpearAnimations.thirdPersonAttackItem(poseStack, spear, attackTime);
+            }
+            InteractionHand hand = arm == entity.getMainArm() ? InteractionHand.MAIN_HAND : InteractionHand.OFF_HAND;
+            if (entity.isUsingItem() && entity.getUsedItemHand() == hand) {
+                LancerSpearAnimations.thirdPersonUseItem(poseStack, spear,
+                        entity.getTicksUsingItem() + this.partialTick, arm, attackTime,
+                        lancer.getTicksSinceSpearHit(this.partialTick));
             }
         }
         ItemStack renderStack = stack;
@@ -121,60 +130,10 @@ public class MillagerItemInHandLayer<T extends AbstractMillager> extends ItemInH
         poseStack.popPose();
     }
 
-    private static boolean isAttackingWith(LivingEntity entity, HumanoidArm arm) {
-        if (entity.getAttackAnim(0.0F) <= 0.0F) return false;
+    private boolean isAttackingWith(LivingEntity entity, HumanoidArm arm) {
+        if (entity.getAttackAnim(this.partialTick) <= 0.0F) return false;
         boolean mainHand = entity.swingingArm == InteractionHand.MAIN_HAND;
         return arm == (mainHand ? entity.getMainArm() : entity.getMainArm().getOpposite());
     }
 
-    private static void applySpearAttackTransform(PoseStack poseStack, LancerSpearItem spear, float attackTime) {
-        float attack = inQuad(progress(attackTime, 0.05F, 0.2F));
-        float retract = inOutExpo(progress(attackTime, 0.4F, 1.0F));
-        rotateAround(poseStack, Axis.XN, 70.0F * (attack - retract), 0.0F, -0.125F, 0.125F);
-        poseStack.translate(0.0F, spear.getKineticProfile().forwardMovement() * (attack - retract), 0.0F);
-    }
-
-    private static void applySpearUseTransform(PoseStack poseStack, LancerSpearItem spear, int useTicks,
-                                               HumanoidArm arm, float attackTime) {
-        LancerSpearItem.KineticProfile profile = spear.getKineticProfile();
-        float raiseProgress = progress(useTicks, 0.0F, profile.delayTicks());
-        float swayProgress = progress(useTicks, profile.delayTicks() + profile.dismountTicks() - 20.0F,
-                profile.delayTicks() + profile.dismountTicks());
-        float raiseBackProgress = progress(useTicks, spear.getDamageUseDuration() - 5.0F, spear.getDamageUseDuration());
-        float attack = inQuad(progress(attackTime, 0.05F, 0.2F));
-        float retract = inOutExpo(progress(attackTime, 0.4F, 1.0F));
-        float raiseProgressModified = 1.0F - outBack(1.0F - raiseProgress);
-        int invert = arm == HumanoidArm.RIGHT ? 1 : -1;
-        poseStack.translate(0.0F, 0.0F, -profile.forwardMovement() * (raiseProgressModified - raiseBackProgress));
-        rotateAround(poseStack, Axis.XN, 70.0F * (raiseProgress - raiseBackProgress) - 40.0F * (attack - retract),
-                0.0F, -0.03125F, 0.125F);
-        rotateAround(poseStack, Axis.YP, invert * 90.0F * (raiseProgress - swayProgress + 3.0F * retract + attack),
-                0.0F, 0.0F, 0.125F);
-    }
-
-    private static void rotateAround(PoseStack poseStack, Axis axis, float degrees, float x, float y, float z) {
-        poseStack.translate(x, y, z);
-        poseStack.mulPose(axis.rotationDegrees(degrees));
-        poseStack.translate(-x, -y, -z);
-    }
-
-    private static float progress(float time, float start, float end) {
-        return Math.max(0.0F, Math.min(1.0F, (time - start) / (end - start)));
-    }
-
-    private static float inQuad(float value) {
-        return value * value;
-    }
-
-    private static float inOutExpo(float value) {
-        if (value == 0.0F || value == 1.0F) return value;
-        return value < 0.5F ? (float) Math.pow(2.0F, 20.0F * value - 10.0F) / 2.0F
-                : (2.0F - (float) Math.pow(2.0F, -20.0F * value + 10.0F)) / 2.0F;
-    }
-
-    private static float outBack(float value) {
-        float overshoot = 1.70158F;
-        float offset = value - 1.0F;
-        return 1.0F + (overshoot + 1.0F) * offset * offset * offset + overshoot * offset * offset;
-    }
 }

@@ -13,7 +13,6 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.neoforged.bus.api.IEventBus;
 
-import java.util.Set;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.function.UnaryOperator;
@@ -198,7 +197,7 @@ public class NeoForgeRegistryFactory implements DeferredRegister.Factory {
                 for (int i = 0; i < validBlocks.length; i++) {
                     blocks[i] = validBlocks[i].get();
                 }
-                return new BlockEntityType<>(factory::create, Set.of(blocks), null);
+                return BlockEntityType.Builder.of(factory::create, blocks).build(null);
             }));
         }
 
