@@ -29,7 +29,7 @@ public class BeeGolemFlashLayer extends RenderLayer<BeeGolemRenderState, BeeGole
                 this.flashModel,
                 state,
                 poseStack,
-                RenderTypes.entityCutoutNoCull(FLASH_TEXTURE),
+                RenderTypes.entityTranslucentEmissive(FLASH_TEXTURE),
                 0xF000F0,
                 LivingEntityRenderer.getOverlayCoords(state, 0.0F),
                 state.flashColor,

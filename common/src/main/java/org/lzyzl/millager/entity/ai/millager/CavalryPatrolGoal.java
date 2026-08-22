@@ -136,9 +136,7 @@ public class CavalryPatrolGoal extends AbstractMillagerPatrolGoal {
                 .orElse(center);
         List<BlockPos> sorted = nearestNeighborSort(deduplicated, farthest);
 
-        for (BlockPos pos : sorted) {
-            this.patrolRoute.add(pos);
-        }
+        this.patrolRoute.addAll(sorted);
     }
 
     @Override

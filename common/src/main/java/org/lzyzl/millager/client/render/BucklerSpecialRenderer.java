@@ -20,6 +20,7 @@ import org.lzyzl.millager.client.render.item.BucklerModel;
 import java.util.function.Consumer;
 
 public class BucklerSpecialRenderer implements SpecialModelRenderer<DataComponentMap> {
+    @SuppressWarnings("deprecation")
     private static final Material TEXTURE = new Material(TextureAtlas.LOCATION_ITEMS, Identifier.fromNamespaceAndPath("millager", "item/buckler"));
 
     private final MaterialSet materials;
@@ -36,7 +37,7 @@ public class BucklerSpecialRenderer implements SpecialModelRenderer<DataComponen
     }
 
     @Override
-    public void submit(@Nullable DataComponentMap components, ItemDisplayContext displayContext, @NonNull PoseStack poseStack, SubmitNodeCollector submitNodeCollector, int lightCoords, int overlayCoords, boolean hasFoil, int outlineColor) {
+    public void submit(@Nullable DataComponentMap components, @NonNull ItemDisplayContext displayContext, @NonNull PoseStack poseStack, SubmitNodeCollector submitNodeCollector, int lightCoords, int overlayCoords, boolean hasFoil, int outlineColor) {
         poseStack.pushPose();
         poseStack.scale(1.0F, -1.0F, -1.0F);
         submitNodeCollector.submitModelPart(this.model.root(), poseStack, this.model.renderType(TEXTURE.atlasLocation()),

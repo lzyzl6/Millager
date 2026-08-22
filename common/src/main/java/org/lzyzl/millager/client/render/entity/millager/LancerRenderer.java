@@ -32,7 +32,7 @@ public class LancerRenderer extends MillagerRenderer<Lancer, LancerRenderState> 
     @Override
     public void extractRenderState(Lancer lancer, LancerRenderState state, float f) {
         super.extractRenderState(lancer, state, f);
-        if(state.armPose == AbstractMillager.MillagerPose.SPELLCASTING) {
+        if(state.armPose == AbstractMillager.MillagerPose.SPELLCASTING || state.armPose == AbstractMillager.MillagerPose.NEUTRAL) {
             state.leftHandItemStack = ItemStack.EMPTY;
             state.rightHandItemStack = ItemStack.EMPTY;
 

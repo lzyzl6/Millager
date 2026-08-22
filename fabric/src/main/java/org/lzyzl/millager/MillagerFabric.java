@@ -41,7 +41,7 @@ public class MillagerFabric implements ModInitializer {
         ItemGroupEvents.modifyEntriesEvent(MillagerItemGroups.MILLAGER_CREATIVE_TAB_KEY)
                 .register(entries -> MillagerItemGroups.addExtraContents(entries::accept, entries.getContext()));
     }
-
+    @SuppressWarnings("ConstantConditions")
     private static void registerAttributes() {
         FabricDefaultAttributeRegistry.register(MillagerEntityTypes.Bee_Golem.get(), BeeGolem.createAttributes());
         FabricDefaultAttributeRegistry.register(MillagerEntityTypes.Archers.get(), Archer.createAttributes());

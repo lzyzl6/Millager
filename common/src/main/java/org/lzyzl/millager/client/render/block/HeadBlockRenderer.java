@@ -13,6 +13,7 @@ import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
 import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.state.CameraRenderState;
+import net.minecraft.core.Direction;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.Util;
 import net.minecraft.world.level.block.AbstractSkullBlock;
@@ -71,7 +72,7 @@ public class HeadBlockRenderer implements BlockEntityRenderer<HeadBlockEntity, S
         skullBlockRenderState.animationProgress = headBlockEntity.getAnimation(f);
         BlockState blockState = headBlockEntity.getBlockState();
         boolean bl = blockState.getBlock() instanceof WallSkullBlock;
-        skullBlockRenderState.direction = bl ? blockState.getValue(WallSkullBlock.FACING) : null;
+        skullBlockRenderState.direction = bl ? blockState.getValue(WallSkullBlock.FACING) : Direction.NORTH;
         int i = bl ? RotationSegment.convertToSegment(skullBlockRenderState.direction.getOpposite()) : blockState.getValue(SkullBlock.ROTATION);
         skullBlockRenderState.rotationDegrees = RotationSegment.convertToDegrees(i);
         skullBlockRenderState.skullType = ((AbstractSkullBlock)blockState.getBlock()).getType();

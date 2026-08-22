@@ -4,6 +4,7 @@ import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.MobRenderer;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
+import org.jspecify.annotations.NonNull;
 import org.lzyzl.millager.client.MillagerModelLayers;
 import org.lzyzl.millager.entity.golem.BeeGolem;
 
@@ -54,7 +55,7 @@ public class BeeGolemRenderer extends MobRenderer<BeeGolem,BeeGolemRenderState,B
     }
 
     @Override
-    public Identifier getTextureLocation(BeeGolemRenderState state) {
+    public @NonNull Identifier getTextureLocation(BeeGolemRenderState state) {
         return BG_LOCATION;
     }
 

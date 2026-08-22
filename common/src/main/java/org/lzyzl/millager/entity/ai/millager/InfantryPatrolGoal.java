@@ -11,8 +11,6 @@ import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.ai.village.poi.PoiManager;
 import net.minecraft.world.entity.ai.village.poi.PoiType;
 import net.minecraft.world.entity.ai.village.poi.PoiTypes;
-import net.minecraft.world.entity.monster.Creeper;
-import net.minecraft.world.entity.monster.Enemy;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.levelgen.Heightmap;
@@ -20,6 +18,7 @@ import org.jspecify.annotations.Nullable;
 import org.lzyzl.millager.MillagerItems;
 import org.lzyzl.millager.entity.millager.AbstractMillager;
 import org.lzyzl.millager.entity.millager.Rider;
+import org.lzyzl.millager.util.MillagerTargetingHelper;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -238,7 +237,7 @@ public class InfantryPatrolGoal extends AbstractMillagerPatrolGoal {
         candidates.addAll(this.mob.level().getEntitiesOfClass(
                 Mob.class,
                 this.mob.getBoundingBox().inflate(INDOOR_KILL_RADIUS),
-                m -> !m.isUnderWater() && m instanceof Enemy && !(m instanceof Creeper)
+                m -> !m.isUnderWater() && MillagerTargetingHelper.canAttack(this.mob, m)
         ));
 
         candidates.addAll(this.mob.level().getEntitiesOfClass(

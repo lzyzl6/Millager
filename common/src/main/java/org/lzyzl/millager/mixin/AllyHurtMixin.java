@@ -10,12 +10,11 @@ import org.lzyzl.millager.MillagerGameRules;
 import org.lzyzl.millager.entity.millager.AbstractMillager;
 import org.lzyzl.millager.entity.millager.Rider;
 import org.lzyzl.millager.entity.projectile.RioterProjectile;
+import org.lzyzl.millager.util.MillagerTargetingHelper;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-
-import static org.lzyzl.millager.util.MiscHelper.isMillagerFaction;
 
 @Mixin(LivingEntity.class)
 public class AllyHurtMixin {
@@ -25,20 +24,22 @@ public class AllyHurtMixin {
         Entity sourceEntity = damageSource.getEntity();
         Entity directEntity = damageSource.getDirectEntity();
         LivingEntity self = (LivingEntity) (Object) this;
+        if (directEntity instanceof RioterProjectile rioterProjectile && rioterProjectile.isRioterProjectile()
+                && !MillagerTargetingHelper.isHostileToMillager(self)
+                && !(MillagerTargetingHelper.isFriendlyToMillager(self) && serverLevel.getGameRules().get(MillagerGameRules.FRIENDLY_FIRE.get()))) cir.setReturnValue(false);
         if (serverLevel.getGameRules().get(MillagerGameRules.FRIENDLY_FIRE.get())) return;
-        if (
-                directEntity instanceof RioterProjectile rioterProjectile &&
-                        rioterProjectile.isRioterProjectile() && isMillagerFaction(self)
-        ) cir.setReturnValue(false);
-        if (isMillagerFaction(self) && isMillagerFaction(sourceEntity)) {
+        if (sourceEntity instanceof LivingEntity livingSource
+                && MillagerTargetingHelper.areFriendly(livingSource, self)) {
             cir.setReturnValue(false);
         }
-        if (isMillagerFaction(self) && isMillagerFaction(directEntity)) {
+        if (directEntity instanceof LivingEntity livingDirect
+                && MillagerTargetingHelper.areFriendly(livingDirect, self)) {
             cir.setReturnValue(false);
         }
     }
 
     @Inject(method = "hurtServer", at = @At("TAIL"))
+    @SuppressWarnings("ConstantValue")
     private void millager$onHorseHurt(ServerLevel serverLevel, DamageSource damageSource, float amount, CallbackInfoReturnable<Boolean> cir) {
         if (!cir.getReturnValue() || !(damageSource.getEntity() instanceof Player player)) return;
         if (!((Object) this instanceof Horse horse)) return;

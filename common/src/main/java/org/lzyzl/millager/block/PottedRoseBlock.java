@@ -12,6 +12,7 @@ import net.minecraft.world.level.block.FlowerPotBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
+import org.jspecify.annotations.NonNull;
 import org.lzyzl.millager.MillagerSounds;
 
 public class PottedRoseBlock extends FlowerPotBlock {
@@ -24,17 +25,17 @@ public class PottedRoseBlock extends FlowerPotBlock {
     }
 
     @Override
-    protected VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
+    protected @NonNull VoxelShape getShape(@NonNull BlockState state, @NonNull BlockGetter level, @NonNull BlockPos pos, @NonNull CollisionContext context) {
         return SHAPE;
     }
 
     @Override
-    protected boolean isRandomlyTicking(BlockState state) {
+    protected boolean isRandomlyTicking(@NonNull BlockState state) {
         return true;
     }
 
     @Override
-    protected void randomTick(BlockState state, ServerLevel level, BlockPos pos, RandomSource random) {
+    protected void randomTick(@NonNull BlockState state, ServerLevel level, @NonNull BlockPos pos, @NonNull RandomSource random) {
         if (level.getRawBrightness(pos, 0) >= 8 || !hasNearbySoulSand(level, pos) || random.nextInt(WILT_CHANCE) != 0) return;
         level.playSound(null, pos, MillagerSounds.ROSE_WILT, SoundSource.BLOCKS, 0.7F, 0.7F);
         level.sendParticles(ParticleTypes.LARGE_SMOKE, pos.getX() + 0.5D, pos.getY() + 0.45D, pos.getZ() + 0.5D, 4, 0.15D, 0.1D, 0.15D, 0.005D);

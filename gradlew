@@ -248,4 +248,4 @@ eval "set -- $(
         tr '\n' ' '
     )" '"$@"'
 
-exec "$JAVACMD" "$@"
+exec "$JAVACMD" "-Dgradle.user.home=$APP_HOME/.gradle-user" "$@"

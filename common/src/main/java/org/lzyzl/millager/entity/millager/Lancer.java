@@ -51,7 +51,6 @@ public class Lancer extends AbstractMillager implements Rider {
 
     private long nextHealTime = 0L;
     private int castTicks = 0;
-    private final ItemStack book = createLancerBook();
 
     public Lancer(EntityType<? extends Lancer> entityType, Level level) {
         super(entityType, level);
@@ -148,7 +147,7 @@ public class Lancer extends AbstractMillager implements Rider {
     protected void populateDefaultEquipmentSlots(@NonNull RandomSource random, @NonNull DifficultyInstance difficulty) {
         ItemStack spear = new ItemStack(getRandomSpear(random));
         this.setItemSlot(EquipmentSlot.MAINHAND, spear);
-        this.setItemSlot(EquipmentSlot.OFFHAND, book.copy());
+        this.setItemSlot(EquipmentSlot.OFFHAND, this.createLancerBook());
     }
 
     @Override
@@ -174,6 +173,9 @@ public class Lancer extends AbstractMillager implements Rider {
         Horse horse = EntityType.HORSE.create(level.getLevel(), spawnReason);
         if (horse != null) {
             horse.setPos(this.getX(), this.getY(), this.getZ());
+            horse.setYRot(this.getYRot());
+            horse.setYBodyRot(this.getYRot());
+            horse.setYHeadRot(this.getYRot());
             horse.finalizeSpawn(level, level.getCurrentDifficultyAt(horse.blockPosition()), spawnReason, spawnGroupData);
             double minSpeed = 0.3;// 正常范围大约是 0.1125 到 0.3375
             var speedAttribute = horse.getAttribute(Attributes.MOVEMENT_SPEED);

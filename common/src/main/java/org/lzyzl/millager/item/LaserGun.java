@@ -3,6 +3,7 @@ package org.lzyzl.millager.item;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.ItemUseAnimation;
+import org.jspecify.annotations.NonNull;
 
 public class LaserGun extends Item {
 
@@ -11,7 +12,7 @@ public class LaserGun extends Item {
     }
 
     @Override
-    public ItemUseAnimation getUseAnimation(ItemStack itemStack) {
+    public @NonNull ItemUseAnimation getUseAnimation(@NonNull ItemStack itemStack) {
         return ItemUseAnimation.SPYGLASS;
     }
 

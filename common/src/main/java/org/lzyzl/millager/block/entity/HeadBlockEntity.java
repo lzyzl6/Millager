@@ -11,7 +11,6 @@ import net.minecraft.network.chat.ComponentSerialization;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.component.ResolvableProfile;
-import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.SkullBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
@@ -49,7 +48,7 @@ public class HeadBlockEntity extends BlockEntity {
         this.customName = parseCustomNameSafe(valueInput, "custom_name");
     }
 
-    public static void animation(Level level, BlockPos blockPos, BlockState blockState, HeadBlockEntity entity) {
+    public static void animation(BlockState blockState, HeadBlockEntity entity) {
         if (blockState.hasProperty(SkullBlock.POWERED) && blockState.getValue(SkullBlock.POWERED)) {
             entity.isAnimating = true;
             ++entity.animationTickCount;

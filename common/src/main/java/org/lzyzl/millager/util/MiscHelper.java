@@ -16,7 +16,6 @@ import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
-import net.minecraft.world.entity.PlayerRideable;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
@@ -158,11 +157,6 @@ public class MiscHelper {
             return true;
         }
 
-        if (entity.getClass().getCanonicalName() != null &&
-                entity.getClass().getCanonicalName().contains("guardvillagers")) {
-            return true;
-        }
-
         if (entity instanceof Horse horse) {
             return horse.getTags().contains("millager_mount");
         }
@@ -173,7 +167,7 @@ public class MiscHelper {
     public static boolean isAllyCaused(DamageSource damageSource) {
         Entity source = damageSource.getEntity();
         if(source == null) source = damageSource.getDirectEntity();
-        return isMillagerFaction(source);
+        return source instanceof LivingEntity livingEntity && MillagerTargetingHelper.isFriendlyToMillager(livingEntity);
     }
 
     public static void performFireExplosion(ThrowableItemProjectile projectile, ServerLevel level, Vec3 pos, float radius, int color, float instantDamage, float spawnChance) {
@@ -197,9 +191,12 @@ public class MiscHelper {
                     ClipContext.Block.VISUAL, ClipContext.Fluid.NONE, entity));
 
             if (hit.getType() != HitResult.Type.BLOCK) {
+                if (isRioterProjectile && projectile.getOwner() instanceof AbstractMillager millager
+                        && !MillagerTargetingHelper.isHostileToMillager(millager, entity)
+                        && !(MillagerTargetingHelper.isFriendlyToMillager(entity) && level.getGameRules().get(MillagerGameRules.FRIENDLY_FIRE.get()))) continue;
                 entity.hurtServer(level,level.damageSources().explosion(projectile.getOwner(), projectile), instantDamage);
                 if(isRioterProjectile) {
-                    boolean canIgnite = !isMillagerFaction(entity) || level.getGameRules().get(MillagerGameRules.FRIENDLY_FIRE.get());
+                    boolean canIgnite = !MillagerTargetingHelper.isFriendlyToMillager(entity) || level.getGameRules().get(MillagerGameRules.FRIENDLY_FIRE.get());
                     if(projectile.getOwner() instanceof Rioter rioter) {
                         if(rioter.getTarget() instanceof LivingEntity target && entity.getUUID().equals(target.getUUID()) && canIgnite) entity.igniteForSeconds(instantDamage * 2 + 2);
                         else if(!(entity instanceof Player) && canIgnite) entity.igniteForSeconds(instantDamage * 2 + 2);

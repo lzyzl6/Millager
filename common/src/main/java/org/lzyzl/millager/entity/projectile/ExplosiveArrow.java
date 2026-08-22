@@ -56,13 +56,13 @@ public class ExplosiveArrow extends AbstractArrow {
     }
 
     @Override
-    protected void addAdditionalSaveData(ValueOutput valueOutput) {
+    protected void addAdditionalSaveData(@NonNull ValueOutput valueOutput) {
         super.addAdditionalSaveData(valueOutput);
         valueOutput.putInt("fireTicks", this.fireTicks);
     }
 
     @Override
-    protected void readAdditionalSaveData(ValueInput valueInput) {
+    protected void readAdditionalSaveData(@NonNull ValueInput valueInput) {
         super.readAdditionalSaveData(valueInput);
         this.setFireTicks(valueInput.getIntOr("fireTicks", 0));
     }

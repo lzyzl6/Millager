@@ -15,6 +15,7 @@ import net.minecraft.world.level.block.state.BlockBehaviour;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.function.UnaryOperator;
@@ -58,7 +59,7 @@ public class FabricRegistryFactory implements DeferredRegister.Factory {
             ResourceKey<T> key = ResourceKey.create(registryKey, id(modId, name));
             DeferredHolder<T, I> holder = new DeferredHolder<>(key);
             finalizers.add(() -> {
-                Registry<T> registry = (Registry<T>) BuiltInRegistries.REGISTRY.getValue(registryKey.identifier());
+                Registry<T> registry = Objects.requireNonNull((Registry<T>) BuiltInRegistries.REGISTRY.getValue(registryKey.identifier()));
                 I value = supplier.get();
                 Holder.Reference<T> ref = Registry.registerForHolder(registry, key, value);
                 holder.bind(() -> value);

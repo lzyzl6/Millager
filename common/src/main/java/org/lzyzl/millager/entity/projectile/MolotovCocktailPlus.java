@@ -15,8 +15,8 @@ import org.lzyzl.millager.util.MiscHelper;
 
 public class MolotovCocktailPlus extends ThrowableItemProjectile {
 
-    int color = 14589720;
-    float radius = 9f;
+    final int color = 14589720;
+    final float radius = 9f;
 
     public MolotovCocktailPlus(EntityType<? extends ThrowableItemProjectile> entityType, Level level) {
         super(entityType, level);

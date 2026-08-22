@@ -6,12 +6,12 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.world.level.chunk.ChunkGeneratorStructureState;
 import net.minecraft.world.level.levelgen.structure.placement.RandomSpreadStructurePlacement;
 import net.minecraft.world.level.levelgen.structure.placement.RandomSpreadType;
-import net.minecraft.world.level.levelgen.structure.placement.StructurePlacement.ExclusionZone;
 import net.minecraft.world.level.levelgen.structure.placement.StructurePlacementType;
+import org.jspecify.annotations.NonNull;
 import org.lzyzl.millager.worldgen.MillagerStructures;
 
 import java.util.List;
-
+@SuppressWarnings("deprecation")
 public class MultiExclusionRandomSpreadStructurePlacement extends RandomSpreadStructurePlacement {
 
     public static final MapCodec<MultiExclusionRandomSpreadStructurePlacement> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
@@ -32,7 +32,7 @@ public class MultiExclusionRandomSpreadStructurePlacement extends RandomSpreadSt
     }
 
     @Override
-    public boolean isStructureChunk(ChunkGeneratorStructureState state, int chunkX, int chunkZ) {
+    public boolean isStructureChunk(@NonNull ChunkGeneratorStructureState state, int chunkX, int chunkZ) {
         if (!super.isStructureChunk(state, chunkX, chunkZ)) {
             return false;
         }
@@ -45,7 +45,7 @@ public class MultiExclusionRandomSpreadStructurePlacement extends RandomSpreadSt
     }
 
     @Override
-    public StructurePlacementType<?> type() {
+    public @NonNull StructurePlacementType<?> type() {
         return MillagerStructures.MULTI_EXCLUSION_RANDOM_SPREAD.get();
     }
 

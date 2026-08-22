@@ -39,8 +39,8 @@ public abstract class MinecraftServerMixin {
             return;
         }
 
-        StructureTemplatePoolAccessor target = (StructureTemplatePoolAccessor) (Object) targetPool;
-        StructureTemplatePoolAccessor source = (StructureTemplatePoolAccessor) (Object) sourcePool;
+        StructureTemplatePoolAccessor target = (StructureTemplatePoolAccessor) targetPool;
+        StructureTemplatePoolAccessor source = (StructureTemplatePoolAccessor) sourcePool;
         List<Pair<StructurePoolElement, Integer>> templates = new ArrayList<>(target.millager$getRawTemplates());
         boolean changed = false;
         for (Pair<StructurePoolElement, Integer> template : source.millager$getRawTemplates()) {

@@ -37,6 +37,7 @@ public class MillagerFabricClient implements ClientModInitializer {
     public void onInitializeClient() {
         ClientRegistrationContext ctx = new ClientRegistrationContext() {
             @Override
+            @SuppressWarnings("deprecation")
             public <T extends Entity> void registerEntityRenderer(EntityType<? extends T> type, EntityRendererProvider<T> provider) {
                 EntityRendererRegistry.register(type, provider);
             }

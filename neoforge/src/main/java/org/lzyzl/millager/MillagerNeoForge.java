@@ -165,7 +165,7 @@ public class MillagerNeoForge {
 
                 @Override
                 public void registerLayerDefinition(ModelLayerLocation location, Supplier<LayerDefinition> supplier) {
-                    event.registerLayerDefinition(location, supplier::get);
+                    event.registerLayerDefinition(location, supplier);
                 }
 
                 @Override

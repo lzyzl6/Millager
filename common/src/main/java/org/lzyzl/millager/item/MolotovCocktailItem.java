@@ -14,17 +14,18 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.ProjectileItem;
 import net.minecraft.world.level.Level;
+import org.jspecify.annotations.NonNull;
 import org.lzyzl.millager.entity.projectile.MolotovCocktail;
 
 public class MolotovCocktailItem extends Item implements ProjectileItem {
-    public static float PROJECTILE_SHOOT_POWER = 1.5F;
+    public static final float PROJECTILE_SHOOT_POWER = 1.5F;
 
     public MolotovCocktailItem(Properties properties) {
         super(properties);
     }
 
     @Override
-    public InteractionResult use(Level level, Player player, InteractionHand interactionHand) {
+    public @NonNull InteractionResult use(Level level, Player player, @NonNull InteractionHand interactionHand) {
         ItemStack itemStack = player.getItemInHand(interactionHand);
         level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.SPLASH_POTION_THROW, SoundSource.NEUTRAL, 0.5F, 0.4F / (level.getRandom().nextFloat() * 0.4F + 0.8F));
         if (level instanceof ServerLevel serverLevel) {
@@ -38,7 +39,7 @@ public class MolotovCocktailItem extends Item implements ProjectileItem {
     }
 
     @Override
-    public Projectile asProjectile(Level level, Position position, ItemStack itemStack, Direction direction) {
+    public @NonNull Projectile asProjectile(@NonNull Level level, Position position, @NonNull ItemStack itemStack, @NonNull Direction direction) {
         return new MolotovCocktail(level, position.x(), position.y(), position.z(), itemStack);
     }
 }

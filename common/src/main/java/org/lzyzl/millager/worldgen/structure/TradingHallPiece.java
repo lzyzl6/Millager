@@ -19,6 +19,7 @@ import net.minecraft.world.level.levelgen.structure.pieces.StructurePieceSeriali
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructurePlaceSettings;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplateManager;
+import org.jspecify.annotations.NonNull;
 import org.lzyzl.millager.util.HangingEntityPositionFix;
 import org.lzyzl.millager.worldgen.MillagerStructures;
 
@@ -45,14 +46,14 @@ public class TradingHallPiece extends TemplateStructurePiece {
     }
 
     @Override
-    protected void addAdditionalSaveData(StructurePieceSerializationContext ctx, CompoundTag tag) {
+    protected void addAdditionalSaveData(@NonNull StructurePieceSerializationContext ctx, @NonNull CompoundTag tag) {
         super.addAdditionalSaveData(ctx, tag);
         tag.store("rot", Rotation.CODEC, this.placeSettings.getRotation());
     }
 
     @Override
-    public void postProcess(WorldGenLevel level, StructureManager structureManager, ChunkGenerator generator,
-                            RandomSource random, BoundingBox box, ChunkPos chunkPos, BlockPos pivot) {
+    public void postProcess(@NonNull WorldGenLevel level, @NonNull StructureManager structureManager, @NonNull ChunkGenerator generator,
+                            @NonNull RandomSource random, @NonNull BoundingBox box, @NonNull ChunkPos chunkPos, @NonNull BlockPos pivot) {
         HangingEntityPositionFix.begin();
         try {
             super.postProcess(level, structureManager, generator, random, box, chunkPos, pivot);
@@ -72,6 +73,6 @@ public class TradingHallPiece extends TemplateStructurePiece {
     }
 
     @Override
-    protected void handleDataMarker(String marker, BlockPos pos, ServerLevelAccessor level, RandomSource random, BoundingBox box) {
+    protected void handleDataMarker(@NonNull String marker, @NonNull BlockPos pos, @NonNull ServerLevelAccessor level, @NonNull RandomSource random, @NonNull BoundingBox box) {
     }
 }

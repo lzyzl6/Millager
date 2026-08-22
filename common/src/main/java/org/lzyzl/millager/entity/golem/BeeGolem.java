@@ -9,6 +9,7 @@ import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
@@ -20,7 +21,6 @@ import net.minecraft.world.entity.ai.navigation.PathNavigation;
 import net.minecraft.world.entity.animal.FlyingAnimal;
 import net.minecraft.world.entity.animal.golem.AbstractGolem;
 import net.minecraft.world.entity.animal.golem.IronGolem;
-import net.minecraft.world.entity.monster.Enemy;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelReader;
@@ -32,6 +32,7 @@ import org.jspecify.annotations.NonNull;
 import org.lzyzl.millager.MillagerSounds;
 import org.lzyzl.millager.entity.ai.golem.*;
 import org.lzyzl.millager.entity.millager.AbstractMillager;
+import org.lzyzl.millager.util.MillagerTargetingHelper;
 
 import java.util.Objects;
 import java.util.UUID;
@@ -81,8 +82,11 @@ public class BeeGolem extends AbstractGolem implements FlyingAnimal {
     public void tick() {
         super.tick();
         this.setLifeTicks(this.getLifeTicks() + 1);
-        if (!this.level().isClientSide() && this.getTarget() == null && this.isAttacking()) {
-            this.setAttacking(false);
+        if (!this.level().isClientSide()) {
+            if (this.getTarget() != null && (!this.getTarget().isAlive() || !MillagerTargetingHelper.canBeeGolemAttack(this.getTarget()))) {
+                this.setTarget(null);
+            }
+            if (this.getTarget() == null && this.isAttacking()) this.setAttacking(false);
         }
     }
 
@@ -114,8 +118,14 @@ public class BeeGolem extends AbstractGolem implements FlyingAnimal {
         this.goalSelector.addGoal(2, new BeeGolemWanderGoal(this));
 
         this.targetSelector.addGoal(1, new BeeGolemAvoidAllyGoal(this, true));
-        this.targetSelector.addGoal(1, new BeeGolemNearestTargetGoal<>(this, Mob.class, 5, true, true, (livingEntity, serverLevel) -> livingEntity instanceof Enemy));
+        this.targetSelector.addGoal(1, new BeeGolemNearestTargetGoal<>(this, Mob.class, 5, true, true, (entity, level) -> MillagerTargetingHelper.canBeeGolemAttack(entity)));
         this.targetSelector.addGoal(2, new HurtByTargetGoal(this, IronGolem.class, BeeGolem.class, AbstractMillager.class).setAlertOthers());
+    }
+
+    @Override
+    public boolean canAttack(@NonNull LivingEntity target) {
+        if (MillagerTargetingHelper.hasBeeGolemOverride(target)) return MillagerTargetingHelper.canBeeGolemAttack(target);
+        return super.canAttack(target);
     }
 
     public static AttributeSupplier.Builder createAttributes() {

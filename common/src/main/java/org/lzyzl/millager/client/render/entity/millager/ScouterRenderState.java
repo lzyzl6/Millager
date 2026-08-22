@@ -5,5 +5,5 @@ import net.minecraft.world.item.ItemStack;
 
 public class ScouterRenderState extends MillagerRenderState {
     public ItemStack offhandStack = ItemStack.EMPTY;
-    public ItemStackRenderState hornRenderState = new ItemStackRenderState();
+    public final ItemStackRenderState hornRenderState = new ItemStackRenderState();
 }

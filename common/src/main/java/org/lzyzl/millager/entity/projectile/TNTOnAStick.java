@@ -157,7 +157,7 @@ public class TNTOnAStick extends ThrowableItemProjectile implements RioterProjec
     }
 
     public float getRotationProgress(float partialTick) {
-        if(this.isFalling()) this.rotationProgress = approach360(this.rotationProgress, 1.0f);
+        if(this.isFalling()) this.rotationProgress = approach360(this.rotationProgress);
         return !this.onGround() ? this.rotationProgress + this.getRotationDelta() * partialTick : this.rotationProgress;
     }
 
@@ -259,15 +259,15 @@ public class TNTOnAStick extends ThrowableItemProjectile implements RioterProjec
         return this.onGround() && blockState.isAir();
     }
 
-    private float approach360(float rotationProgress, float step) {
+    private float approach360(float rotationProgress) {
         float angleInCircle = rotationProgress % 360.0f;
         if (angleInCircle < 0) angleInCircle += 360.0f;
 
         if (angleInCircle > 0.1f && angleInCircle < 359.9f) {
             if (angleInCircle <= 180.0f) {
-                rotationProgress -= Math.min(step, angleInCircle);
+                rotationProgress -= Math.min((float) 1.0, angleInCircle);
             } else {
-                rotationProgress += Math.min(step, 360.0f - angleInCircle);
+                rotationProgress += Math.min((float) 1.0, 360.0f - angleInCircle);
             }
         } else {
             rotationProgress = Math.round(rotationProgress / 360.0f) * 360.0f;

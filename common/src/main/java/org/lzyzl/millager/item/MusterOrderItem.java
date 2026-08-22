@@ -10,6 +10,7 @@ import net.minecraft.tags.BlockTags;
 import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
@@ -19,6 +20,7 @@ import net.minecraft.world.item.ItemUseAnimation;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.Heightmap;
+import net.minecraft.world.phys.AABB;
 import org.jspecify.annotations.NonNull;
 import org.lzyzl.millager.MillagerSounds;
 import org.lzyzl.millager.behavior.MillagerEntityPool;
@@ -85,11 +87,9 @@ public class MusterOrderItem extends Item {
     }
 
     private void summonSquad(ServerLevel level, Player player) {
-        List<MillagerEntityPool.Entry> pool = variant == Variant.INFANTRY
-                ? MillagerEntityPool.INFANTRY
-                : variant == Variant.CAVALRY
-                ? MillagerEntityPool.CAVALRY
-                : level.getRandom().nextBoolean() ? MillagerEntityPool.INFANTRY : MillagerEntityPool.CAVALRY;
+        boolean cavalry = variant == Variant.CAVALRY
+                || variant == Variant.RANDOM && level.getRandom().nextBoolean();
+        List<MillagerEntityPool.Entry> pool = cavalry ? MillagerEntityPool.CAVALRY : MillagerEntityPool.INFANTRY;
         int count = DefenderConfig.SQUAD_MIN_SIZE + level.getRandom().nextInt(
                 DefenderConfig.SQUAD_MAX_SIZE - DefenderConfig.SQUAD_MIN_SIZE + 1);
         List<BlockPos> usedPositions = new ArrayList<>();
@@ -98,7 +98,7 @@ public class MusterOrderItem extends Item {
         for (int i = 0; i < count; i++) {
             MillagerEntityPool.Entry entry = MillagerEntityPool.weightedPick(pool, level.getRandom());
             if (entry == null) break;
-            BlockPos pos = findSpawnPos(level, player, usedPositions);
+            BlockPos pos = findSpawnPos(level, player, usedPositions, cavalry);
             AbstractMillager entity = entry.type().create(level, EntitySpawnReason.EVENT);
             if (entity == null) continue;
 
@@ -116,15 +116,15 @@ public class MusterOrderItem extends Item {
         }
     }
 
-    private BlockPos findSpawnPos(ServerLevel level, Player player, List<BlockPos> usedPositions) {
-        BlockPos pos = findNearbySpawnPos(level, player, usedPositions, MIN_SPACING_SQ);
-        if (pos == null) pos = findNearbySpawnPos(level, player, usedPositions, 4);
-        if (pos == null) pos = findNearbySpawnPos(level, player, usedPositions, 1);
+    private BlockPos findSpawnPos(ServerLevel level, Player player, List<BlockPos> usedPositions, boolean cavalry) {
+        BlockPos pos = findNearbySpawnPos(level, player, usedPositions, MIN_SPACING_SQ, cavalry);
+        if (pos == null) pos = findNearbySpawnPos(level, player, usedPositions, 4, cavalry);
+        if (pos == null) pos = findNearbySpawnPos(level, player, usedPositions, 1, cavalry);
         return pos != null ? pos : player.blockPosition();
     }
 
     private BlockPos findNearbySpawnPos(ServerLevel level, Player player, List<BlockPos> usedPositions,
-                                         int spacingSq) {
+                                         int spacingSq, boolean cavalry) {
         BlockPos playerPos = player.blockPosition();
         int minimumY = Mth.ceil(player.getY() - 1.5);
 
@@ -149,15 +149,23 @@ public class MusterOrderItem extends Item {
                 if (playerDx * playerDx + playerDz * playerDz < MIN_PLAYER_DISTANCE_SQ) continue;
                 int surfaceY = level.getHeight(Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, x, z);
 
-                for (int y = surfaceY; y >= minimumY; y--) {
+                for (int y = Math.min(surfaceY, playerPos.getY()); y >= minimumY; y--) {
                     BlockPos candidate = new BlockPos(x, y, z);
                     if (!isValidGround(level, candidate)) continue;
                     if (usedPositions.stream().anyMatch(used -> horizontalDistSqr(used, candidate) < spacingSq)) continue;
+                    if (cavalry && hasCavalrySpawnObstruction(level, candidate)) continue;
                     return candidate;
                 }
             }
         }
         return null;
+    }
+
+    private boolean hasCavalrySpawnObstruction(ServerLevel level, BlockPos pos) {
+        AABB box = EntityType.HORSE.getDimensions().makeBoundingBox(
+                pos.getX() + 0.5D, pos.getY(), pos.getZ() + 0.5D).inflate(
+                DefenderConfig.CAVALRY_SPAWN_CLEARANCE, 0.0D, DefenderConfig.CAVALRY_SPAWN_CLEARANCE);
+        return !level.noCollision(box);
     }
 
     private int horizontalDistSqr(BlockPos first, BlockPos second) {

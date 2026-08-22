@@ -76,8 +76,6 @@ public class MillagerItemGroups {
                         output.accept(MillagerItems.MAULER_SPAWN_EGG);
                         output.accept(MillagerItems.RIOTER_SPAWN_EGG);
                         output.accept(MillagerItems.BREACHER_SPAWN_EGG);
-//                        output.accept(MillagerItems.SCHOLAR_SPAWN_EGG);
-//                        output.accept(MillagerItems.CONJURER_SPAWN_EGG);
                     })
                     .build()
     );
