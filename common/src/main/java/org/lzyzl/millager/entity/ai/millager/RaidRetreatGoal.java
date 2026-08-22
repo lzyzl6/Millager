@@ -89,7 +89,6 @@ public class RaidRetreatGoal extends Goal {
                 || this.retreatTicks >= RETREAT_TIMEOUT_TICKS
                 || this.millager.blockPosition().distSqr(center) >= RETREAT_DISTANCE * RETREAT_DISTANCE) {
             this.disappear();
-            return;
         }
     }
 

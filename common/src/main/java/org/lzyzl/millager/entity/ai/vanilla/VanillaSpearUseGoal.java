@@ -20,10 +20,10 @@ public class VanillaSpearUseGoal<T extends AbstractMillager> extends Goal {
     private final T mob;
     @Nullable
     private SpearUseState state;
-    double speedModifierWhenCharging;
-    double speedModifierWhenRepositioning;
-    float approachDistanceSq;
-    float targetInRangeRadiusSq;
+    final double speedModifierWhenCharging;
+    final double speedModifierWhenRepositioning;
+    final float approachDistanceSq;
+    final float targetInRangeRadiusSq;
 
     public VanillaSpearUseGoal(T mob, double d, double e, float f, float g) {
         this.mob = mob;

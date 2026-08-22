@@ -2,7 +2,6 @@ package org.lzyzl.millager.block;
 
 import net.minecraft.core.registries.Registries;
 import net.minecraft.world.flag.FeatureFlagSet;
-import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.MenuType;
 import org.lzyzl.millager.registry.DeferredHolder;
 import org.lzyzl.millager.registry.DeferredRegister;

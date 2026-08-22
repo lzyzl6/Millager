@@ -11,7 +11,6 @@ import org.lzyzl.millager.entity.millager.AbstractMillager;
 import org.lzyzl.millager.util.MiscHelper;
 
 import java.util.EnumSet;
-import java.util.UUID;
 
 import static org.lzyzl.millager.Millager.MOD_ID;
 

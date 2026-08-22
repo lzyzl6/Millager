@@ -17,7 +17,7 @@ import net.minecraft.world.level.Level;
 import org.lzyzl.millager.entity.projectile.MolotovCocktail;
 
 public class MolotovCocktailItem extends Item implements ProjectileItem {
-    public static float PROJECTILE_SHOOT_POWER = 1.5F;
+    public static final float PROJECTILE_SHOOT_POWER = 1.5F;
 
     public MolotovCocktailItem(Properties properties) {
         super(properties);

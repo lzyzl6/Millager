@@ -277,6 +277,8 @@ public class Archer extends AbstractMillager implements RangedAttackMob {
             } else {
                 itemEntity.discard();
             }
+        } else {
+            super.pickUpItem(serverLevel, itemEntity);
         }
     }
 

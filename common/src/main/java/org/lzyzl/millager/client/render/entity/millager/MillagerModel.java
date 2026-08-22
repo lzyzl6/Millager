@@ -19,7 +19,6 @@ public class MillagerModel<S extends MillagerRenderState> extends HumanoidModel<
     public static final MeshTransformer BODY_TRANSFORMER = MeshTransformer.scaling(0.95F);
     final ModelPart body;
     private final ModelPart quiver;
-    private final ModelPart back_bottom;
     private final ModelPart back_cover;
     private final ModelPart head;
     private final ModelPart arms;
@@ -27,16 +26,14 @@ public class MillagerModel<S extends MillagerRenderState> extends HumanoidModel<
     private final ModelPart right_arm;
     private final ModelPart left_leg;
     private final ModelPart right_leg;
-    private final ModelPart bags;
-    private final ModelPart more_bags;
 
     protected MillagerModel(ModelPart root) {
         super(root);
         this.quiver = root.getChild("quiver");
         this.quiver.getChild("arrows");
-        this.back_bottom = root.getChild("back_bottom");
-        this.back_cover = this.back_bottom.getChild("back_cover");
-        this.back_bottom.getChild("back_top");
+        ModelPart backBottom = root.getChild("back_bottom");
+        this.back_cover = backBottom.getChild("back_cover");
+        backBottom.getChild("back_top");
         this.head = root.getChild("head");
         this.head.getChild("hat");
         this.head.getChild("headwear");
@@ -49,13 +46,13 @@ public class MillagerModel<S extends MillagerRenderState> extends HumanoidModel<
         this.right_arm = root.getChild("right_arm");
         this.left_leg = root.getChild("left_leg");
         this.right_leg = root.getChild("right_leg");
-        this.bags = root.getChild("bags");
-        this.bags.getChild("front_right_bag");
-        this.more_bags = this.bags.getChild("more_bags");
-        this.more_bags.getChild("back_right_bag");
-        this.more_bags.getChild("back_left_bag");
-        this.more_bags.getChild("front_left_bag");
-        this.more_bags.getChild("front_middle_bag");
+        ModelPart bags = root.getChild("bags");
+        bags.getChild("front_right_bag");
+        ModelPart moreBags = bags.getChild("more_bags");
+        moreBags.getChild("back_right_bag");
+        moreBags.getChild("back_left_bag");
+        moreBags.getChild("front_left_bag");
+        moreBags.getChild("front_middle_bag");
     }
 
     public static LayerDefinition createLayer() {
