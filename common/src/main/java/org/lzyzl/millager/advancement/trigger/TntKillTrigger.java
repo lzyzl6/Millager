@@ -7,9 +7,11 @@ import net.minecraft.advancements.predicates.MinMaxBounds;
 import net.minecraft.advancements.predicates.entity.EntityPredicate;
 import net.minecraft.advancements.triggers.SimpleCriterionTrigger;
 import net.minecraft.server.level.ServerPlayer;
+import org.jspecify.annotations.NullMarked;
 
 import java.util.Optional;
 
+@NullMarked
 public class TntKillTrigger extends SimpleCriterionTrigger<TntKillTrigger.TriggerInstance> {
 
     @Override

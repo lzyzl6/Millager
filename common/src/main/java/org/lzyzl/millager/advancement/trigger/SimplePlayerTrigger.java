@@ -6,13 +6,14 @@ import net.minecraft.advancements.predicates.ContextAwarePredicate;
 import net.minecraft.advancements.predicates.entity.EntityPredicate;
 import net.minecraft.advancements.triggers.SimpleCriterionTrigger;
 import net.minecraft.server.level.ServerPlayer;
+import org.jspecify.annotations.NonNull;
 
 import java.util.Optional;
 
 public class SimplePlayerTrigger extends SimpleCriterionTrigger<SimplePlayerTrigger.TriggerInstance> {
 
     @Override
-    public Codec<TriggerInstance> codec() {
+    public @NonNull Codec<TriggerInstance> codec() {
         return TriggerInstance.CODEC;
     }
 

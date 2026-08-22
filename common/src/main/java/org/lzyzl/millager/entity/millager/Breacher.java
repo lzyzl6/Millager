@@ -193,6 +193,9 @@ public class Breacher extends AbstractMillager implements Rider {
         Horse horse = EntityTypes.HORSE.create(level.getLevel(), spawnReason);
         if (horse == null) return;
         horse.setPos(this.getX(), this.getY(), this.getZ());
+        horse.setYRot(this.getYRot());
+        horse.setYBodyRot(this.getYRot());
+        horse.setYHeadRot(this.getYRot());
         horse.finalizeSpawn(level, level.getCurrentDifficultyAt(horse.blockPosition()), spawnReason, spawnGroupData);
         var speed = horse.getAttribute(Attributes.MOVEMENT_SPEED);
         if (speed != null && speed.getBaseValue() < 0.3D) speed.setBaseValue(0.3D);

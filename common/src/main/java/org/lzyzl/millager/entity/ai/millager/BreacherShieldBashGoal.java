@@ -13,6 +13,7 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.lzyzl.millager.MillagerSounds;
 import org.lzyzl.millager.entity.millager.Breacher;
+import org.lzyzl.millager.util.MillagerTargetingHelper;
 
 import java.util.EnumSet;
 
@@ -89,7 +90,8 @@ public class BreacherShieldBashGoal extends Goal {
             return false;
         }
         return victim != this.breacher && victim.isAlive() && !this.breacher.isAlliedTo(victim)
-                && (victim == target || victim instanceof Enemy) && this.isInFront(victim);
+                && ((victim == target && victim instanceof Player) || victim instanceof Enemy && MillagerTargetingHelper.canAttack(this.breacher, victim))
+                && this.isInFront(victim);
     }
 
     private boolean isSurrounded() {

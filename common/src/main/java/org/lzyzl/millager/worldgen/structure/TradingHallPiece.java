@@ -19,11 +19,13 @@ import net.minecraft.world.level.levelgen.structure.pieces.StructurePieceSeriali
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructurePlaceSettings;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplateManager;
+import org.jspecify.annotations.NullMarked;
 import org.lzyzl.millager.util.HangingEntityPositionFix;
 import org.lzyzl.millager.worldgen.MillagerStructures;
 
 import static org.lzyzl.millager.Millager.MOD_ID;
 
+@NullMarked
 public class TradingHallPiece extends TemplateStructurePiece {
 
     private static final Identifier STRUCTURE = Identifier.fromNamespaceAndPath(MOD_ID, "trading_hall");

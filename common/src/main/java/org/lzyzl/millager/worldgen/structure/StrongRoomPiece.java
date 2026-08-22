@@ -13,10 +13,12 @@ import net.minecraft.world.level.levelgen.structure.TemplateStructurePiece;
 import net.minecraft.world.level.levelgen.structure.pieces.StructurePieceSerializationContext;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructurePlaceSettings;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplateManager;
+import org.jspecify.annotations.NullMarked;
 import org.lzyzl.millager.worldgen.MillagerStructures;
 
 import static org.lzyzl.millager.Millager.MOD_ID;
 
+@NullMarked
 public class StrongRoomPiece extends TemplateStructurePiece {
 
     private static final Identifier STRUCTURE = Identifier.fromNamespaceAndPath(MOD_ID, "strong_room");

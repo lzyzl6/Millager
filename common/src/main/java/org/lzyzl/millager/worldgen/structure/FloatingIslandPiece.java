@@ -22,12 +22,14 @@ import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemp
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.ServerLevelAccessor;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
+import org.jspecify.annotations.NullMarked;
 import org.lzyzl.millager.worldgen.MillagerStructures;
 
 import java.util.List;
 
 import static org.lzyzl.millager.Millager.MOD_ID;
 
+@NullMarked
 public class FloatingIslandPiece extends TemplateStructurePiece {
 
     private static final Identifier STRUCTURE = Identifier.fromNamespaceAndPath(MOD_ID, "island");

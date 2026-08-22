@@ -4,11 +4,13 @@ import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.MobRenderer;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
+import org.jspecify.annotations.NullMarked;
 import org.lzyzl.millager.client.MillagerModelLayers;
 import org.lzyzl.millager.entity.golem.BeeGolem;
 
 import static org.lzyzl.millager.Millager.MOD_ID;
 
+@NullMarked
 public class BeeGolemRenderer extends MobRenderer<BeeGolem,BeeGolemRenderState,BeeGolemModel> {
 
     private static final Identifier BG_LOCATION = Identifier.fromNamespaceAndPath(MOD_ID,"textures/entity/golem/bee_golem.png");

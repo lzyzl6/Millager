@@ -7,9 +7,11 @@ import net.minecraft.advancements.predicates.MinMaxBounds;
 import net.minecraft.advancements.predicates.entity.EntityPredicate;
 import net.minecraft.advancements.triggers.SimpleCriterionTrigger;
 import net.minecraft.server.level.ServerPlayer;
+import org.jspecify.annotations.NullMarked;
 
 import java.util.Optional;
 
+@NullMarked
 public class HoldTotemsTrigger extends SimpleCriterionTrigger<HoldTotemsTrigger.TriggerInstance> {
 
     @Override

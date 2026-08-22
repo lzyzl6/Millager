@@ -22,9 +22,11 @@ import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.Vec3;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
+import org.jspecify.annotations.NullMarked;
 import org.lzyzl.millager.MillagerEntityTypes;
 import org.lzyzl.millager.MillagerItems;
 
+@NullMarked
 public class ExplosiveArrow extends AbstractArrow {
 
     private int fireTicks = 0;

@@ -26,7 +26,6 @@ public class MillagerModelLayers {
     public static final ModelLayerLocation MAULER = new ModelLayerLocation(Identifier.fromNamespaceAndPath(MOD_ID,"mauler"), "main");
     public static final ModelLayerLocation RIOTER = new ModelLayerLocation(Identifier.fromNamespaceAndPath(MOD_ID,"rioter"), "main");
     public static final ModelLayerLocation SCHOLAR = new ModelLayerLocation(Identifier.fromNamespaceAndPath(MOD_ID,"scholar"), "main");
-//    public static final ModelLayerLocation CONJURER = new ModelLayerLocation(Identifier.fromNamespaceAndPath(MOD_ID,"conjurer"), "main");
     public static final ModelLayerLocation SCOUTER = new ModelLayerLocation(Identifier.fromNamespaceAndPath(MOD_ID,"scouter"), "main");
 
     public static final ModelLayerLocation VILLAGER_HEAD = new ModelLayerLocation(Identifier.fromNamespaceAndPath(MOD_ID,"villager_head"), "main");
@@ -46,8 +45,6 @@ public class MillagerModelLayers {
         ctx.registerLayerDefinition(SWORDMASTER, MillagerModel::createLayer);
         ctx.registerLayerDefinition(MAULER, MillagerModel::createLayer);
         ctx.registerLayerDefinition(RIOTER, MillagerModel::createLayer);
-//        ctx.registerLayerDefinition(SCHOLAR, MillagerModel::createLayer);
-//        ctx.registerLayerDefinition(CONJURER, MillagerModel::createLayer);
         ctx.registerLayerDefinition(SCOUTER, MillagerModel::createLayer);
 
         ctx.registerLayerDefinition(VILLAGER_HEAD, VillagerHeadModel::createLayer);

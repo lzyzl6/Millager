@@ -8,10 +8,12 @@ import net.minecraft.world.level.levelgen.structure.placement.RandomSpreadStruct
 import net.minecraft.world.level.levelgen.structure.placement.RandomSpreadType;
 import net.minecraft.world.level.levelgen.structure.placement.StructurePlacement.ExclusionZone;
 import net.minecraft.world.level.levelgen.structure.placement.StructurePlacementType;
+import org.jspecify.annotations.NullMarked;
 import org.lzyzl.millager.worldgen.MillagerStructures;
 
 import java.util.List;
 
+@NullMarked
 public class MultiExclusionRandomSpreadStructurePlacement extends RandomSpreadStructurePlacement {
 
     public static final MapCodec<MultiExclusionRandomSpreadStructurePlacement> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(

@@ -21,10 +21,10 @@ import net.minecraft.world.entity.animal.equine.Horse;
 import net.minecraft.world.entity.animal.golem.IronGolem;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.monster.Creeper;
-import net.minecraft.world.entity.monster.Enemy;
 import net.minecraft.world.entity.monster.RangedAttackMob;
 import net.minecraft.world.entity.npc.InventoryCarrier;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.BannerItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.levelgen.structure.StructureStart;
@@ -43,6 +43,7 @@ import org.lzyzl.millager.entity.ai.millager.RaidRetreatGoal;
 import org.lzyzl.millager.entity.ai.vanilla.ExtendedDefendVillageTargetGoal;
 import org.lzyzl.millager.entity.golem.BeeGolem;
 import org.lzyzl.millager.util.MiscHelper;
+import org.lzyzl.millager.util.MillagerTargetingHelper;
 import org.lzyzl.millager.util.MultigolemDetector;
 import org.lzyzl.millager.util.VillageBannerHelper;
 import org.lzyzl.millager.worldgen.MillagerStructures;
@@ -82,6 +83,7 @@ public abstract class AbstractMillager extends PathfinderMob implements NeutralM
     private @Nullable UUID playerAttackWarningPlayer;
     private int playerAttackWarningTick;
     private boolean playerAttackRetaliationReady;
+
     protected AbstractMillager(EntityType<? extends AbstractMillager> entityType, Level level) {
         super(entityType, level);
         this.getNavigation().setCanOpenDoors(true);
@@ -146,7 +148,7 @@ public abstract class AbstractMillager extends PathfinderMob implements NeutralM
                             if (livingEntity.isUnderWater()) return false;
                             if(livingEntity instanceof IronGolem golem) return MultigolemDetector.isZombieGolem(golem);
                             if (this instanceof RangedAttackMob && livingEntity instanceof Creeper creeper && creeper.getTarget() instanceof AbstractMillager) return true;
-                            return livingEntity instanceof Enemy && !(livingEntity instanceof Creeper);
+                            return MillagerTargetingHelper.canAttack(this, livingEntity);
                         }
                         )
                 );
@@ -214,6 +216,16 @@ public abstract class AbstractMillager extends PathfinderMob implements NeutralM
     @Override
     protected void pickUpItem(@NonNull ServerLevel serverLevel, ItemEntity itemEntity) {
         ItemStack itemStack = itemEntity.getItem();
+        if (this.canEquipBanner(itemStack)) {
+            this.onItemPickup(itemEntity);
+            ItemStack banner = itemStack.copy();
+            banner.setCount(1);
+            this.setItemSlot(EquipmentSlot.HEAD, banner);
+            itemStack.shrink(1);
+            if (itemStack.isEmpty()) itemEntity.discard();
+            return;
+        }
+        if (itemStack.getItem() instanceof BannerItem) return;
         if (this.wantsItem(itemStack)) {
             this.onItemPickup(itemEntity);
             ItemStack itemStack2 = this.inventory.addItem(itemStack);
@@ -222,7 +234,20 @@ public abstract class AbstractMillager extends PathfinderMob implements NeutralM
             } else {
                 itemStack.setCount(itemStack2.getCount());
             }
+            return;
         }
+        super.pickUpItem(serverLevel, itemEntity);
+    }
+
+    @Override
+    public boolean wantsToPickUp(ServerLevel serverLevel, ItemStack itemStack) {
+        return itemStack.getItem() instanceof BannerItem
+                ? this.canEquipBanner(itemStack)
+                : this.wantsItem(itemStack) || super.wantsToPickUp(serverLevel, itemStack);
+    }
+
+    private boolean canEquipBanner(ItemStack itemStack) {
+        return VillageBannerHelper.isVillageBanner(itemStack) && this.getItemBySlot(EquipmentSlot.HEAD).isEmpty();
     }
 
     protected abstract boolean wantsItem(ItemStack itemStack);
@@ -252,8 +277,9 @@ public abstract class AbstractMillager extends PathfinderMob implements NeutralM
 
     public void recordPlayerAttack(Player player, float amount) {
         this.clearExpiredPlayerAttackWarning();
+        if (amount <= 0.0F) return;
         if (!this.canRespondToPlayerAttack(player)) return;
-        if (this.getTarget() != null || amount < 2.0F) return;
+        if (this.getTarget() != null) return;
         if (this.playerAttackWarningPlayer != null) {
             this.playerAttackRetaliationReady = true;
             return;
@@ -371,7 +397,6 @@ public abstract class AbstractMillager extends PathfinderMob implements NeutralM
 
     public void clearSquad() {
         this.squadId = null;
-        if (this.squadLeaderBanner) this.setItemSlot(EquipmentSlot.HEAD, ItemStack.EMPTY);
         this.squadLeader = false;
         this.squadLeaderBanner = false;
     }

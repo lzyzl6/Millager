@@ -14,10 +14,12 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.ProjectileItem;
 import net.minecraft.world.level.Level;
+import org.jspecify.annotations.NullMarked;
 import org.lzyzl.millager.entity.projectile.MolotovCocktail;
 
+@NullMarked
 public class MolotovCocktailItem extends Item implements ProjectileItem {
-    public static float PROJECTILE_SHOOT_POWER = 1.5F;
+    public static final float PROJECTILE_SHOOT_POWER = 1.5F;
 
     public MolotovCocktailItem(Properties properties) {
         super(properties);
