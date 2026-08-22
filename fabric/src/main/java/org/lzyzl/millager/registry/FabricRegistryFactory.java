@@ -19,7 +19,7 @@ import org.lzyzl.millager.util.ResourceLocationHelper;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
+import java.util.Objects;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.function.UnaryOperator;
@@ -68,7 +68,7 @@ public class FabricRegistryFactory implements DeferredRegister.Factory {
             ResourceKey<T> key = ResourceKey.create(registryKey, id(modId, name));
             DeferredHolder<T, I> holder = new DeferredHolder<>(key);
             finalizers.add(() -> {
-                Registry<T> registry = (Registry<T>) BuiltInRegistries.REGISTRY.get(registryKey.location());
+                Registry<T> registry = (Registry<T>) Objects.requireNonNull(BuiltInRegistries.REGISTRY.get(registryKey.location()));
                 I value = supplier.get();
                 Registry.register(registry, key, value);
                 holder.bind(() -> value);

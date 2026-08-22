@@ -36,10 +36,10 @@ import net.minecraft.world.entity.animal.IronGolem;
 import net.minecraft.world.entity.animal.horse.Horse;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.monster.Creeper;
-import net.minecraft.world.entity.monster.Enemy;
 import net.minecraft.world.entity.monster.RangedAttackMob;
 import net.minecraft.world.entity.npc.InventoryCarrier;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.BannerItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.levelgen.structure.StructureStart;
@@ -47,6 +47,7 @@ import net.minecraft.world.level.pathfinder.Path;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 import org.lzyzl.millager.MillagerItems;
+import org.lzyzl.millager.compat.goety.GoetyCompat;
 import org.lzyzl.millager.entity.ai.millager.CavalryPatrolGoal;
 import org.lzyzl.millager.entity.ai.millager.InfantryPatrolGoal;
 import org.lzyzl.millager.entity.ai.millager.MillagerDefendVillageGoal;
@@ -56,11 +57,13 @@ import org.lzyzl.millager.entity.ai.millager.RaidRetreatGoal;
 import org.lzyzl.millager.entity.ai.vanilla.ExtendedDefendVillageTargetGoal;
 import org.lzyzl.millager.entity.golem.BeeGolem;
 import org.lzyzl.millager.util.MiscHelper;
+import org.lzyzl.millager.util.MillagerTargetingHelper;
 import org.lzyzl.millager.util.MultigolemDetector;
 import org.lzyzl.millager.util.VillageBannerHelper;
 import org.lzyzl.millager.worldgen.MillagerStructures;
 
 import java.util.Comparator;
+import java.util.Objects;
 import java.util.UUID;
 
 public abstract class AbstractMillager extends PathfinderMob implements NeutralMob, InventoryCarrier {
@@ -83,6 +86,7 @@ public abstract class AbstractMillager extends PathfinderMob implements NeutralM
     private @Nullable UUID professionOrderOwner;
     private boolean scoutingPOI = false;
     private @Nullable BlockPos raidReinforcementCenter;
+    private @Nullable UUID goetyRaidOwner;
     private @Nullable UUID squadId;
     private boolean squadLeader;
     private boolean squadLeaderBanner;
@@ -138,6 +142,8 @@ public abstract class AbstractMillager extends PathfinderMob implements NeutralM
         this.goalSelector.addGoal(7, new LookAtPlayerGoal(this, Player.class, 8.0F));
         this.goalSelector.addGoal(8, new RandomLookAroundGoal(this));
 
+        this.targetSelector.addGoal(0, new NearestAttackableTargetGoal<>(this, LivingEntity.class, 1, false, false,
+                this::isGoetyRaidTarget));
         this.targetSelector.addGoal(1, new ExtendedDefendVillageTargetGoal(this));
         this.targetSelector.addGoal(2, new MillagerHurtByTargetGoal(this, AbstractMillager.class, BeeGolem.class, IronGolem.class).setAlertOthers());
         this.targetSelector.addGoal(2, new NearestAttackableTargetGoal<>(this, Player.class, 10, true, false, livingEntity -> {
@@ -172,7 +178,7 @@ public abstract class AbstractMillager extends PathfinderMob implements NeutralM
                             if (livingEntity.isUnderWater()) return false;
                             if(livingEntity instanceof IronGolem golem) return MultigolemDetector.isZombieGolem(golem);
                             if (this instanceof RangedAttackMob && livingEntity instanceof Creeper creeper && creeper.getTarget() instanceof AbstractMillager) return true;
-                            return livingEntity instanceof Enemy && !(livingEntity instanceof Creeper);
+                            return MillagerTargetingHelper.canAttack(this, livingEntity);
                         }
                         )
                 );
@@ -218,6 +224,7 @@ public abstract class AbstractMillager extends PathfinderMob implements NeutralM
         if (this.raidReinforcementCenter != null) {
             output.putLong("RaidReinforcementCenter", this.raidReinforcementCenter.asLong());
         }
+        if (this.goetyRaidOwner != null) output.putUUID("GoetyRaidOwner", this.goetyRaidOwner);
         if (this.squadId != null) {
             output.putUUID("SquadId", this.squadId);
         }
@@ -239,6 +246,7 @@ public abstract class AbstractMillager extends PathfinderMob implements NeutralM
         if (input.contains("RaidReinforcementCenter")) {
             this.raidReinforcementCenter = BlockPos.of(input.getLong("RaidReinforcementCenter"));
         }
+        if (input.hasUUID("GoetyRaidOwner")) this.goetyRaidOwner = input.getUUID("GoetyRaidOwner");
         if (input.hasUUID("SquadId")) {
             this.squadId = input.getUUID("SquadId");
         } else if (input.hasUUID("RaidReinforcementSquadId")) {
@@ -254,6 +262,16 @@ public abstract class AbstractMillager extends PathfinderMob implements NeutralM
     @Override
     public void pickUpItem(@NonNull ItemEntity itemEntity) {
         ItemStack itemStack = itemEntity.getItem();
+        if (this.canEquipBanner(itemStack)) {
+            this.onItemPickup(itemEntity);
+            ItemStack banner = itemStack.copy();
+            banner.setCount(1);
+            this.setItemSlot(EquipmentSlot.HEAD, banner);
+            itemStack.shrink(1);
+            if (itemStack.isEmpty()) itemEntity.discard();
+            return;
+        }
+        if (itemStack.getItem() instanceof BannerItem) return;
         if (this.wantsItem(itemStack)) {
             this.onItemPickup(itemEntity);
             ItemStack itemStack2 = this.inventory.addItem(itemStack);
@@ -262,7 +280,20 @@ public abstract class AbstractMillager extends PathfinderMob implements NeutralM
             } else {
                 itemStack.setCount(itemStack2.getCount());
             }
+            return;
         }
+        super.pickUpItem(itemEntity);
+    }
+
+    @Override
+    public boolean wantsToPickUp(@NonNull ItemStack itemStack) {
+        return itemStack.getItem() instanceof BannerItem
+                ? this.canEquipBanner(itemStack)
+                : this.wantsItem(itemStack) || super.wantsToPickUp(itemStack);
+    }
+
+    private boolean canEquipBanner(ItemStack itemStack) {
+        return VillageBannerHelper.isVillageBanner(itemStack) && this.getItemBySlot(EquipmentSlot.HEAD).isEmpty();
     }
 
     protected abstract boolean wantsItem(ItemStack itemStack);
@@ -292,8 +323,9 @@ public abstract class AbstractMillager extends PathfinderMob implements NeutralM
 
     public void recordPlayerAttack(Player player, float amount) {
         this.clearExpiredPlayerAttackWarning();
+        if (amount <= 0.0F) return;
         if (!this.canRespondToPlayerAttack(player)) return;
-        if (this.getTarget() != null || amount < 2.0F) return;
+        if (this.getTarget() != null) return;
         if (this.playerAttackWarningPlayer != null) {
             this.playerAttackRetaliationReady = true;
             return;
@@ -319,8 +351,8 @@ public abstract class AbstractMillager extends PathfinderMob implements NeutralM
                 && this.tickCount - this.playerAttackWarningTick <= PLAYER_ATTACK_WARNING_TICKS;
     }
 
-    public boolean shouldRetaliateAgainst(Player player) {
-        return this.shouldRetaliate() && this.canRespondToPlayerAttack(player);
+    public boolean shouldIgnoreRetaliationAgainst(Player player) {
+        return !this.shouldRetaliate() || !this.canRespondToPlayerAttack(player);
     }
 
     private boolean canRespondToPlayerAttack(Player player) {
@@ -404,6 +436,19 @@ public abstract class AbstractMillager extends PathfinderMob implements NeutralM
         this.raidReinforcementArrived = false;
     }
 
+    public @Nullable UUID getGoetyRaidOwner() {
+        return this.goetyRaidOwner;
+    }
+
+    private boolean isGoetyRaidTarget(LivingEntity entity) {
+        UUID owner = this.goetyRaidOwner;
+        return owner != null && GoetyCompat.isRaidTarget(entity, owner);
+    }
+
+    public void setGoetyRaidOwner(@Nullable UUID owner) {
+        this.goetyRaidOwner = owner;
+    }
+
     public boolean isRaidReinforcementArrived() {
         return this.raidReinforcementArrived;
     }
@@ -427,7 +472,6 @@ public abstract class AbstractMillager extends PathfinderMob implements NeutralM
 
     public void clearSquad() {
         this.squadId = null;
-        if (this.squadLeaderBanner) this.setItemSlot(EquipmentSlot.HEAD, ItemStack.EMPTY);
         this.squadLeader = false;
         this.squadLeaderBanner = false;
     }
@@ -579,13 +623,15 @@ public abstract class AbstractMillager extends PathfinderMob implements NeutralM
 
     private boolean hasMatchingSquadCenter(AbstractMillager candidate) {
         BlockPos center = this.raidReinforcementCenter;
-        return center == null ? candidate.getRaidReinforcementCenter() == null : center.equals(candidate.getRaidReinforcementCenter());
+        return (center == null ? candidate.getRaidReinforcementCenter() == null : center.equals(candidate.getRaidReinforcementCenter()))
+                && Objects.equals(this.goetyRaidOwner, candidate.goetyRaidOwner);
     }
 
     private boolean hasCompatibleSquadCenter(AbstractMillager candidate) {
         BlockPos center = this.raidReinforcementCenter;
         BlockPos candidateCenter = candidate.getRaidReinforcementCenter();
-        return center != null && center.equals(candidateCenter);
+        return center != null && center.equals(candidateCenter)
+                && Objects.equals(this.goetyRaidOwner, candidate.goetyRaidOwner);
     }
 
     public boolean isScoutingPOI() {

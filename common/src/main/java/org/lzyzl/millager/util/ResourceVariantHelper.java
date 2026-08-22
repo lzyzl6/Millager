@@ -33,7 +33,7 @@ public class ResourceVariantHelper {
             BANNER_PATTERNS.register("villager", () -> new BannerPattern("mlv"));
 
     public static final DeferredHolder<BannerPattern, BannerPattern> VILLAGE_VILLAGER_PATTERN =
-            BANNER_PATTERNS.register("village_villager", () -> new BannerPattern("mlvv"));
+            BANNER_PATTERNS.register("village_villager", () -> new BannerPattern("village_villager"));
 
     public static ResourceKey<BannerPattern> createPatternKey(String string) {
         return ResourceKey.create(Registries.BANNER_PATTERN, ResourceLocationHelper.create(MOD_ID, string));

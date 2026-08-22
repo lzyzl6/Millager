@@ -28,13 +28,8 @@ public class TNTOnAStickModel extends EntityModel<TNTOnAStick> {
 
     @Override
     public void setupAnim(TNTOnAStick entity, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch) {
-        if (!entity.onGround()) {
-            this.main.yRot = entity.getViewYRot(limbSwing) * ((float)Math.PI / 180f);
-            this.main.xRot = entity.getRotationProgress(limbSwing) * ((float)Math.PI / 180f);
-        } else {
-            this.main.yRot = entity.getLastYRot() * ((float)Math.PI / 180f);
-            this.main.xRot = entity.getRotationProgress(limbSwing) * ((float)Math.PI / 180f);
-        }
+        this.main.yRot = (entity.onGround() ? entity.getLastYRot() : entity.getViewYRot(limbSwing)) * ((float)Math.PI / 180f);
+        this.main.xRot = entity.getRotationProgress(limbSwing) * ((float)Math.PI / 180f);
     }
 
     @Override

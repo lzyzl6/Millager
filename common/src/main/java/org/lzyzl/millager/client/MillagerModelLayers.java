@@ -34,15 +34,12 @@ public class MillagerModelLayers {
         ctx.registerLayerDefinition(BEE_GOLEM, BeeGolemModel::createLayer);
         ctx.registerLayerDefinition(BEE_GOLEM_FLASH, BeeGolemFlashModel::createLayer);
 
-        ctx.registerLayerDefinition(DOCTOR, MillagerModel::createLayer);
-        ctx.registerLayerDefinition(BREACHER, MillagerModel::createLayer);
-        ctx.registerLayerDefinition(LANCER, MillagerModel::createLayer);
-        ctx.registerLayerDefinition(ARCHER, MillagerModel::createLayer);
-        ctx.registerLayerDefinition(SWORDMASTER, MillagerModel::createLayer);
-        ctx.registerLayerDefinition(MAULER, MillagerModel::createLayer);
-        ctx.registerLayerDefinition(RIOTER, MillagerModel::createLayer);
-        ctx.registerLayerDefinition(SCOUTER, MillagerModel::createLayer);
+        registerMillagerModelLayers(ctx);
         ctx.registerLayerDefinition(VILLAGER_HEAD, VillagerHeadModel::createLayer);
         ctx.registerLayerDefinition(ILLAGER_HEAD, VillagerHeadModel::createLayer);
+    }
+
+    private static void registerMillagerModelLayers(ClientRegistrationContext ctx) {
+        for (ModelLayerLocation location : new ModelLayerLocation[]{MillagerModelLayers.DOCTOR, MillagerModelLayers.BREACHER, MillagerModelLayers.LANCER, MillagerModelLayers.ARCHER, MillagerModelLayers.SWORDMASTER, MillagerModelLayers.MAULER, MillagerModelLayers.RIOTER, MillagerModelLayers.SCOUTER}) ctx.registerLayerDefinition(location, MillagerModel::createLayer);
     }
 }

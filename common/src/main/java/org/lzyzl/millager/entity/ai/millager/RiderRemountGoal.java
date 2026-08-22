@@ -86,6 +86,12 @@ public class RiderRemountGoal<T extends AbstractMillager & Rider> extends Goal {
                     this.targetHorse.addTag("millager_mount");
                 }
 
+                float yRot = this.rider.getYRot();
+                this.targetHorse.setYRot(yRot);
+                this.targetHorse.setYBodyRot(yRot);
+                this.targetHorse.setYHeadRot(yRot);
+                this.rider.setYBodyRot(yRot);
+                this.rider.setYHeadRot(yRot);
                 this.rider.startRiding(this.targetHorse);
             }
         }

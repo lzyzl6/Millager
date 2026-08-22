@@ -15,8 +15,9 @@
   "entity.millager.mauler": "Parçalayıcı",
   "entity.millager.rioter": "İsyancı",
   "entity.millager.scouter": "Gözcü",
+
   "entity.millager.villager.commander": "Komutan",
-  "entity.minecraft.villager.commander": "Komutan",
+  "entity.minecraft.villager.millager.commander": "Komutan",
 
   "item.millager.tnt_on_a_stick": "Çubuklu TNT",
   "item.millager.liquor": "İçki",
@@ -324,5 +325,9 @@
   "millager.config.option.patrol.ruined_cp_patrol_size_max.name": "Maksimum Yıkık Karakol Devriyesi Boyutu",
   "millager.config.option.patrol.ruined_cp_patrol_size_max.description": "Yıkık bir komuta karakolu zorba devriyesindeki maksimum üye sayısını ayarlar. Yüksek değerler daha büyük devriyelere izin verir. Varsayılan değer 7'dir; değer yıkık karakol minimumundan düşük veya 100'den yüksek olamaz.",
   "millager.config.option.patrol.ruined_cp_patrol_near_dist.name": "Yıkık Karakol Devriyesi Yakın Mesafesi",
-  "millager.config.option.patrol.ruined_cp_patrol_near_dist.description": "İlk devriye oluşumunun yıkık komuta karakolu merkezinden maksimum yatay koordinat sapmasını ayarlar. Yüksek değerler ilk oluşumu yıkık komuta karakolu merkezinden daha uzağa yerleştirebilir. Mesafe blok cinsinden ölçülür. Varsayılan değer 24'tür ve aralık 0-512'dir."
+  "millager.config.option.patrol.ruined_cp_patrol_near_dist.description": "İlk devriye oluşumunun yıkık komuta karakolu merkezinden maksimum yatay koordinat sapmasını ayarlar. Yüksek değerler ilk oluşumu yıkık komuta karakolu merkezinden daha uzağa yerleştirebilir. Mesafe blok cinsinden ölçülür. Varsayılan değer 24'tür ve aralık 0-512'dir.",
+  "millager.config.target.hostile.description": "Millager'lar bu varlığı aktif olarak arar ve saldırır.",
+  "millager.config.target.neutral.description": "Millager'lar bu varlığı aktif olarak aramaz, ancak saldırıya uğrarsa karşılık verebilir.",
+  "millager.config.target.friendly.description": "Millager'lar bu varlığa saldırmaz ve onu müttefik kabul eder.",
+  "millager.config.target.bee_golem.description": "Arı Golemlerinin bu varlığa aktif olarak saldırıp saldırmayacağını belirler; bu ayar varsayılan hedefleme kurallarının önceliğine sahiptir."
 }

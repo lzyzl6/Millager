@@ -18,7 +18,7 @@ public class MillagerHurtByTargetGoal extends HurtByTargetGoal {
     public boolean canUse() {
         LivingEntity attacker = this.mob.getLastHurtByMob();
         if (attacker instanceof Player player) {
-            if (!this.millager.shouldRetaliateAgainst(player)) return false;
+            if (this.millager.shouldIgnoreRetaliationAgainst(player)) return false;
             this.targetMob = attacker;
             return true;
         }

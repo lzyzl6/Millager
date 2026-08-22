@@ -32,7 +32,8 @@ public class RaidReinforcementGoal extends Goal {
         BlockPos center = this.millager.getRaidReinforcementCenter();
         if (center == null || !(this.millager.level() instanceof ServerLevel serverLevel)) return false;
         Raid raid = serverLevel.getRaidAt(center);
-        return raid != null && raid.isActive() && !raid.isOver() && !raid.isStopped()
+        return (this.millager.getGoetyRaidOwner() != null
+                || raid != null && raid.isActive() && !raid.isOver() && !raid.isStopped())
                 && this.millager.getTarget() == null
                 && this.needsToReach(center);
     }
@@ -44,7 +45,7 @@ public class RaidReinforcementGoal extends Goal {
         if (this.millager.getTarget() != null) return false;
         if (!(this.millager.level() instanceof ServerLevel serverLevel)) return false;
         Raid raid = serverLevel.getRaidAt(center);
-        return raid != null && raid.isActive() && !raid.isOver()
+        return (this.millager.getGoetyRaidOwner() != null || raid != null && raid.isActive() && !raid.isOver())
                 && this.needsToReach(center);
     }
 

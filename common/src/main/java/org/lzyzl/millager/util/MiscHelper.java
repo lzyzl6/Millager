@@ -1,6 +1,7 @@
 package org.lzyzl.millager.util;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.core.particles.DustParticleOptions;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
@@ -29,6 +30,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.MapItem;
 import net.minecraft.world.level.ClipContext;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.structure.Structure;
@@ -132,6 +134,35 @@ public class MiscHelper {
         return current + f;
     }
 
+    public static Vec3 predictProjectileTarget(LivingEntity target, double predictionTicks) {
+        Vec3 movement = target.getDeltaMovement();
+        return new Vec3(
+                target.getX() + movement.x * predictionTicks,
+                !target.onGround() && Math.abs(movement.y) > 0.01 ? target.getY() + movement.y * predictionTicks : target.getY(),
+                target.getZ() + movement.z * predictionTicks
+        );
+    }
+
+    public static Direction getNearestExposedDirection(Level level, BlockPos pos, Vec3 point) {
+        double minDistance = Double.MAX_VALUE;
+        Direction nearest = Direction.UP;
+        for (Direction direction : Direction.values()) {
+            double axisPosition = switch (direction.getAxis()) {
+                case X -> point.x;
+                case Y -> point.y;
+                case Z -> point.z;
+            };
+            double facePosition = direction.getAxisDirection() == Direction.AxisDirection.POSITIVE
+                    ? Math.floor(axisPosition) + 1.0D : Math.floor(axisPosition);
+            double distance = Math.abs(axisPosition - facePosition);
+            if (level.getBlockState(pos.relative(direction)).isAir() && distance < minDistance) {
+                minDistance = distance;
+                nearest = direction;
+            }
+        }
+        return nearest;
+    }
+
     public static boolean isMillagerFaction(@Nullable Object entity) {
         if (entity == null) return false;
 
@@ -139,11 +170,6 @@ public class MiscHelper {
 
         if (entity instanceof AbstractMillager || entity instanceof Villager ||
                  (entity instanceof BeeGolem bee && bee.isSummoned())) {
-            return true;
-        }
-
-        if (entity.getClass().getCanonicalName() != null &&
-                entity.getClass().getCanonicalName().contains("guardvillagers")) {
             return true;
         }
 
@@ -157,7 +183,7 @@ public class MiscHelper {
     public static boolean isAllyCaused(DamageSource damageSource) {
         Entity source = damageSource.getEntity();
         if(source == null) source = damageSource.getDirectEntity();
-        return isMillagerFaction(source);
+        return source instanceof LivingEntity livingEntity && MillagerTargetingHelper.isFriendlyToMillager(livingEntity);
     }
 
     public static void performFireExplosion(ThrowableItemProjectile projectile, ServerLevel level, Vec3 pos, float radius, int color, float instantDamage, float spawnChance) {
@@ -190,9 +216,12 @@ public class MiscHelper {
                     ClipContext.Block.VISUAL, ClipContext.Fluid.NONE, entity));
 
             if (hit.getType() != HitResult.Type.BLOCK) {
+                if (isRioterProjectile && projectile.getOwner() instanceof AbstractMillager millager
+                        && !MillagerTargetingHelper.isHostileToMillager(millager, entity)
+                        && !(MillagerTargetingHelper.isFriendlyToMillager(entity) && level.getGameRules().getRule(MillagerGameRules.FRIENDLY_FIRE).get())) continue;
                 entity.hurt(level.damageSources().explosion(projectile, projectile.getOwner()), instantDamage);
                 if(isRioterProjectile) {
-                    boolean canIgnite = !isMillagerFaction(entity) || level.getGameRules().getRule(MillagerGameRules.FRIENDLY_FIRE).get();
+                    boolean canIgnite = !MillagerTargetingHelper.isFriendlyToMillager(entity) || level.getGameRules().getRule(MillagerGameRules.FRIENDLY_FIRE).get();
                     if(projectile.getOwner() instanceof Rioter rioter) {
                         LivingEntity target = rioter.getTarget();
                         if(target != null && entity.getUUID().equals(target.getUUID()) && canIgnite) entity.setSecondsOnFire(Mth.ceil(instantDamage * 2 + 2));

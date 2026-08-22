@@ -14,6 +14,7 @@ import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.damagesource.DamageTypes;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.MobSpawnType;
 import net.minecraft.world.entity.SpawnGroupData;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
@@ -21,6 +22,7 @@ import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.goal.AvoidEntityGoal;
 import net.minecraft.world.entity.animal.IronGolem;
 import net.minecraft.world.entity.animal.horse.Horse;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
@@ -37,6 +39,7 @@ import org.lzyzl.millager.entity.golem.BeeGolem;
 
 public class Lancer extends AbstractMillager implements Rider {
     private static final EntityDataAccessor<Boolean> IS_HEALING = SynchedEntityData.defineId(Lancer.class, EntityDataSerializers.BOOLEAN);
+    private static final EntityDataAccessor<Integer> LAST_SPEAR_HIT_TICK = SynchedEntityData.defineId(Lancer.class, EntityDataSerializers.INT);
     private long nextHealTime;
     private int castTicks;
     public Lancer(EntityType<? extends Lancer> entityType, Level level) {
@@ -46,9 +49,18 @@ public class Lancer extends AbstractMillager implements Rider {
     }
 
     @Override
+    public void setTarget(@Nullable LivingEntity target) {
+        super.setTarget(target);
+        if (target != null && !LancerSpearUseGoal.isLancerSpear(this.getMainHandItem())) {
+            this.setItemSlot(EquipmentSlot.MAINHAND, new ItemStack(this.getRandomSpear(this.getRandom())));
+            this.setDropChance(EquipmentSlot.MAINHAND, 0.0F);
+        }
+    }
+
+    @Override
     public MillagerPose getMillagerPose() {
         if (this.isHealing()) return MillagerPose.SPELLCASTING;
-        if (this.isUsingItem() && LancerSpearUseGoal.isLancerSpear(this.getUseItem())) return MillagerPose.SPEAR;
+        if (LancerSpearUseGoal.isLancerSpear(this.getMainHandItem())) return MillagerPose.SPEAR;
         return this.getMainHandItem().isEmpty() ? MillagerPose.NEUTRAL : MillagerPose.HOLDING_ITEM;
     }
 
@@ -63,11 +75,16 @@ public class Lancer extends AbstractMillager implements Rider {
     }
 
     @Override
+    protected int calculateFallDamage(float fallDistance, float damageMultiplier) {
+        return super.calculateFallDamage(fallDistance, damageMultiplier * 0.7F);
+    }
+
+    @Override
     protected void registerGoals() {
         this.goalSelector.addGoal(0, new RiderRemountGoal<>(this, 1.2D));
         this.goalSelector.addGoal(1, new LancerHealAuraGoal(this));
+        this.goalSelector.addGoal(2, new AvoidEntityGoal<>(this, Horse.class, 4.0F, 1.0D, 1.2D));
         this.goalSelector.addGoal(2, new LancerSpearUseGoal<>(this, 1.5D, 1.3D, 10.0F, 2.0F));
-        this.goalSelector.addGoal(3, new AvoidEntityGoal<>(this, Horse.class, 4.0F, 1.0D, 1.2D));
         this.targetSelector.addGoal(1, new RiderAvoidAllyGoal<>(this, true));
         this.targetSelector.addGoal(1, new RiderHorseHurtByTargetGoal<>(this, AbstractMillager.class, BeeGolem.class, IronGolem.class));
         super.registerGoals();
@@ -77,6 +94,7 @@ public class Lancer extends AbstractMillager implements Rider {
     protected void defineSynchedData() {
         super.defineSynchedData();
         this.entityData.define(IS_HEALING, false);
+        this.entityData.define(LAST_SPEAR_HIT_TICK, -1);
     }
 
     @Override
@@ -116,6 +134,61 @@ public class Lancer extends AbstractMillager implements Rider {
         return super.hurt(damageSource, amount);
     }
 
+    @Override
+    public SpawnGroupData finalizeSpawn(@NonNull ServerLevelAccessor level, @NonNull DifficultyInstance difficulty,
+                                        @NonNull MobSpawnType spawnReason, @Nullable SpawnGroupData spawnGroupData,
+                                        @Nullable CompoundTag tag) {
+        spawnGroupData = super.finalizeSpawn(level, difficulty, spawnReason, spawnGroupData, tag);
+        this.populateDefaultEquipmentSlots(level.getRandom(), difficulty);
+        this.createMount(level, spawnReason, spawnGroupData);
+        this.enchantSpawnedWeapon(level.getRandom(), difficulty.getSpecialMultiplier());
+        return spawnGroupData;
+    }
+
+    @Override
+    protected void populateDefaultEquipmentSlots(@NonNull RandomSource random, @NonNull DifficultyInstance difficulty) {
+        this.setItemSlot(EquipmentSlot.MAINHAND, new ItemStack(this.getRandomSpear(random)));
+        this.setDropChance(EquipmentSlot.MAINHAND, 0.0F);
+        this.setItemSlot(EquipmentSlot.OFFHAND, this.createLancerBook());
+    }
+
+    private void createMount(ServerLevelAccessor level, MobSpawnType spawnReason, SpawnGroupData spawnGroupData) {
+        Rider.createMount(this, level, spawnReason, spawnGroupData, 0.3D, 25.0D, 1, 3);
+    }
+
+    @Override
+    protected boolean wantsItem(ItemStack itemStack) {
+        return itemStack.is(Items.CACTUS) || itemStack.is(Items.LEAD);
+    }
+
+    @Override
+    public double getMyRidingOffset() {
+        return -0.45D;
+    }
+
+    private Item getRandomSpear(RandomSource random) {
+        return switch (random.nextInt(3)) {
+            case 0 -> MillagerItems.ironLancerSpear.get();
+            case 1 -> MillagerItems.goldenLancerSpear.get();
+            default -> MillagerItems.diamondLancerSpear.get();
+        };
+    }
+
+    private ItemStack createLancerBook() {
+        ItemStack book = new ItemStack(Items.WRITTEN_BOOK);
+        CompoundTag tag = new CompoundTag();
+        tag.putString("title", "The Book of the Healing Aura");
+        tag.putString("author", "Unknown Villager");
+        tag.putInt("generation", 1);
+        ListTag pages = new ListTag();
+        for (int i = 1; i <= 13; i++) {
+            pages.add(StringTag.valueOf(Component.Serializer.toJson(Component.translatable("item.millager.written_book.lancer.page" + i))));
+        }
+        tag.put("pages", pages);
+        book.setTag(tag);
+        return book;
+    }
+
     public boolean isHealing() {
         return this.entityData.get(IS_HEALING);
     }
@@ -140,68 +213,15 @@ public class Lancer extends AbstractMillager implements Rider {
         this.castTicks = castTicks;
     }
 
-    @Override
-    public SpawnGroupData finalizeSpawn(@NonNull ServerLevelAccessor level, @NonNull DifficultyInstance difficulty,
-                                        @NonNull MobSpawnType spawnReason, @Nullable SpawnGroupData spawnGroupData,
-                                        @Nullable CompoundTag tag) {
-        spawnGroupData = super.finalizeSpawn(level, difficulty, spawnReason, spawnGroupData, tag);
-        this.populateDefaultEquipmentSlots(level.getRandom(), difficulty);
-        this.createMount(level, spawnReason, spawnGroupData);
-        this.enchantSpawnedWeapon(level.getRandom(), difficulty.getSpecialMultiplier());
-        return spawnGroupData;
-    }
-
-    @Override
-    protected void populateDefaultEquipmentSlots(@NonNull RandomSource random, @NonNull DifficultyInstance difficulty) {
-        this.setItemSlot(EquipmentSlot.MAINHAND, new ItemStack(switch (random.nextInt(3)) {
-            case 0 -> MillagerItems.ironLancerSpear.get();
-            case 1 -> MillagerItems.goldenLancerSpear.get();
-            default -> MillagerItems.diamondLancerSpear.get();
-        }));
-        this.setDropChance(EquipmentSlot.MAINHAND, 0.0F);
-        this.setItemSlot(EquipmentSlot.OFFHAND, this.createLancerBook());
-    }
-
-    private ItemStack createLancerBook() {
-        ItemStack book = new ItemStack(Items.WRITTEN_BOOK);
-        CompoundTag tag = new CompoundTag();
-        tag.putString("title", "The Book of the Healing Aura");
-        tag.putString("author", "Unknown Villager");
-        tag.putInt("generation", 1);
-        ListTag pages = new ListTag();
-        for (int i = 1; i <= 13; i++) {
-            pages.add(StringTag.valueOf(Component.Serializer.toJson(Component.translatable("item.millager.written_book.lancer.page" + i))));
+    public void onSpearHit() {
+        int lastHitTick = this.entityData.get(LAST_SPEAR_HIT_TICK);
+        if (lastHitTick < 0 || this.tickCount - lastHitTick > 10) {
+            this.entityData.set(LAST_SPEAR_HIT_TICK, this.tickCount);
         }
-        tag.put("pages", pages);
-        book.setTag(tag);
-        return book;
     }
 
-    @Override
-    public void createMount(ServerLevelAccessor level, MobSpawnType spawnReason, SpawnGroupData spawnGroupData) {
-        Horse horse = EntityType.HORSE.create(level.getLevel());
-        if (horse == null) return;
-        horse.moveTo(this.getX(), this.getY(), this.getZ(), this.getYRot(), this.getXRot());
-        horse.finalizeSpawn(level, level.getCurrentDifficultyAt(horse.blockPosition()), spawnReason, spawnGroupData, null);
-        var speedAttr = horse.getAttribute(Attributes.MOVEMENT_SPEED);
-        if (speedAttr != null && speedAttr.getBaseValue() < 0.3) speedAttr.setBaseValue(0.3);
-        var healthAttr = horse.getAttribute(Attributes.MAX_HEALTH);
-        if (healthAttr != null && healthAttr.getBaseValue() < 25) healthAttr.setBaseValue(25);
-        horse.setHealth(horse.getMaxHealth());
-        horse.inventory.setItem(1, new ItemStack(Rider.getRandomHorseArmor(level.getRandom(), 1, 3)));
-        horse.setTamed(true);
-        horse.addTag("millager_mount");
-        this.startRiding(horse);
-        level.addFreshEntity(horse);
-    }
-
-    @Override
-    protected boolean wantsItem(ItemStack itemStack) {
-        return itemStack.is(Items.CACTUS) || itemStack.is(Items.LEAD);
-    }
-
-    @Override
-    public double getMyRidingOffset() {
-        return -0.45D;
+    public float getTicksSinceSpearHit(float partialTick) {
+        int lastHitTick = this.entityData.get(LAST_SPEAR_HIT_TICK);
+        return lastHitTick < 0 ? 0.0F : this.tickCount - lastHitTick + partialTick;
     }
 }

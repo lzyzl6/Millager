@@ -21,8 +21,13 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.jspecify.annotations.NonNull;
 import org.lzyzl.millager.MillagerSounds;
+import org.lzyzl.millager.entity.millager.AbstractMillager;
+import org.lzyzl.millager.entity.millager.Lancer;
+import org.lzyzl.millager.util.MillagerTargetingHelper;
 
 import java.util.List;
+import java.util.Map;
+import java.util.WeakHashMap;
 
 public class LancerSpearItem extends Item {
     private static final double MOB_MIN_REACH = 1.0D;
@@ -31,26 +36,23 @@ public class LancerSpearItem extends Item {
     private static final double PLAYER_MAX_REACH = 4.5D;
     private static final double CREATIVE_PLAYER_MAX_REACH = 6.5D;
     private static final double HITBOX_MARGIN = 0.125D;
+    private static final Map<LivingEntity, Map<LivingEntity, Long>> RECENT_KINETIC_TARGETS = new WeakHashMap<>();
 
     public enum Material {
-        IRON(Tiers.IRON, 0.95F, 0.95F, 0.6F, 2.5F, 11.0F, 6.75F, 5.1F, 11.25F, 4.6F),
-        GOLD(Tiers.GOLD, 0.95F, 0.7F, 0.7F, 3.5F, 13.0F, 8.5F, 5.1F, 13.75F, 4.6F),
-        DIAMOND(Tiers.DIAMOND, 1.05F, 1.075F, 0.5F, 3.0F, 10.0F, 6.5F, 5.1F, 10.0F, 4.6F);
+        IRON(Tiers.IRON, 0.95F, 0.95F, 0.6F, 2.5F, 8.0F, 6.75F, 11.25F),
+        GOLD(Tiers.GOLD, 0.95F, 0.7F, 0.7F, 3.5F, 10.0F, 8.5F, 13.75F),
+        DIAMOND(Tiers.DIAMOND, 1.05F, 1.075F, 0.5F, 3.0F, 7.5F, 6.5F, 10.0F);
 
         private final Tier tier;
         private final float attackDuration;
         private final KineticProfile kineticProfile;
 
         Material(Tier tier, float attackDuration, float damageMultiplier, float delaySeconds, float dismountSeconds, float dismountSpeed,
-                 float knockbackSeconds, float knockbackSpeed, float damageSeconds, float relativeDamageSpeed) {
+                 float knockbackSeconds, float damageSeconds) {
             this.tier = tier;
             this.attackDuration = attackDuration;
             this.kineticProfile = new KineticProfile(delaySeconds, dismountSeconds, dismountSpeed, knockbackSeconds,
-                    knockbackSpeed, damageSeconds, relativeDamageSpeed, damageMultiplier);
-        }
-
-        public int durability() {
-            return this.tier.getUses();
+                    (float) 5.1, damageSeconds, (float) 4.6, damageMultiplier);
         }
 
         public Tier tier() {
@@ -70,7 +72,7 @@ public class LancerSpearItem extends Item {
     private final Multimap<Attribute, AttributeModifier> attributes;
 
     public LancerSpearItem(Material material, Properties properties) {
-        super(properties.durability(material.durability()));
+        super(properties);
         this.material = material;
         this.attributes = ImmutableMultimap.of(
                 Attributes.ATTACK_DAMAGE, new AttributeModifier(BASE_ATTACK_DAMAGE_UUID, "Weapon modifier",
@@ -130,15 +132,21 @@ public class LancerSpearItem extends Item {
             boolean canKnockback = profile.canKnockback(kineticTicks, attackerSpeed, speedMultiplier);
             boolean canDamage = profile.canDamage(kineticTicks, relativeSpeed, speedMultiplier);
             if (!canDismount && !canKnockback && !canDamage) continue;
+            if (!rememberKineticTarget(user, target, level.getGameTime())) continue;
             float damage = (float) user.getAttributeBaseValue(Attributes.ATTACK_DAMAGE)
                     + Mth.floor((float) (relativeSpeed * profile.damageMultiplier()));
-            if (!target.hurt(user.damageSources().mobAttack(user), damage)) continue;
-            target.playSound(MillagerSounds.LANCER_SPEAR_HIT, 1.0F, 1.0F);
+            boolean hit = canDamage && target.hurt(user.damageSources().mobAttack(user), damage);
             if (canKnockback) {
+                hit = true;
                 target.knockback((float) Math.max(0.25D, relativeSpeed * 0.1D), -look.x, -look.z);
             }
-            if (canDismount && target.isPassenger()) target.stopRiding();
-            stack.hurtAndBreak(1, user, entity -> entity.broadcastBreakEvent(user.getUsedItemHand()));
+            if (canDismount && target.isPassenger()) {
+                hit = true;
+                target.stopRiding();
+            }
+            if (!hit) continue;
+            target.playSound(MillagerSounds.LANCER_SPEAR_HIT, 1.0F, 1.0F);
+            if (user instanceof Lancer lancer) lancer.onSpearHit();
         }
     }
 
@@ -149,7 +157,6 @@ public class LancerSpearItem extends Item {
             if (piercedTarget != target) piercedTarget.hurt(attacker.damageSources().mobAttack(attacker),
                     (float) attacker.getAttributeValue(Attributes.ATTACK_DAMAGE));
         }
-        stack.hurtAndBreak(1, attacker, entity -> entity.broadcastBreakEvent(EquipmentSlot.MAINHAND));
         return true;
     }
 
@@ -167,13 +174,22 @@ public class LancerSpearItem extends Item {
     }
 
     private boolean canHit(LivingEntity user, LivingEntity target, Vec3 start, Vec3 end) {
-        return target != user && user.canAttack(target) && !user.isAlliedTo(target) && user.hasLineOfSight(target)
+        return target != user && (user instanceof AbstractMillager millager ? MillagerTargetingHelper.canAttack(millager, target) : user.canAttack(target))
+                && !user.isAlliedTo(target) && user.hasLineOfSight(target)
                 && target.getBoundingBox().inflate(HITBOX_MARGIN).clip(start, end).isPresent();
     }
 
     private static Vec3 getKineticMotion(Entity entity) {
         if (!(entity instanceof Player) && entity.isPassenger()) entity = entity.getRootVehicle();
         return entity.getDeltaMovement().scale(20.0D);
+    }
+
+    private static boolean rememberKineticTarget(LivingEntity user, LivingEntity target, long gameTime) {
+        Map<LivingEntity, Long> targets = RECENT_KINETIC_TARGETS.computeIfAbsent(user, key -> new WeakHashMap<>());
+        Long lastContact = targets.get(target);
+        if (lastContact != null && gameTime - lastContact < 10L) return false;
+        targets.put(target, gameTime);
+        return true;
     }
 
     @Override

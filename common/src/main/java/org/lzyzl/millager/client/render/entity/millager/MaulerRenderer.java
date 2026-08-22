@@ -21,7 +21,7 @@ public class MaulerRenderer extends MillagerRenderer<Mauler> {
     }
 
     @Override
-    public @NonNull ResourceLocation getTextureLocation(Mauler mauler) {
+    public @NonNull ResourceLocation getTextureLocation(@NonNull Mauler mauler) {
         if (mauler.isInvisible()) return TEXTURE;
         return switch (mauler.getCrackiness()) {
             case LOW -> CRACKINESS_LOW_TEXTURE;

@@ -14,7 +14,7 @@ import org.jspecify.annotations.NonNull;
 import org.lzyzl.millager.entity.projectile.MolotovCocktail;
 
 public class MolotovCocktailItem extends Item {
-    public static float PROJECTILE_SHOOT_POWER = 1.5F;
+    public static final float PROJECTILE_SHOOT_POWER = 1.5F;
 
     public MolotovCocktailItem(Properties properties) {
         super(properties);

@@ -15,7 +15,7 @@ public class ExplosiveArrowItem extends ArrowItem {
     }
 
     @Override
-    public @NonNull AbstractArrow createArrow(@NonNull Level level, ItemStack itemStack, @NonNull LivingEntity livingEntity) {
-        return new ExplosiveArrow(level, livingEntity, itemStack.copyWithCount(1));
+    public @NonNull AbstractArrow createArrow(@NonNull Level level, @NonNull ItemStack itemStack, @NonNull LivingEntity livingEntity) {
+        return new ExplosiveArrow(level, livingEntity);
     }
 }

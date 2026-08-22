@@ -45,9 +45,7 @@ public class EnemyAttackHelper {
     private static boolean isRangedEnemy(Mob mob) {
         return mob instanceof RangedAttackMob
                 || mob instanceof Blaze
-                || mob instanceof Witch
                 || mob instanceof Guardian
-                || mob instanceof ElderGuardian
                 || mob instanceof Vex
                 || mob instanceof Ghast;
     }

@@ -1,7 +1,6 @@
 package org.lzyzl.millager.entity.projectile;
 
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
@@ -22,6 +21,7 @@ import net.minecraft.world.phys.Vec3;
 import org.jspecify.annotations.NonNull;
 import org.lzyzl.millager.MillagerEntityTypes;
 import org.lzyzl.millager.MillagerItems;
+import org.lzyzl.millager.util.MiscHelper;
 
 public class ExplosiveArrow extends AbstractArrow {
 
@@ -30,12 +30,12 @@ public class ExplosiveArrow extends AbstractArrow {
     public ExplosiveArrow(EntityType<? extends AbstractArrow> entityType, Level level) {
         super(entityType, level);
     }
-    public ExplosiveArrow(Level level, LivingEntity livingEntity, ItemStack itemStack) {
+    public ExplosiveArrow(Level level, LivingEntity livingEntity) {
         super(MillagerEntityTypes.Explosive_Arrow.get(), livingEntity, level);
         this.setFireTicks(0);
     }
 
-    public ExplosiveArrow(Level level, double d, double e, double f, ItemStack itemStack) {
+    public ExplosiveArrow(Level level, double d, double e, double f) {
         super(MillagerEntityTypes.Explosive_Arrow.get(), d, e, f, level);
         this.setFireTicks(0);
     }
@@ -127,25 +127,11 @@ public class ExplosiveArrow extends AbstractArrow {
         BlockState state = level.getBlockState(bp);
 
         if (state.isCollisionShapeFullBlock(level, bp)) {
-            double minDistance = Double.MAX_VALUE;
-            Direction bestDirection = Direction.UP;
-            for (Direction dir : Direction.values()) {
-                double axisPos = (dir.getAxis() == Direction.Axis.X) ? currentPos.x :
-                        (dir.getAxis() == Direction.Axis.Y) ? currentPos.y : currentPos.z;
-                double facePos = (dir.getAxisDirection() == Direction.AxisDirection.POSITIVE) ?
-                        (Math.floor(axisPos) + 1.0) : Math.floor(axisPos);
-                double dist = Math.abs(axisPos - facePos);
-                if (level.getBlockState(bp.relative(dir)).isAir()) {
-                    if (dist < minDistance) {
-                        minDistance = dist;
-                        bestDirection = dir;
-                    }
-                }
-            }
+            var direction = MiscHelper.getNearestExposedDirection(level, bp, currentPos);
             return currentPos.add(
-                    bestDirection.getStepX() * 0.1,
-                    bestDirection.getStepY() * 0.1,
-                    bestDirection.getStepZ() * 0.1
+                    direction.getStepX() * 0.1,
+                    direction.getStepY() * 0.1,
+                    direction.getStepZ() * 0.1
             );
         }
         return currentPos;

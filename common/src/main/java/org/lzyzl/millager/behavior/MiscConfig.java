@@ -7,6 +7,8 @@ public final class MiscConfig {
     public static volatile boolean GENERATE_STRONG_ROOMS = true;
     public static volatile boolean GENERATE_TRADING_HALLS = true;
     public static volatile boolean GENERATE_INFANTRY_HUTS = true;
+    public static volatile int GUARD_VILLAGER_BANNER_SPAWN_CHANCE = 5;
+    public static volatile boolean ENABLE_GOETY_RAIDS = true;
     public static volatile int FAST_HORSE_DESPAWN_TICKS = 140;
     public static volatile int MOUNT_HORSE_DESPAWN_TICKS = 900;
     public static volatile int DOCTOR_IRON_GOLEM_LIMIT = 3;

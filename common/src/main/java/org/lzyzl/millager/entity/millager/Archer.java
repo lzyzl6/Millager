@@ -8,15 +8,11 @@ import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.RandomSource;
-import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.InteractionHand;
+import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.damagesource.DamageSource;
-import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.EquipmentSlot;
-import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.MobSpawnType;
-import net.minecraft.world.entity.SpawnGroupData;
+import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.item.ItemEntity;
@@ -40,6 +36,7 @@ import org.lzyzl.millager.MillagerItems;
 import org.lzyzl.millager.entity.ai.millager.ArcherBowAttackGoal;
 import org.lzyzl.millager.entity.ai.millager.ArcherCraftArrowGoal;
 import org.lzyzl.millager.entity.ai.millager.ArcherPickArrowGoal;
+import org.lzyzl.millager.util.MiscHelper;
 
 import java.util.function.Predicate;
 
@@ -167,23 +164,13 @@ public class Archer extends AbstractMillager implements RangedAttackMob {
         double speed = 3.0;
         double predictionTicks = (dist / speed) + 2.0;
 
-        Vec3 movement = target.getDeltaMovement();
+        Vec3 predictedTarget = MiscHelper.predictProjectileTarget(target, predictionTicks);
 
-        double predX = target.getX() + movement.x * predictionTicks;
-        double predZ = target.getZ() + movement.z * predictionTicks;
-
-        double predY;
-        if (!target.onGround() && Math.abs(movement.y) > 0.01) {
-            predY = target.getY() + (movement.y * predictionTicks);
-        } else {
-            predY = target.getY();
-        }
-
-        double dx = predX - this.getX();
-        double dz = predZ - this.getZ();
+        double dx = predictedTarget.x - this.getX();
+        double dz = predictedTarget.z - this.getZ();
         double horizontalDist = Math.sqrt(dx * dx + dz * dz);
 
-        double dy = (predY + target.getBbHeight() * 0.3333333333333333) - arrow.getY();
+        double dy = (predictedTarget.y + target.getBbHeight() * 0.3333333333333333) - arrow.getY();
 
         float gravityCompensation = 0.045F;
 
@@ -266,6 +253,8 @@ public class Archer extends AbstractMillager implements RangedAttackMob {
             } else {
                 itemEntity.discard();
             }
+        } else {
+            super.pickUpItem(itemEntity);
         }
     }
 

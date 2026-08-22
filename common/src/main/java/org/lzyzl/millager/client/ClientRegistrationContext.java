@@ -17,8 +17,7 @@ public interface ClientRegistrationContext {
 
     <T extends Entity> void registerEntityRenderer(EntityType<? extends T> type, EntityRendererProvider<T> provider);
 
-    @SuppressWarnings("rawtypes")
-    <T extends BlockEntity> void registerBlockEntityRenderer(BlockEntityType<? extends T> type, BlockEntityRendererProvider provider);
+    <T extends BlockEntity> void registerBlockEntityRenderer(BlockEntityType<? extends T> type, BlockEntityRendererProvider<T> provider);
 
     void registerLayerDefinition(ModelLayerLocation location, Supplier<LayerDefinition> supplier);
 

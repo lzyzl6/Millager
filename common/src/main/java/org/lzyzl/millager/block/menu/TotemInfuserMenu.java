@@ -26,9 +26,9 @@ public class TotemInfuserMenu extends AbstractContainerMenu {
         this.container = container;
         container.startOpen(inventory.player);
 
-        this.addSlot(new TotemInputSlot(container, 0, 81, 18));
-        this.addSlot(new InfusionInputSlot(container, 1, 81, 54));
-        this.addSlot(new InfusionResultSlot(container, 2, 117, 54));
+        this.addSlot(new TotemInputSlot(container));
+        this.addSlot(new InfusionInputSlot(container));
+        this.addSlot(new InfusionResultSlot(container));
 
         for (int row = 0; row < 3; ++row) {
             for (int col = 0; col < 9; ++col) {
@@ -105,8 +105,8 @@ public class TotemInfuserMenu extends AbstractContainerMenu {
     }
 
     private static class TotemInputSlot extends Slot {
-        private TotemInputSlot(Container container, int slot, int x, int y) {
-            super(container, slot, x, y);
+        private TotemInputSlot(Container container) {
+            super(container, 0, 81, 18);
         }
 
         @Override
@@ -116,8 +116,8 @@ public class TotemInfuserMenu extends AbstractContainerMenu {
     }
 
     private static class InfusionInputSlot extends Slot {
-        private InfusionInputSlot(Container container, int slot, int x, int y) {
-            super(container, slot, x, y);
+        private InfusionInputSlot(Container container) {
+            super(container, 1, 81, 54);
         }
 
         @Override
@@ -134,8 +134,8 @@ public class TotemInfuserMenu extends AbstractContainerMenu {
     private static class InfusionResultSlot extends Slot {
         private final Container resultContainer;
 
-        private InfusionResultSlot(Container container, int slot, int x, int y) {
-            super(container, slot, x, y);
+        private InfusionResultSlot(Container container) {
+            super(container, 2, 117, 54);
             this.resultContainer = container;
         }
 

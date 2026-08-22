@@ -19,7 +19,7 @@ public class DispenserHelper {
         DispenserBlock.registerBehavior(MillagerItems.explosiveArrow, new AbstractProjectileDispenseBehavior() {
             @Override
             protected @NonNull Projectile getProjectile(@NonNull Level level, @NonNull Position position, @NonNull ItemStack itemStack) {
-                ExplosiveArrow projectile = new ExplosiveArrow(level, position.x(), position.y(), position.z(), itemStack.copyWithCount(1));
+                ExplosiveArrow projectile = new ExplosiveArrow(level, position.x(), position.y(), position.z());
                 projectile.pickup = AbstractArrow.Pickup.ALLOWED;
                 return projectile;
             }

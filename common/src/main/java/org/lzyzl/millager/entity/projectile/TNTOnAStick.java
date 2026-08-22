@@ -1,7 +1,6 @@
 package org.lzyzl.millager.entity.projectile;
 
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
@@ -26,6 +25,7 @@ import org.lzyzl.millager.MillagerEntityTypes;
 import org.lzyzl.millager.MillagerItems;
 import org.lzyzl.millager.advancement.MillagerCriteria;
 import org.lzyzl.millager.entity.millager.Rioter;
+import org.lzyzl.millager.util.MiscHelper;
 
 import java.util.List;
 
@@ -151,7 +151,7 @@ public class TNTOnAStick extends ThrowableItemProjectile implements RioterProjec
     }
 
     public float getRotationProgress(float partialTick) {
-        if(this.isFalling()) this.rotationProgress = approach360(this.rotationProgress, 1.0f);
+        if(this.isFalling()) this.rotationProgress = approach360(this.rotationProgress);
         return !this.onGround() ? this.rotationProgress + this.getRotationDelta() * partialTick : this.rotationProgress;
     }
 
@@ -223,25 +223,11 @@ public class TNTOnAStick extends ThrowableItemProjectile implements RioterProjec
         BlockState state = level.getBlockState(bp);
 
         if (state.isCollisionShapeFullBlock(level, bp)) {
-            double minDistance = Double.MAX_VALUE;
-            Direction bestDirection = Direction.UP;
-            for (Direction dir : Direction.values()) {
-                double axisPos = (dir.getAxis() == Direction.Axis.X) ? currentPos.x :
-                        (dir.getAxis() == Direction.Axis.Y) ? currentPos.y : currentPos.z;
-                double facePos = (dir.getAxisDirection() == Direction.AxisDirection.POSITIVE) ?
-                        (Math.floor(axisPos) + 1.0) : Math.floor(axisPos);
-                double dist = Math.abs(axisPos - facePos);
-                if (level.getBlockState(bp.relative(dir)).isAir()) {
-                    if (dist < minDistance) {
-                        minDistance = dist;
-                        bestDirection = dir;
-                    }
-                }
-            }
+            var direction = MiscHelper.getNearestExposedDirection(level, bp, currentPos);
             return currentPos.add(
-                    bestDirection.getStepX() * 0.4,
-                    bestDirection.getStepY() * 0.4,
-                    bestDirection.getStepZ() * 0.4
+                    direction.getStepX() * 0.4,
+                    direction.getStepY() * 0.4,
+                    direction.getStepZ() * 0.4
             );
         }
         return currentPos.add(0, 0.05, 0);
@@ -253,15 +239,15 @@ public class TNTOnAStick extends ThrowableItemProjectile implements RioterProjec
         return this.onGround() && blockState.isAir();
     }
 
-    private float approach360(float rotationProgress, float step) {
+    private float approach360(float rotationProgress) {
         float angleInCircle = rotationProgress % 360.0f;
         if (angleInCircle < 0) angleInCircle += 360.0f;
 
         if (angleInCircle > 0.1f && angleInCircle < 359.9f) {
             if (angleInCircle <= 180.0f) {
-                rotationProgress -= Math.min(step, angleInCircle);
+                rotationProgress -= Math.min(1.0f, angleInCircle);
             } else {
-                rotationProgress += Math.min(step, 360.0f - angleInCircle);
+                rotationProgress += Math.min(1.0f, 360.0f - angleInCircle);
             }
         } else {
             rotationProgress = Math.round(rotationProgress / 360.0f) * 360.0f;

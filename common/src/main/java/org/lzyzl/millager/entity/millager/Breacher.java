@@ -152,27 +152,8 @@ public class Breacher extends AbstractMillager implements Rider {
         return itemStack.is(MillagerItems.rose.get());
     }
 
-    @Override
-    public void createMount(ServerLevelAccessor level, MobSpawnType spawnReason, SpawnGroupData spawnGroupData) {
-        Horse horse = EntityType.HORSE.create(level.getLevel());
-        if (horse != null) {
-            horse.moveTo(this.getX(), this.getY(), this.getZ(), this.getYRot(), this.getXRot());
-            horse.finalizeSpawn(level, level.getCurrentDifficultyAt(horse.blockPosition()), spawnReason, spawnGroupData, null);
-
-            var speedAttr = horse.getAttribute(Attributes.MOVEMENT_SPEED);
-            if (speedAttr != null && speedAttr.getBaseValue() < 0.3) speedAttr.setBaseValue(0.3);
-
-            var healthAttr = horse.getAttribute(Attributes.MAX_HEALTH);
-            if (healthAttr != null && healthAttr.getBaseValue() < 25) healthAttr.setBaseValue(25);
-
-            horse.setHealth(horse.getMaxHealth());
-            horse.inventory.setItem(1, new ItemStack(Rider.getRandomHorseArmor(level.getRandom(), 1, 3)));
-            horse.setTamed(true);
-            horse.addTag("millager_mount");
-
-            this.startRiding(horse);
-            level.addFreshEntity(horse);
-        }
+    private void createMount(ServerLevelAccessor level, MobSpawnType spawnReason, SpawnGroupData spawnGroupData) {
+        Rider.createMount(this, level, spawnReason, spawnGroupData, 0.3D, 25.0D, 1, 3);
     }
 
     @Override
@@ -205,7 +186,6 @@ public class Breacher extends AbstractMillager implements Rider {
     public void setAxeCooldown(int cooldown) { this.axeCooldown = cooldown; }
     public int getBashCooldown() { return this.bashCooldown; }
     public void setBashCooldown(int cooldown) { this.bashCooldown = cooldown; }
-    public int getShieldCooldown() { return this.shieldCooldown; }
     public void setShieldCooldown(int cooldown) { this.shieldCooldown = cooldown; }
     public boolean canUseShield() { return this.shieldCooldown <= 0 && this.getOffhandItem().is(MillagerItems.buckler.get()); }
 

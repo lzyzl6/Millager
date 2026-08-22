@@ -5,6 +5,7 @@ import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.FormattedCharSequence;
 import org.lzyzl.millager.config.MillagerConfig;
@@ -24,8 +25,9 @@ public final class MillagerConfigScreen extends Screen {
     private Category category = Category.GAME_RULES;
     private boolean overviewExpanded = true;
     private int page;
-    private int rowsTop;
+    private int pageCount;
     private Component error;
+    private Button targetButton;
 
     public MillagerConfigScreen(Screen parent) {
         super(Component.translatable("millager.config.title"));
@@ -41,6 +43,7 @@ public final class MillagerConfigScreen extends Screen {
     private void rebuild() {
         clearWidgets();
         rows.clear();
+        this.targetButton = null;
 
         int categoryCount = Category.values().length;
         int categoryButtonWidth = Math.min(100, Math.max(40, (this.width - 30) / categoryCount - 5));
@@ -48,7 +51,7 @@ public final class MillagerConfigScreen extends Screen {
         for (int i = 0; i < Category.values().length; i++) {
             Category value = Category.values()[i];
             Button button = addRenderableWidget(Button.builder(value.title, ignored -> {
-                if (!commitPage()) return;
+                if (hasInvalidPageInput()) return;
                 this.category = value;
                 this.page = 0;
                 this.error = null;
@@ -57,7 +60,7 @@ public final class MillagerConfigScreen extends Screen {
             button.active = value != this.category;
         }
         addRenderableWidget(Button.builder(Component.literal(this.overviewExpanded ? "-" : "+"), ignored -> {
-            if (!commitPage()) return;
+            if (hasInvalidPageInput()) return;
             this.overviewExpanded = !this.overviewExpanded;
             this.error = null;
             rebuild();
@@ -66,22 +69,38 @@ public final class MillagerConfigScreen extends Screen {
         int contentWidth = Math.min(560, this.width - 20);
         int left = (this.width - contentWidth) / 2;
         this.overviewLines = this.overviewExpanded ? this.font.split(this.category.overview, contentWidth) : List.of();
-        this.rowsTop = 57 + this.overviewLines.size() * 9 + (this.overviewExpanded ? 7 : 0);
+        int rowsTop = 57 + this.overviewLines.size() * 9 + (this.overviewExpanded ? 7 : 0);
 
         List<Field> fields = fields();
-        int rowsPerPage = rowsPerPage();
-        int pageCount = Math.max(1, (fields.size() + rowsPerPage - 1) / rowsPerPage);
-        this.page = Math.min(this.page, pageCount - 1);
+        int regularRowsPerPage = rowsPerPage(rowsTop);
+        int firstPageRowsPerPage = this.category == Category.MISC ? Math.max(0, regularRowsPerPage - 1) : regularRowsPerPage;
+        this.pageCount = this.category == Category.MISC
+                ? 1 + (Math.max(0, fields.size() - firstPageRowsPerPage) + regularRowsPerPage - 1) / regularRowsPerPage
+                : Math.max(1, (fields.size() + regularRowsPerPage - 1) / regularRowsPerPage);
+        this.page = Math.min(this.page, this.pageCount - 1);
+
+        if (this.category == Category.MISC && this.page == 0) {
+            this.targetButton = addRenderableWidget(Button.builder(Component.empty(),
+                    ignored -> openTargetConfig())
+                    .bounds(left, rowsTop, contentWidth, 20).build());
+            this.targetButton.setAlpha(0.0F);
+            this.targetButton.setTooltip(Tooltip.create(Component.translatable("millager.config.option.misc.target_relations.description")));
+            rowsTop += 36;
+        }
+
+        int rowsPerPage = this.page == 0 ? firstPageRowsPerPage : regularRowsPerPage;
         int labelWidth = labelWidth(fields, contentWidth);
         int inputLeft = left + labelWidth + 8;
         int inputWidth = contentWidth - labelWidth - 8;
-        int first = this.page * rowsPerPage;
+        int first = this.category == Category.MISC && this.page > 0
+                ? firstPageRowsPerPage + (this.page - 1) * regularRowsPerPage
+                : this.page * rowsPerPage;
         int last = Math.min(first + rowsPerPage, fields.size());
         Object section = this.category.section(this.data);
 
         for (int i = first; i < last; i++) {
             Field field = fields.get(i);
-            int y = this.rowsTop + (i - first) * 36;
+            int y = rowsTop + (i - first) * 36;
             try {
                 Component name = displayName(field);
                 Tooltip tooltip = Tooltip.create(description(field));
@@ -111,7 +130,7 @@ public final class MillagerConfigScreen extends Screen {
         }
 
         Button previous = addRenderableWidget(Button.builder(Component.literal("<"), ignored -> {
-            if (!commitPage()) return;
+            if (hasInvalidPageInput()) return;
             this.page--;
             this.error = null;
             rebuild();
@@ -119,12 +138,12 @@ public final class MillagerConfigScreen extends Screen {
         previous.active = this.page > 0;
 
         Button next = addRenderableWidget(Button.builder(Component.literal(">"), ignored -> {
-            if (!commitPage()) return;
+            if (hasInvalidPageInput()) return;
             this.page++;
             this.error = null;
             rebuild();
         }).bounds(this.width / 2 + 55, this.height - 52, 20, 20).build());
-        next.active = this.page + 1 < pageCount;
+        next.active = this.page + 1 < this.pageCount;
 
         addRenderableWidget(Button.builder(Component.translatable("controls.reset"), ignored -> {
             this.data = new MillagerConfig.ConfigData();
@@ -139,7 +158,7 @@ public final class MillagerConfigScreen extends Screen {
                 .bounds(this.width / 2 + 55, this.height - 26, 100, 20).build());
     }
 
-    private boolean commitPage() {
+    private boolean hasInvalidPageInput() {
         Object section = this.category.section(this.data);
 
         for (Row row : this.rows) {
@@ -159,18 +178,18 @@ public final class MillagerConfigScreen extends Screen {
                 }
             } catch (IllegalAccessException | NumberFormatException exception) {
                 this.error = Component.translatable("millager.config.invalid", row.name);
-                return false;
+                return true;
             }
         }
 
-        return true;
+        return false;
     }
 
     private void save() {
-        if (!commitPage()) return;
+        if (hasInvalidPageInput()) return;
 
         if (MillagerConfig.save(this.data)) {
-            this.minecraft.setScreen(this.parent);
+            returnToParent();
         } else {
             this.error = Component.translatable("millager.config.save_failed");
         }
@@ -180,8 +199,8 @@ public final class MillagerConfigScreen extends Screen {
         return Arrays.asList(this.category.type.getFields());
     }
 
-    private int rowsPerPage() {
-        return Math.max(1, Math.min(6, (this.height - this.rowsTop - 67) / 36));
+    private int rowsPerPage(int top) {
+        return Math.max(1, Math.min(10, (this.height - top - 67) / 36));
     }
 
     private int labelWidth(List<Field> fields, int contentWidth) {
@@ -211,7 +230,17 @@ public final class MillagerConfigScreen extends Screen {
 
     @Override
     public void onClose() {
-        this.minecraft.setScreen(this.parent);
+        returnToParent();
+    }
+
+    private void openTargetConfig() {
+        Minecraft minecraft = this.minecraft;
+        if (minecraft != null) minecraft.setScreen(new MillagerTargetConfigScreen(this, this.data));
+    }
+
+    private void returnToParent() {
+        Minecraft minecraft = this.minecraft;
+        if (minecraft != null) minecraft.setScreen(this.parent);
     }
 
     @Override
@@ -227,10 +256,21 @@ public final class MillagerConfigScreen extends Screen {
         for (Row row : this.rows) {
             graphics.drawString(this.font, row.name, left, row.y, 0xFFE0E0E0);
         }
+        if (this.targetButton != null) {
+            if (this.targetButton.isHovered()) {
+                graphics.fill(this.targetButton.getX(), this.targetButton.getY(),
+                        this.targetButton.getX() + this.targetButton.getWidth(), this.targetButton.getY() + this.targetButton.getHeight(),
+                        0xFF303030);
+            }
+            graphics.drawString(this.font, Component.translatable("millager.config.option.misc.target_relations.name"),
+                    this.targetButton.getX(), this.targetButton.getY() + 6, 0xFFE0E0E0);
+            Component more = Component.literal("...");
+            graphics.drawString(this.font, more,
+                    this.targetButton.getX() + this.targetButton.getWidth() - this.font.width(more) - 6,
+                    this.targetButton.getY() + 6, 0xFFE0E0E0);
+        }
 
-        int rowsPerPage = rowsPerPage();
-        int pageCount = Math.max(1, (fields().size() + rowsPerPage - 1) / rowsPerPage);
-        graphics.drawCenteredString(this.font, Component.literal((this.page + 1) + " / " + pageCount), this.width / 2, this.height - 46, 0xFFA0A0A0);
+        graphics.drawCenteredString(this.font, Component.literal((this.page + 1) + " / " + this.pageCount), this.width / 2, this.height - 46, 0xFFA0A0A0);
         if (this.error != null) {
             graphics.drawCenteredString(this.font, this.error, this.width / 2, this.height - 64, 0xFFFF5555);
         }

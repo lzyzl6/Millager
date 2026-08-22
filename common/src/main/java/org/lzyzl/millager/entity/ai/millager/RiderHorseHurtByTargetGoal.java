@@ -38,7 +38,7 @@ public class RiderHorseHurtByTargetGoal<T extends AbstractMillager & Rider> exte
         LivingEntity livingEntity = this.horse.getLastHurtByMob();
         if (i != this.timestamp && livingEntity != null) {
             if (livingEntity instanceof Player player) {
-                if (!this.rider.shouldRetaliateAgainst(player)) return false;
+                if (this.rider.shouldIgnoreRetaliationAgainst(player)) return false;
                 this.targetMob = player;
                 return true;
             }

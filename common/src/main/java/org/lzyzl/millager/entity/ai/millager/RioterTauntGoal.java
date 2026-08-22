@@ -8,15 +8,13 @@ import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.ai.goal.Goal;
-import net.minecraft.world.entity.monster.Creeper;
 import net.minecraft.world.entity.monster.Enemy;
 import org.lzyzl.millager.MillagerSounds;
 import org.lzyzl.millager.entity.millager.Rioter;
+import org.lzyzl.millager.util.MillagerTargetingHelper;
 
 import java.util.EnumSet;
 import java.util.List;
-
-import static org.lzyzl.millager.util.MiscHelper.isMillagerFaction;
 
 public class RioterTauntGoal extends Goal {
 
@@ -85,12 +83,13 @@ public class RioterTauntGoal extends Goal {
         this.rioter.setTaunting(false);
         if (this.rioter.level() instanceof ServerLevel serverLevel) {
             List<LivingEntity> targets = serverLevel.getEntitiesOfClass(LivingEntity.class, this.rioter.getBoundingBox().inflate(16.0D),
-                    e -> e.hasLineOfSight(this.rioter) && !(e instanceof Creeper) && e instanceof Enemy && e instanceof Mob && e.isAlive() && !this.rioter.isAlliedTo(e));
+                    e -> e.hasLineOfSight(this.rioter) && e instanceof Enemy && e instanceof Mob && e.isAlive()
+                            && MillagerTargetingHelper.canAttack(this.rioter, e));
             if(!targets.isEmpty()) {
                 targets.forEach((target) -> {
                     Mob enemy = (Mob) target;
                     LivingEntity enemyTarget = enemy.getTarget();
-                    if(isMillagerFaction(enemyTarget)) {
+                    if(enemyTarget == null || MillagerTargetingHelper.isFriendlyToMillager(enemyTarget)) {
                         enemy.setTarget(this.rioter);
                         serverLevel.sendParticles(ParticleTypes.ANGRY_VILLAGER,
                                 enemy.getX(), enemy.getY() + 1.5D, enemy.getZ(), 5, 0.5D, 0.5D, 0.5D, 0.05D);

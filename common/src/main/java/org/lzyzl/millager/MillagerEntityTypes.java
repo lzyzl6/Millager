@@ -51,14 +51,6 @@ public class MillagerEntityTypes {
             ENTITY_TYPES.registerEntityType("scouter", Scouter::new, MobCategory.MISC,
                     b -> b.sized(0.6F, 1.95F).clientTrackingRange(8));
 
-//    public static final DeferredHolder<EntityType<?>, EntityType<Scholar>> Scholars =
-//            ENTITY_TYPES.registerEntityType("scholar", Scholar::new, MobCategory.MISC,
-//                    b -> b.sized(0.6F, 1.95F).eyeHeight(1.62F).clientTrackingRange(8));
-//
-//    public static final DeferredHolder<EntityType<?>, EntityType<Conjurer>> Conjurers =
-//            ENTITY_TYPES.registerEntityType("conjurer", Conjurer::new, MobCategory.MISC,
-//                    b -> b.sized(0.6F, 1.95F).eyeHeight(1.62F).clientTrackingRange(8));
-
     // Golem
     public static final DeferredHolder<EntityType<?>, EntityType<BeeGolem>> Bee_Golem =
             ENTITY_TYPES.registerEntityType("bee_golem", BeeGolem::new, MobCategory.MISC,

@@ -54,8 +54,8 @@ public final class MillagerForgeClient {
 
             @Override
             @SuppressWarnings({"unchecked", "rawtypes"})
-            public <T extends BlockEntity> void registerBlockEntityRenderer(BlockEntityType<? extends T> type, BlockEntityRendererProvider provider) {
-                event.registerBlockEntityRenderer((BlockEntityType) type, provider);
+            public <T extends BlockEntity> void registerBlockEntityRenderer(BlockEntityType<? extends T> type, BlockEntityRendererProvider<T> provider) {
+                event.registerBlockEntityRenderer(type, provider);
             }
 
             @Override
@@ -79,7 +79,7 @@ public final class MillagerForgeClient {
             }
 
             @Override
-            public <T extends BlockEntity> void registerBlockEntityRenderer(BlockEntityType<? extends T> type, BlockEntityRendererProvider provider) {
+            public <T extends BlockEntity> void registerBlockEntityRenderer(BlockEntityType<? extends T> type, BlockEntityRendererProvider<T> provider) {
                 throw new UnsupportedOperationException();
             }
 
@@ -104,7 +104,7 @@ public final class MillagerForgeClient {
             }
 
             @Override
-            public <T extends BlockEntity> void registerBlockEntityRenderer(BlockEntityType<? extends T> type, BlockEntityRendererProvider provider) {
+            public <T extends BlockEntity> void registerBlockEntityRenderer(BlockEntityType<? extends T> type, BlockEntityRendererProvider<T> provider) {
                 throw new UnsupportedOperationException();
             }
 

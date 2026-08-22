@@ -3,6 +3,7 @@ package org.lzyzl.millager;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.decoration.ArmorStand;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.PotionItem;
@@ -17,6 +18,7 @@ import net.minecraftforge.common.brewing.IBrewingRecipe;
 import net.minecraftforge.event.BuildCreativeModeTabContentsEvent;
 import net.minecraftforge.event.entity.EntityAttributeCreationEvent;
 import net.minecraftforge.event.entity.EntityJoinLevelEvent;
+import net.minecraftforge.event.entity.living.LivingEntityUseItemEvent;
 import net.minecraftforge.event.level.ExplosionEvent;
 import net.minecraftforge.event.village.VillagerTradesEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
@@ -28,6 +30,7 @@ import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.fml.loading.FMLPaths;
 import org.jspecify.annotations.NonNull;
 import org.lzyzl.millager.client.MillagerForgeConfigScreen;
+import org.lzyzl.millager.compat.goety.GoetyCompat;
 import org.lzyzl.millager.config.MillagerConfig;
 import org.lzyzl.millager.entity.golem.BeeGolem;
 import org.lzyzl.millager.entity.millager.*;
@@ -37,6 +40,7 @@ import org.lzyzl.millager.util.EnemyAttackHelper;
 import org.lzyzl.millager.util.VillagerTradeHelper;
 
 @Mod(Millager.MOD_ID)
+@SuppressWarnings("deprecation")
 public class MillagerForge {
 
     public MillagerForge(FMLJavaModLoadingContext context) {
@@ -88,6 +92,13 @@ public class MillagerForge {
     }
 
     @SubscribeEvent
+    public void onLivingEntityUseItemFinish(LivingEntityUseItemEvent.Finish event) {
+        if (event.getEntity() instanceof Player player && isGoetyRaidingHorn(event.getItem())) {
+            GoetyCompat.onRaidingHornUsed(player);
+        }
+    }
+
+    @SubscribeEvent
     public void onExplosionDetonate(ExplosionEvent.Detonate event) {
         if (event.getExplosion().getDirectSourceEntity() instanceof RioterProjectile rioterProjectile && rioterProjectile.isRioterProjectile()) {
             event.getAffectedEntities().removeIf(entity -> !(entity instanceof LivingEntity) || entity instanceof ArmorStand);
@@ -101,32 +112,26 @@ public class MillagerForge {
                         (level, listing) -> event.getTrades().get(level).add(listing)));
     }
 
-    private static class PotionMixRecipe implements IBrewingRecipe {
-
-        private final Potion input;
-        private final Ingredient ingredient;
-        private final Potion output;
-
-        private PotionMixRecipe(Potion input, Ingredient ingredient, Potion output) {
-            this.input = input;
-            this.ingredient = ingredient;
-            this.output = output;
-        }
-
-        @Override
-        public boolean isInput(ItemStack input) {
-            return input.getItem() instanceof PotionItem && PotionUtils.getPotion(input) == this.input;
-        }
-
-        @Override
-        public boolean isIngredient(@NonNull ItemStack ingredient) {
-            return this.ingredient.test(ingredient);
-        }
-
-        @Override
-        public @NonNull ItemStack getOutput(@NonNull ItemStack input, @NonNull ItemStack ingredient) {
-            if (!isInput(input) || !isIngredient(ingredient)) return ItemStack.EMPTY;
-            return PotionUtils.setPotion(input.copyWithCount(1), this.output);
-        }
+    private static boolean isGoetyRaidingHorn(ItemStack stack) {
+        return "goety:raiding_horn".equals(String.valueOf(BuiltInRegistries.ITEM.getKey(stack.getItem())));
     }
+
+    private record PotionMixRecipe(Potion input, Ingredient ingredient, Potion output) implements IBrewingRecipe {
+
+        @Override
+            public boolean isInput(ItemStack input) {
+                return input.getItem() instanceof PotionItem && PotionUtils.getPotion(input) == this.input;
+            }
+
+            @Override
+            public boolean isIngredient(@NonNull ItemStack ingredient) {
+                return this.ingredient.test(ingredient);
+            }
+
+            @Override
+            public @NonNull ItemStack getOutput(@NonNull ItemStack input, @NonNull ItemStack ingredient) {
+                if (!isInput(input) || !isIngredient(ingredient)) return ItemStack.EMPTY;
+                return PotionUtils.setPotion(input.copyWithCount(1), this.output);
+            }
+        }
 }

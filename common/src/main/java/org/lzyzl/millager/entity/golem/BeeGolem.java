@@ -9,6 +9,7 @@ import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.MoverType;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
@@ -21,7 +22,6 @@ import net.minecraft.world.entity.ai.navigation.PathNavigation;
 import net.minecraft.world.entity.animal.AbstractGolem;
 import net.minecraft.world.entity.animal.FlyingAnimal;
 import net.minecraft.world.entity.animal.IronGolem;
-import net.minecraft.world.entity.monster.Enemy;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelReader;
@@ -29,13 +29,16 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.pathfinder.BlockPathTypes;
 import net.minecraft.world.phys.Vec3;
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.lzyzl.millager.MillagerSounds;
+import org.lzyzl.millager.compat.goety.GoetyCompat;
 import org.lzyzl.millager.entity.ai.golem.BeeGolemAttackGoal;
 import org.lzyzl.millager.entity.ai.golem.BeeGolemAvoidAllyGoal;
 import org.lzyzl.millager.entity.ai.golem.BeeGolemNearestTargetGoal;
 import org.lzyzl.millager.entity.ai.golem.BeeGolemShutDownGoal;
 import org.lzyzl.millager.entity.ai.golem.BeeGolemWanderGoal;
 import org.lzyzl.millager.entity.millager.AbstractMillager;
+import org.lzyzl.millager.util.MillagerTargetingHelper;
 
 import java.util.Objects;
 import java.util.UUID;
@@ -45,6 +48,7 @@ public class BeeGolem extends AbstractGolem implements FlyingAnimal {
     private static final EntityDataAccessor<Boolean> IS_ATTACKING = SynchedEntityData.defineId(BeeGolem.class, EntityDataSerializers.BOOLEAN);
     private static final EntityDataAccessor<String> OWNER_UUID = SynchedEntityData.defineId(BeeGolem.class, EntityDataSerializers.STRING);
     private static final EntityDataAccessor<Boolean> IS_SUMMONED = SynchedEntityData.defineId(BeeGolem.class, EntityDataSerializers.BOOLEAN);
+    private @Nullable UUID goetyRaidOwner;
 
     public BeeGolem(EntityType<? extends AbstractGolem> entityType, Level level) {
         super(entityType, level);
@@ -84,8 +88,11 @@ public class BeeGolem extends AbstractGolem implements FlyingAnimal {
     public void tick() {
         super.tick();
         this.setLifeTicks(this.getLifeTicks() + 1);
-        if (!this.level().isClientSide() && this.getTarget() == null && this.isAttacking()) {
-            this.setAttacking(false);
+        if (!this.level().isClientSide()) {
+            if (this.getTarget() != null && (!this.getTarget().isAlive() || !this.canAttackTarget(this.getTarget()))) {
+                this.setTarget(null);
+            }
+            if (this.getTarget() == null && this.isAttacking()) this.setAttacking(false);
         }
     }
 
@@ -126,8 +133,19 @@ public class BeeGolem extends AbstractGolem implements FlyingAnimal {
         this.goalSelector.addGoal(2, new BeeGolemWanderGoal(this));
 
         this.targetSelector.addGoal(1, new BeeGolemAvoidAllyGoal(this, true));
-        this.targetSelector.addGoal(1, new BeeGolemNearestTargetGoal<>(this, Mob.class, 5, true, true, livingEntity -> livingEntity instanceof Enemy));
+        this.targetSelector.addGoal(1, new BeeGolemNearestTargetGoal<>(this, Mob.class, 5, true, true, this::canAttackTarget));
         this.targetSelector.addGoal(2, new HurtByTargetGoal(this, IronGolem.class, BeeGolem.class, AbstractMillager.class).setAlertOthers());
+    }
+
+    @Override
+    public boolean canAttack(@NonNull LivingEntity target) {
+        if (this.isGoetyRaidTarget(target)) return true;
+        if (MillagerTargetingHelper.hasBeeGolemOverride(target)) return MillagerTargetingHelper.canBeeGolemAttack(target);
+        return super.canAttack(target);
+    }
+
+    public boolean canAttackTarget(LivingEntity target) {
+        return this.isGoetyRaidTarget(target) || MillagerTargetingHelper.canBeeGolemAttack(target);
     }
 
     public static AttributeSupplier.Builder createAttributes() {
@@ -160,6 +178,7 @@ public class BeeGolem extends AbstractGolem implements FlyingAnimal {
         valueOutput.putBoolean("isAttacking", this.isAttacking());
         valueOutput.putString("owner", this.getOwnerUUID());
         valueOutput.putBoolean("isSummoned", this.isSummoned());
+        if (this.goetyRaidOwner != null) valueOutput.putUUID("GoetyRaidOwner", this.goetyRaidOwner);
     }
 
     @Override
@@ -169,6 +188,7 @@ public class BeeGolem extends AbstractGolem implements FlyingAnimal {
         this.setAttacking(valueInput.getBoolean("isAttacking"));
         this.setOwnerUUID(valueInput.getString("owner"));
         this.setSummoned(valueInput.getBoolean("isSummoned"));
+        this.goetyRaidOwner = valueInput.hasUUID("GoetyRaidOwner") ? valueInput.getUUID("GoetyRaidOwner") : null;
     }
 
     @Override
@@ -217,6 +237,19 @@ public class BeeGolem extends AbstractGolem implements FlyingAnimal {
 
     public boolean isSummoned() {
         return this.entityData.get(IS_SUMMONED);
+    }
+
+    public @Nullable UUID getGoetyRaidOwner() {
+        return this.goetyRaidOwner;
+    }
+
+    public boolean isGoetyRaidTarget(LivingEntity entity) {
+        UUID owner = this.goetyRaidOwner;
+        return owner != null && GoetyCompat.isRaidTarget(entity, owner);
+    }
+
+    public void setGoetyRaidOwner(@Nullable UUID owner) {
+        this.goetyRaidOwner = owner;
     }
 
     private static class BeeGolemPathNavigation extends FlyingPathNavigation {

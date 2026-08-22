@@ -70,6 +70,7 @@ public class DoctorBeeSummonGoal extends Goal {
             if (golem != null) {
                 Vec3 vec3 = this.doctor.getLookAngle();
                 golem.setSummoned(true);
+                golem.setGoetyRaidOwner(this.doctor.getGoetyRaidOwner());
                 golem.setPos(this.doctor.getX() - vec3.x, this.doctor.getEyeY(), this.doctor.getZ() - vec3.z);
                 level.addFreshEntity(golem);
                 level.sendParticles(ParticleTypes.ENCHANTED_HIT,

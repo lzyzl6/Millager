@@ -17,8 +17,8 @@ import org.lzyzl.millager.util.MiscHelper;
 
 public class MolotovCocktail extends ThrowableItemProjectile implements RioterProjectile {
 
-    int color = 14589720;
-    float radius = 5f;
+    private static final int COLOR = 14589720;
+    private static final float RADIUS = 5F;
     private boolean isRioterProjectile;
 
     public MolotovCocktail(EntityType<? extends ThrowableItemProjectile> entityType, Level level) {
@@ -65,7 +65,7 @@ public class MolotovCocktail extends ThrowableItemProjectile implements RioterPr
     @Override
     public void tick() {
         if(this.isOnFire() && !this.level().isClientSide()) {
-            MiscHelper.performFireExplosion(this,(ServerLevel)this.level(), this.position(), this.isRioterProjectile, radius, color,2.0f,0.6f);
+            MiscHelper.performFireExplosion(this, (ServerLevel)this.level(), this.position(), this.isRioterProjectile, RADIUS, COLOR, 2.0F, 0.6F);
             this.discard();
         }
         super.tick();
@@ -75,7 +75,7 @@ public class MolotovCocktail extends ThrowableItemProjectile implements RioterPr
     protected void onHit(@NonNull HitResult hitResult) {
         super.onHit(hitResult);
         if (!this.level().isClientSide()) {
-            MiscHelper.performFireExplosion(this, (ServerLevel)this.level(), this.position(), this.isRioterProjectile, radius, color,2.0f,0.6f);
+            MiscHelper.performFireExplosion(this, (ServerLevel)this.level(), this.position(), this.isRioterProjectile, RADIUS, COLOR, 2.0F, 0.6F);
             this.level().broadcastEntityEvent(this, (byte)3);
             this.discard();
         }

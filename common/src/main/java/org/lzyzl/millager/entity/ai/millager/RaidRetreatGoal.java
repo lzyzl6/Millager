@@ -45,6 +45,7 @@ public class RaidRetreatGoal extends Goal {
     public boolean canUse() {
         BlockPos center = this.millager.getRaidReinforcementCenter();
         if (center == null || !(this.millager.level() instanceof ServerLevel serverLevel)) return false;
+        if (this.millager.getGoetyRaidOwner() != null) return false;
         if (!serverLevel.getGameRules().getRule(MillagerGameRules.RAID_DEFENDERS_RETREAT).get()) return false;
         Raid raid = serverLevel.getRaidAt(center);
         return raid == null || raid.isOver() || raid.isStopped();

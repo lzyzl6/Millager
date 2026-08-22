@@ -9,23 +9,21 @@ import net.minecraft.client.model.geom.builders.*;
 import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.HumanoidArm;
+import net.minecraft.world.item.ItemStack;
 import org.jspecify.annotations.NonNull;
 import org.lzyzl.millager.entity.millager.AbstractMillager;
 import org.lzyzl.millager.item.LancerSpearItem;
 
 public class MillagerModel<T extends AbstractMillager> extends HumanoidModel<T> {
 
-    private final ModelPart root;
     private final ModelPart quiver;
     private final ModelPart back_bottom;
     private final ModelPart back_cover;
     private final ModelPart arms;
     private final ModelPart bags;
-    private final ModelPart more_bags;
 
     protected MillagerModel(ModelPart root) {
         super(root);
-        this.root = root;
         this.quiver = root.getChild("quiver");
         this.quiver.getChild("arrows");
         this.back_bottom = root.getChild("back_bottom");
@@ -39,11 +37,11 @@ public class MillagerModel<T extends AbstractMillager> extends HumanoidModel<T> 
         this.arms.getChild("mirrored");
         this.bags = root.getChild("bags");
         this.bags.getChild("front_right_bag");
-        this.more_bags = this.bags.getChild("more_bags");
-        this.more_bags.getChild("back_right_bag");
-        this.more_bags.getChild("back_left_bag");
-        this.more_bags.getChild("front_left_bag");
-        this.more_bags.getChild("front_middle_bag");
+        ModelPart moreBags = this.bags.getChild("more_bags");
+        moreBags.getChild("back_right_bag");
+        moreBags.getChild("back_left_bag");
+        moreBags.getChild("front_left_bag");
+        moreBags.getChild("front_middle_bag");
     }
 
     public static LayerDefinition createLayer() {
@@ -192,33 +190,12 @@ public class MillagerModel<T extends AbstractMillager> extends HumanoidModel<T> 
             }
             case SPEAR -> {
                 ModelPart spearArm = leftHanded ? this.leftArm : this.rightArm;
-                if (!(entity.getUseItem().getItem() instanceof LancerSpearItem spear)) break;
-                LancerSpearItem.KineticProfile profile = spear.getKineticProfile();
-                float useTicks = entity.getTicksUsingItem();
-                float raiseProgress = progress(useTicks, 0.0F, profile.delayTicks());
-                float raiseStart = progress(raiseProgress, 0.0F, 0.5F);
-                float raiseMiddle = progress(raiseProgress, 0.5F, 0.8F);
-                float raiseEnd = progress(raiseProgress, 0.8F, 1.0F);
-                float swayProgress = progress(useTicks, profile.delayTicks() + profile.dismountTicks() - 20.0F,
-                        profile.delayTicks() + profile.dismountTicks());
-                float lowerProgress = outCubic(inOutElastic(progress(useTicks - 20.0F,
-                        profile.delayTicks() + profile.knockbackTicks() - 40.0F,
-                        profile.delayTicks() + profile.knockbackTicks())));
-                float raiseBackProgress = progress(useTicks, profile.damageUseDuration() - 5.0F,
-                        profile.damageUseDuration());
-                float swayIntensity = 2.0F * outCirc(swayProgress) - 2.0F * inCirc(raiseBackProgress);
-                float swayScaleSlow = Mth.sin(useTicks * 19.0F * ((float) Math.PI / 180F)) * swayIntensity;
-                float swayScaleFast = Mth.sin(useTicks * 30.0F * ((float) Math.PI / 180F)) * swayIntensity;
-                float spearRotation = (-40.0F * raiseStart + 30.0F * raiseMiddle - 20.0F * raiseEnd
-                        + 20.0F * lowerProgress + 10.0F * raiseBackProgress + 0.6F * swayScaleSlow * swayIntensity)
-                        * ((float) Math.PI / 180F);
-                spearArm.xRot = Mth.clamp(-(float) Math.PI / 2F + this.head.xRot + 0.8F,
-                        -120.0F * ((float) Math.PI / 180F), 30.0F * ((float) Math.PI / 180F)) + spearRotation;
-                spearArm.yRot = Mth.clamp(this.head.yRot + (leftHanded ? 0.1F : -0.1F),
-                        -60.0F * ((float) Math.PI / 180F), 60.0F * ((float) Math.PI / 180F))
-                        + (leftHanded ? 1.0F : -1.0F) * swayScaleFast * swayIntensity * ((float) Math.PI / 180F);
-                spearArm.zRot = (leftHanded ? 1.0F : -1.0F) * swayScaleSlow * swayIntensity
-                        * ((float) Math.PI / 360F);
+                ItemStack spearStack = entity.isUsingItem() ? entity.getUseItem() : entity.getMainHandItem();
+                if (!(spearStack.getItem() instanceof LancerSpearItem spear)) break;
+                float partialTick = Mth.clamp(ageInTicks - entity.tickCount, 0.0F, 1.0F);
+                float useTime = entity.isUsingItem() ? entity.getTicksUsingItem() + partialTick : 0.0F;
+                LancerSpearAnimations.thirdPersonHandUse(spearArm, this.head, !leftHanded,
+                        entity.isFallFlying(), this.swimAmount, spear, useTime);
             }
             case SWINGING_ARM -> {
                 float progress = this.attackTime;
@@ -343,30 +320,6 @@ public class MillagerModel<T extends AbstractMillager> extends HumanoidModel<T> 
     @Override
     public @NonNull ModelPart getArm(@NonNull HumanoidArm humanoidArm) {
         return humanoidArm == HumanoidArm.LEFT ? this.leftArm : this.rightArm;
-    }
-
-    private static float progress(float value, float start, float end) {
-        return Mth.clamp((value - start) / (end - start), 0.0F, 1.0F);
-    }
-
-    private static float outCirc(float value) {
-        return Mth.sqrt(1.0F - (value - 1.0F) * (value - 1.0F));
-    }
-
-    private static float inCirc(float value) {
-        return 1.0F - Mth.sqrt(1.0F - value * value);
-    }
-
-    private static float outCubic(float value) {
-        return 1.0F - (1.0F - value) * (1.0F - value) * (1.0F - value);
-    }
-
-    private static float inOutElastic(float value) {
-        if (value == 0.0F || value == 1.0F) return value;
-        float exponent = value < 0.5F ? 20.0F * value - 10.0F : -20.0F * value + 10.0F;
-        float wave = Mth.sin((20.0F * value - 11.125F) * ((float) Math.PI * 2.0F / 4.5F));
-        float scale = (float) Math.pow(2.0F, exponent);
-        return value < 0.5F ? -scale * wave / 2.0F : scale * wave / 2.0F + 1.0F;
     }
 
     @Override

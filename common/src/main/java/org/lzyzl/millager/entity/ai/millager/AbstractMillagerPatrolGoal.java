@@ -153,7 +153,7 @@ public abstract class AbstractMillagerPatrolGoal extends Goal {
         AbstractMillager leader;
         if (squadId == null) {
             if (this.mob.tickCount % SQUAD_ASSIGNMENT_SCAN_INTERVAL != 0) {
-                if (!this.followUngroupedMate()) this.tickLeaderLogic();
+                if (this.shouldTickLeaderLogic()) this.tickLeaderLogic();
                 return;
             }
             AbstractMillager availableLeader = this.findAvailableSquadLeader();
@@ -171,7 +171,7 @@ public abstract class AbstractMillagerPatrolGoal extends Goal {
             mates = new ArrayList<>(mates.subList(firstIndex, lastIndex));
             if (mates.size() < 2) {
                 this.ungroupedMate = this.findReachableUngroupedMate();
-                if (!this.followUngroupedMate()) this.tickLeaderLogic();
+                if (this.shouldTickLeaderLogic()) this.tickLeaderLogic();
                 return;
             }
             this.ungroupedMate = null;
@@ -231,25 +231,25 @@ public abstract class AbstractMillagerPatrolGoal extends Goal {
                 .orElse(null);
     }
 
-    private boolean followUngroupedMate() {
+    private boolean shouldTickLeaderLogic() {
         AbstractMillager mate = this.ungroupedMate;
-        if (mate == null) return false;
+        if (mate == null) return true;
         if (!mate.isAlive() || !this.isSameType(mate) || mate.getSquadId() != null
                 || this.mob.distanceToSqr(mate) > SQUAD_APPROACH_RADIUS * SQUAD_APPROACH_RADIUS) {
             this.ungroupedMate = null;
             this.ungroupedMateNavTimer = 0;
-            return false;
+            return true;
         }
         if (this.mob.distanceToSqr(mate) <= SQUAD_FORMATION_RADIUS * SQUAD_FORMATION_RADIUS) {
             this.mob.getNavigation().stop();
-            return true;
+            return false;
         }
         this.ungroupedMateNavTimer++;
         if (this.ungroupedMateNavTimer >= FOLLOWER_RECALC_INTERVAL || this.mob.getNavigation().isDone()) {
             this.mob.getNavigation().moveTo(mate, this.walkSpeed);
             this.ungroupedMateNavTimer = 0;
         }
-        return true;
+        return false;
     }
 
     protected abstract boolean isSameType(AbstractMillager other);

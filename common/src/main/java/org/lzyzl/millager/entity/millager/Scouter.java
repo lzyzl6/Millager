@@ -1,9 +1,6 @@
 package org.lzyzl.millager.entity.millager;
 
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Holder;
-import net.minecraft.core.Registry;
-import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
@@ -33,7 +30,6 @@ import net.minecraft.world.entity.projectile.Projectile;
 import net.minecraft.world.entity.projectile.ProjectileUtil;
 import net.minecraft.world.item.CrossbowItem;
 import net.minecraft.world.item.DyeColor;
-import net.minecraft.world.item.Instrument;
 import net.minecraft.world.item.InstrumentItem;
 import net.minecraft.world.item.Instruments;
 import net.minecraft.world.item.ItemStack;
@@ -54,15 +50,11 @@ import org.lzyzl.millager.entity.ai.vanilla.VanillaRangedCrossbowAttackGoal;
 import org.lzyzl.millager.entity.golem.BeeGolem;
 import org.lzyzl.millager.util.MiscHelper;
 
-import java.util.Optional;
 
 public class Scouter extends AbstractMillager implements CrossbowAttackMob, Rider {
 
     private static final EntityDataAccessor<Boolean> IS_CHARGING_CROSSBOW = SynchedEntityData.defineId(Scouter.class, EntityDataSerializers.BOOLEAN);
     private static final EntityDataAccessor<Boolean> IS_TOOTING = SynchedEntityData.defineId(Scouter.class, EntityDataSerializers.BOOLEAN);
-
-    private final ItemStack rocketAmmo = createFireworkRocket();
-    private final ItemStack goatHorn = createHorn();
 
     private boolean hasTooted = false;
     private boolean pendingRaidToot = false;
@@ -171,7 +163,7 @@ public class Scouter extends AbstractMillager implements CrossbowAttackMob, Ride
     @Override
     protected void populateDefaultEquipmentSlots(@NonNull RandomSource random, @NonNull DifficultyInstance difficulty) {
         this.setItemSlot(EquipmentSlot.MAINHAND, Items.CROSSBOW.getDefaultInstance());
-        this.setItemSlot(EquipmentSlot.OFFHAND, this.goatHorn.copy());
+        this.setItemSlot(EquipmentSlot.OFFHAND, this.createHorn());
     }
 
     @Override
@@ -189,7 +181,7 @@ public class Scouter extends AbstractMillager implements CrossbowAttackMob, Ride
     @Override
     public @NonNull ItemStack getProjectile(ItemStack itemStack) {
         if (itemStack.getItem() instanceof CrossbowItem) {
-            return this.rocketAmmo.copy();
+            return this.createFireworkRocket();
         } else {
             return ItemStack.EMPTY;
         }
@@ -206,18 +198,13 @@ public class Scouter extends AbstractMillager implements CrossbowAttackMob, Ride
         double speed = 1.5;
         double predictionTicks = (dist / speed) + 2.0;
 
-        Vec3 movement = target.getDeltaMovement();
-        double predX = target.getX() + movement.x * predictionTicks;
-        double predZ = target.getZ() + movement.z * predictionTicks;
-        double predY = (!target.onGround() && Math.abs(movement.y) > 0.01)
-                ? target.getY() + (movement.y * predictionTicks)
-                : target.getY();
+        Vec3 predictedTarget = MiscHelper.predictProjectileTarget(target, predictionTicks);
 
-        double dx = predX - this.getX();
-        double dz = predZ - this.getZ();
+        double dx = predictedTarget.x - this.getX();
+        double dz = predictedTarget.z - this.getZ();
         double horizontalDist = Math.sqrt(dx * dx + dz * dz);
 
-        double dy = (predY + target.getBbHeight() * 0.3333333333333333) - rocket.getY();
+        double dy = (predictedTarget.y + target.getBbHeight() * 0.3333333333333333) - rocket.getY();
         float gravityCompensation = 0.045F;
 
         if (this.level() instanceof ServerLevel serverLevel) {
@@ -260,30 +247,8 @@ public class Scouter extends AbstractMillager implements CrossbowAttackMob, Ride
         this.yHeadRot = this.getYRot();
     }
 
-    @Override
-    public void createMount(ServerLevelAccessor level, MobSpawnType spawnReason, SpawnGroupData spawnGroupData) {
-        Horse horse = EntityType.HORSE.create(level.getLevel());
-        if (horse != null) {
-            horse.moveTo(this.getX(), this.getY(), this.getZ(), this.getYRot(), this.getXRot());
-            horse.finalizeSpawn(level, level.getCurrentDifficultyAt(horse.blockPosition()), spawnReason, spawnGroupData, null);
-            double minSpeed = 0.25;
-            var speedAttribute = horse.getAttribute(Attributes.MOVEMENT_SPEED);
-            if (speedAttribute != null && speedAttribute.getBaseValue() < minSpeed) {
-                speedAttribute.setBaseValue(minSpeed);
-            }
-            double minHealth = 22;
-            var healthAttribute = horse.getAttribute(Attributes.MAX_HEALTH);
-            if (healthAttribute != null && healthAttribute.getBaseValue() < minHealth) {
-                healthAttribute.setBaseValue(minHealth);
-            }
-            horse.setHealth(horse.getMaxHealth());
-            horse.inventory.setItem(1, new ItemStack(Rider.getRandomHorseArmor(level.getRandom(), 2)));
-            horse.setTamed(true);
-            horse.addTag("millager_mount");
-
-            this.startRiding(horse);
-            level.addFreshEntity(horse);
-        }
+    private void createMount(ServerLevelAccessor level, MobSpawnType spawnReason, SpawnGroupData spawnGroupData) {
+        Rider.createMount(this, level, spawnReason, spawnGroupData, 0.25D, 22.0D, 0, 2);
     }
 
     private ItemStack createFireworkRocket() {
@@ -291,28 +256,28 @@ public class Scouter extends AbstractMillager implements CrossbowAttackMob, Ride
         CompoundTag fireworks = rocket.getOrCreateTagElement("Fireworks");
         fireworks.putByte("Flight", (byte)1);
         ListTag explosions = new ListTag();
-        explosions.add(this.createFireworkExplosion(false));
+        explosions.add(this.createFireworkExplosion());
         for (int i = 0; i < 6; i++) {
-            explosions.add(this.createFireworkExplosion(false));
+            explosions.add(this.createFireworkExplosion());
         }
         fireworks.put("Explosions", explosions);
         return rocket;
     }
 
-    private CompoundTag createFireworkExplosion(boolean trail) {
+    private CompoundTag createFireworkExplosion() {
         CompoundTag explosion = new CompoundTag();
         explosion.putByte("Type", (byte)FireworkRocketItem.Shape.BURST.getId());
         explosion.putIntArray("Colors", new int[]{DyeColor.GRAY.getFireworkColor(), DyeColor.BLACK.getFireworkColor()});
-        explosion.putBoolean("Trail", trail);
+        explosion.putBoolean("Trail", false);
         explosion.putBoolean("Flicker", false);
         return explosion;
     }
 
     private ItemStack createHorn() {
-        RegistryAccess registryAccess = this.level().registryAccess();
-        Registry<Instrument> instrumentRegistry = registryAccess.registryOrThrow(Registries.INSTRUMENT);
-        Optional<Holder.Reference<Instrument>> holder = instrumentRegistry.getHolder(Instruments.FEEL_GOAT_HORN);
-        return holder.map(instrumentReference -> InstrumentItem.create(Items.GOAT_HORN, instrumentReference)).orElse(ItemStack.EMPTY);
+        return this.level().registryAccess().lookup(Registries.INSTRUMENT)
+                .flatMap(registry -> registry.get(Instruments.FEEL_GOAT_HORN))
+                .map(instrument -> InstrumentItem.create(Items.GOAT_HORN, instrument))
+                .orElse(ItemStack.EMPTY);
     }
 
     public boolean hasTooted() {

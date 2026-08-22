@@ -185,23 +185,13 @@ public class Rioter extends AbstractMillager implements RangedAttackMob {
 
             double predictionTicks = (dist / speed) + 1.5;
 
-            Vec3 targetMovement = target.getDeltaMovement();
+            Vec3 predictedTarget = MiscHelper.predictProjectileTarget(target, predictionTicks);
 
-            double predX = target.getX() + targetMovement.x * predictionTicks;
-            double predZ = target.getZ() + targetMovement.z * predictionTicks;
-
-            double predY;
-            if (!target.onGround() && Math.abs(targetMovement.y) > 0.01) {
-                predY = target.getY() + (targetMovement.y * predictionTicks);
-            } else {
-                predY = target.getY();
-            }
-
-            double dx = predX - this.getX();
-            double dz = predZ - this.getZ();
+            double dx = predictedTarget.x - this.getX();
+            double dz = predictedTarget.z - this.getZ();
             double horizontalDist = Math.sqrt(dx * dx + dz * dz);
 
-            double dy = (predY + target.getBbHeight() * 0.3333) - (this.getY() + 1.5);
+            double dy = (predictedTarget.y + target.getBbHeight() * 0.3333) - (this.getY() + 1.5);
 
             float gravityCompensation = 0.15F;
 
